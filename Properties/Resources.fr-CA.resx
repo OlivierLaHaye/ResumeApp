@@ -1,0 +1,820 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppSubtitle" xml:space="preserve">
+    <value>Profil WPF front-end orienté UI</value>
+  </data>
+  <data name="AppTitle" xml:space="preserve">
+    <value>Curriculum vitae</value>
+  </data>
+  <data name="ButtonCopyEmail" xml:space="preserve">
+    <value>Copier le courriel</value>
+  </data>
+  <data name="ButtonDarkMode" xml:space="preserve">
+    <value>Thème sombre</value>
+  </data>
+  <data name="ButtonDownloadPdf" xml:space="preserve">
+    <value>Télécharger en PDF</value>
+  </data>
+  <data name="ButtonEnglish" xml:space="preserve">
+    <value>Anglais</value>
+  </data>
+  <data name="ButtonFrench" xml:space="preserve">
+    <value>Français</value>
+  </data>
+  <data name="ButtonLightMode" xml:space="preserve">
+    <value>Thème clair</value>
+  </data>
+  <data name="ButtonOpenGitHub" xml:space="preserve">
+    <value>Ouvrir GitHub</value>
+  </data>
+  <data name="ButtonOpenLinkedIn" xml:space="preserve">
+    <value>Ouvrir LinkedIn</value>
+  </data>
+  <data name="ButtonOpenPortfolio" xml:space="preserve">
+    <value>Ouvrir le portfolio</value>
+  </data>
+  <data name="ButtonPrint" xml:space="preserve">
+    <value>Imprimer</value>
+  </data>
+  <data name="ButtonToggleLanguage" xml:space="preserve">
+    <value>Changer la langue</value>
+  </data>
+  <data name="ButtonToggleTheme" xml:space="preserve">
+    <value>Changer le thème</value>
+  </data>
+  <data name="CoreSkillsLine1" xml:space="preserve">
+    <value>Design system et craft UI: patterns de composants, styles WPF, architecture ResourceDictionary, mindset design tokens, états visuels, cohérence d’interaction, finition UI</value>
+  </data>
+  <data name="CoreSkillsLine2" xml:space="preserve">
+    <value>WPF et C#: WPF, XAML, C# 7.3, MVVM, binding, commandes, DependencyProperty, ControlTemplate, DataTemplate, converters, behaviors</value>
+  </data>
+  <data name="CoreSkillsLine3" xml:space="preserve">
+    <value>Prototypage et design visuel: Adobe Photoshop (maquettes UI haute fidélité depuis 2001), hiérarchie visuelle, composition, prototypage itératif</value>
+  </data>
+  <data name="CoreSkillsLine4" xml:space="preserve">
+    <value>Performance et réactivité: réactivité UI, mentalité scrolling fluide, concepts de virtualisation, mindset profiling [Ajoute des exemples si applicable.]</value>
+  </data>
+  <data name="CoreSkillsLine5" xml:space="preserve">
+    <value>Localisation: ressources resx, structure bilingue, expansion du texte, robustesse des layouts</value>
+  </data>
+  <data name="CoreSkillsLine6" xml:space="preserve">
+    <value>Collaboration et leadership: guidance UI auprès des développeurs, standards et support en review, alignement inter-équipes, itération avec parties prenantes et QA</value>
+  </data>
+  <data name="DesignSystemBullet1" xml:space="preserve">
+    <value>Fondations UI: espacement cohérent, rythme typographique, décisions de couleur, et hiérarchie de layout sur l’ensemble des écrans.</value>
+  </data>
+  <data name="DesignSystemBullet2" xml:space="preserve">
+    <value>UI réutilisable: styles, templates et contrôles personnalisés qui standardisent les états et les patterns (normal, survol, pressé, désactivé, chargement, validation).</value>
+  </data>
+  <data name="DesignSystemBullet3" xml:space="preserve">
+    <value>Thèmes: clair et sombre pilotés par des ressources centralisées pour garder l’expérience cohérente entre modules.</value>
+  </data>
+  <data name="DesignSystemBullet4" xml:space="preserve">
+    <value>Prototypage: maquettes Photoshop qui se traduisent en décisions UI prêtes à intégrer, avec moins d’aller-retour.</value>
+  </data>
+  <data name="Education1LocationDates" xml:space="preserve">
+    <value>Québec, QC, Canada | 2014 à 2018</value>
+  </data>
+  <data name="Education1Title" xml:space="preserve">
+    <value>Université Laval | Baccalauréat en informatique</value>
+  </data>
+  <data name="Education2LocationDates" xml:space="preserve">
+    <value>Québec, QC, Canada | 2008 à 2011</value>
+  </data>
+  <data name="Education2Title" xml:space="preserve">
+    <value>Cégep Limoilou | DEC, Animation 3D et synthèse d’images</value>
+  </data>
+  <data name="EducationItem1LocationDates" xml:space="preserve">
+    <value>Québec, QC, Canada | 2014 à 2018</value>
+</data>
+  <data name="EducationItem1Notes" xml:space="preserve">
+    <value></value>
+</data>
+  <data name="EducationItem1Title" xml:space="preserve">
+    <value>Université Laval | Baccalauréat en informatique</value>
+</data>
+  <data name="EducationItem2LocationDates" xml:space="preserve">
+    <value>Québec, QC, Canada | 2008 à 2011</value>
+</data>
+  <data name="EducationItem2Notes" xml:space="preserve">
+    <value></value>
+</data>
+  <data name="EducationItem2Title" xml:space="preserve">
+    <value>Cégep Limoilou | DEC, Animation 3D et synthèse d’images</value>
+</data>
+  <data name="EducationPageSubtitle" xml:space="preserve">
+    <value>Diplômes et parcours pertinent.</value>
+</data>
+  <data name="Experience1AccomplishmentsHeader" xml:space="preserve">
+    <value>Réalisations:</value>
+  </data>
+  <data name="Experience1Bullet1" xml:space="preserve">
+    <value>Mené la modernisation UI vers WPF dans la transition de VXelements vers Creaform.OS, avec un look modernisé et des améliorations visuelles à grande échelle. [Ajoute résultats mesurables si possible.]</value>
+  </data>
+  <data name="Experience1Bullet2" xml:space="preserve">
+    <value>Défini et renforcé des standards UI (espacement, typographie, états, règles de theming) pour réduire la fragmentation et garder un produit cohérent.</value>
+  </data>
+  <data name="Experience1Bullet3" xml:space="preserve">
+    <value>Créé des maquettes Photoshop haute fidélité et des visuels prêts à prototyper pour valider tôt la direction et réduire le churn UI en fin de cycle.</value>
+  </data>
+  <data name="Experience1Bullet4" xml:space="preserve">
+    <value>Agi comme ressource de référence UI/UX, en accompagnant les développeurs sur les décisions de style et les détails d’interaction.</value>
+  </data>
+  <data name="Experience1LocationDates" xml:space="preserve">
+    <value>Lévis, QC, Canada (Hybride) | 2024-03 à Présent</value>
+  </data>
+  <data name="Experience1Scope" xml:space="preserve">
+    <value>Portée: Leadership UI/UX et livraison front-end sur plusieurs projets, en assurant une UI desktop cohérente et de haute qualité.</value>
+  </data>
+  <data name="Experience1Tech" xml:space="preserve">
+    <value>Tech: WPF, XAML, C# 7.3, MVVM, Visual Studio, Adobe Photoshop</value>
+  </data>
+  <data name="Experience1Title" xml:space="preserve">
+    <value>Creaform | UI/UX Expert Software Developer</value>
+  </data>
+  <data name="Experience2AccomplishmentsHeader" xml:space="preserve">
+    <value>Réalisations:</value>
+  </data>
+  <data name="Experience2Bullet1" xml:space="preserve">
+    <value>Conçu et développé une nouvelle interface pour peel.OS, en améliorant la clarté du workflow et la cohérence UI. [Ajoute ce qui a changé: navigation, flows, patterns.]</value>
+  </data>
+  <data name="Experience2Bullet2" xml:space="preserve">
+    <value>Contribué à peel 3 by Creaform et à l’équipe du projet peel, reconnu par l’AMETEK Innovation Award 2022. [Ajoute ta contribution et impact.]</value>
+  </data>
+  <data name="Experience2Bullet3" xml:space="preserve">
+    <value>Livré des features WPF avec un standard élevé d’utilisabilité, de hiérarchie visuelle, et de finition d’interaction.</value>
+  </data>
+  <data name="Experience2LocationDates" xml:space="preserve">
+    <value>Québec, QC, Canada | 2020-02 à 2024-03</value>
+  </data>
+  <data name="Experience2Scope" xml:space="preserve">
+    <value>Portée: Développement logiciel avec emphase UI front-end et intégration WPF.</value>
+  </data>
+  <data name="Experience2Tech" xml:space="preserve">
+    <value>Tech: WPF, XAML, C#, MVVM, Visual Studio</value>
+  </data>
+  <data name="Experience2Title" xml:space="preserve">
+    <value>Creaform | Software Developer</value>
+  </data>
+  <data name="Experience3AccomplishmentsHeader" xml:space="preserve">
+    <value>Réalisations:</value>
+  </data>
+  <data name="Experience3Bullet1" xml:space="preserve">
+    <value>Créé et maintenu des interfaces front-end avec React, JavaScript et Redux, en visant clarté et maintenabilité.</value>
+  </data>
+  <data name="Experience3Bullet2" xml:space="preserve">
+    <value>Conçu des assets visuels avec Photoshop et Illustrator pour soutenir produit et marketing.</value>
+  </data>
+  <data name="Experience3Bullet3" xml:space="preserve">
+    <value>Travaillé au besoin sur des volets image et médias (OpenCV, Libraw, After Effects). [Garde seulement si pertinent.]</value>
+  </data>
+  <data name="Experience3LocationDates" xml:space="preserve">
+    <value>Québec, QC, Canada | 2018-05 à 2020-02</value>
+  </data>
+  <data name="Experience3Scope" xml:space="preserve">
+    <value>Portée: UI front-end et production visuelle.</value>
+  </data>
+  <data name="Experience3Tech" xml:space="preserve">
+    <value>Tech: React, JavaScript, Redux, C#, Unity, C++, OpenCV, Libraw, Adobe Photoshop, Illustrator, After Effects</value>
+  </data>
+  <data name="Experience3Title" xml:space="preserve">
+    <value>Arcane Technologies | Software Developer</value>
+  </data>
+  <data name="Experience4AccomplishmentsHeader" xml:space="preserve">
+    <value>Réalisations:</value>
+  </data>
+  <data name="Experience4Bullet1" xml:space="preserve">
+    <value>Développé des fonctionnalités en C# et VB.NET et contribué aux tests unitaires pour la stabilité.</value>
+  </data>
+  <data name="Experience4Bullet2" xml:space="preserve">
+    <value>Travaillé en Scrum et soutenu des besoins de données via SQL.</value>
+  </data>
+  <data name="Experience4LocationDates" xml:space="preserve">
+    <value>Québec, QC, Canada | 2017-05 à 2017-08</value>
+  </data>
+  <data name="Experience4Tech" xml:space="preserve">
+    <value>Tech: C#, VB.NET, SQL, Scrum</value>
+  </data>
+  <data name="Experience4Title" xml:space="preserve">
+    <value>iA Groupe financier (Industrielle Alliance) | Stagiaire en développement logiciel</value>
+  </data>
+  <data name="ExperienceArcaneAcc1" xml:space="preserve">
+  <value>Built and maintained front-end interfaces using React, JavaScript, and Redux, focusing on clear UI structure and maintainable patterns.</value>
+</data>
+  <data name="ExperienceArcaneAcc2" xml:space="preserve">
+  <value>Created visual assets using Photoshop and Illustrator, supporting product UI and marketing needs.</value>
+</data>
+  <data name="ExperienceArcaneAcc3" xml:space="preserve">
+  <value>Worked on image processing and media pipelines as needed.</value>
+</data>
+  <data name="ExperienceArcaneCompany" xml:space="preserve">
+  <value>Arcane Technologies</value>
+</data>
+  <data name="ExperienceArcaneEndIso" xml:space="preserve">
+  <value>2020-02-01</value>
+</data>
+  <data name="ExperienceArcaneLocation" xml:space="preserve">
+  <value>Québec, QC, Canada</value>
+</data>
+  <data name="ExperienceArcaneRole" xml:space="preserve">
+  <value>Software Developer</value>
+</data>
+  <data name="ExperienceArcaneScope" xml:space="preserve">
+  <value>Built front-end interfaces and contributed to visual production.</value>
+</data>
+  <data name="ExperienceArcaneStartIso" xml:space="preserve">
+  <value>2018-05-01</value>
+</data>
+  <data name="ExperienceArcaneTech" xml:space="preserve">
+  <value>React, JavaScript, Redux, C#, Unity, C++, OpenCV, Libraw, Adobe Photoshop, Illustrator, After Effects</value>
+</data>
+  <data name="ExperienceCreaformSoftwareDeveloperAcc1" xml:space="preserve">
+  <value>Designed and delivered a new user interface for peel.OS, improving workflow clarity and overall UI consistency.</value>
+</data>
+  <data name="ExperienceCreaformSoftwareDeveloperAcc2" xml:space="preserve">
+  <value>Contributed to peel 3 by Creaform and the peel project team, recognized with the AMETEK Innovation Award 2022.</value>
+</data>
+  <data name="ExperienceCreaformSoftwareDeveloperAcc3" xml:space="preserve">
+  <value>Shipped WPF UI features with a high standard for usability, visual hierarchy, and interaction polish.</value>
+</data>
+  <data name="ExperienceCreaformSoftwareDeveloperCompany" xml:space="preserve">
+  <value>Creaform</value>
+</data>
+  <data name="ExperienceCreaformSoftwareDeveloperEndIso" xml:space="preserve">
+  <value>2024-03-01</value>
+</data>
+  <data name="ExperienceCreaformSoftwareDeveloperLocation" xml:space="preserve">
+  <value>Québec, QC, Canada</value>
+</data>
+  <data name="ExperienceCreaformSoftwareDeveloperRole" xml:space="preserve">
+  <value>Software Developer</value>
+</data>
+  <data name="ExperienceCreaformSoftwareDeveloperScope" xml:space="preserve">
+  <value>Front-end focused software development with emphasis on UI design and WPF implementation.</value>
+</data>
+  <data name="ExperienceCreaformSoftwareDeveloperStartIso" xml:space="preserve">
+  <value>2020-02-01</value>
+</data>
+  <data name="ExperienceCreaformSoftwareDeveloperTech" xml:space="preserve">
+  <value>WPF, XAML, C#, MVVM, Visual Studio</value>
+</data>
+  <data name="ExperienceCreaformUiUxExpertAcc1" xml:space="preserve">
+  <value>Led UI modernization to WPF during the transition from VXelements to Creaform.OS, delivering a refreshed look and broad visual improvements.</value>
+</data>
+  <data name="ExperienceCreaformUiUxExpertAcc2" xml:space="preserve">
+  <value>Defined and reinforced UI standards (spacing, typography, states, theming rules) to reduce fragmentation and keep the product cohesive.</value>
+</data>
+  <data name="ExperienceCreaformUiUxExpertAcc3" xml:space="preserve">
+  <value>Produced high-fidelity Photoshop mockups and prototype-ready visuals to validate direction early and reduce late-stage UI churn.</value>
+</data>
+  <data name="ExperienceCreaformUiUxExpertAcc4" xml:space="preserve">
+  <value>Supported developers with styling decisions and interaction details to raise overall UI polish and consistency.</value>
+</data>
+  <data name="ExperienceCreaformUiUxExpertCompany" xml:space="preserve">
+  <value>Creaform</value>
+</data>
+  <data name="ExperienceCreaformUiUxExpertEndIso" xml:space="preserve">
+  <value></value>
+</data>
+  <data name="ExperienceCreaformUiUxExpertLocation" xml:space="preserve">
+  <value>Lévis, QC, Canada (Hybrid)</value>
+</data>
+  <data name="ExperienceCreaformUiUxExpertRole" xml:space="preserve">
+  <value>UI/UX Expert Software Developer</value>
+</data>
+  <data name="ExperienceCreaformUiUxExpertScope" xml:space="preserve">
+  <value>Lead UI/UX and front-end delivery across projects, ensuring consistent, high-quality desktop UI.</value>
+</data>
+  <data name="ExperienceCreaformUiUxExpertStartIso" xml:space="preserve">
+  <value>2024-03-01</value>
+</data>
+  <data name="ExperienceCreaformUiUxExpertTech" xml:space="preserve">
+  <value>WPF, XAML, C# 7.3, MVVM, Visual Studio, Adobe Photoshop</value>
+</data>
+  <data name="ExperienceDateRangeSeparator" xml:space="preserve">
+  <value> to </value>
+</data>
+  <data name="ExperienceIaAcc1" xml:space="preserve">
+  <value>Delivered features in C# and VB.NET and contributed to unit testing for long-term stability.</value>
+</data>
+  <data name="ExperienceIaAcc2" xml:space="preserve">
+  <value>Supported Scrum delivery and data workflows using SQL.</value>
+</data>
+  <data name="ExperienceIaCompany" xml:space="preserve">
+  <value>iA Groupe financier (Industrielle Alliance)</value>
+</data>
+  <data name="ExperienceIaEndIso" xml:space="preserve">
+  <value>2017-08-01</value>
+</data>
+  <data name="ExperienceIaLocation" xml:space="preserve">
+  <value>Québec, QC, Canada</value>
+</data>
+  <data name="ExperienceIaRole" xml:space="preserve">
+  <value>Software Development Intern</value>
+</data>
+  <data name="ExperienceIaScope" xml:space="preserve">
+  <value>Internship focused on feature delivery and team support.</value>
+</data>
+  <data name="ExperienceIaStartIso" xml:space="preserve">
+  <value>2017-05-01</value>
+</data>
+  <data name="ExperienceIaTech" xml:space="preserve">
+  <value>C#, VB.NET, SQL, Scrum</value>
+</data>
+  <data name="ExperienceLegendPaletteText" xml:space="preserve">
+  <value>Color helps scan roles quickly.</value>
+</data>
+  <data name="ExperienceLegendShapeText" xml:space="preserve">
+  <value>Shape adds a non-color cue.</value>
+</data>
+  <data name="ExperienceLegendTitle" xml:space="preserve">
+  <value>Timeline cues</value>
+</data>
+  <data name="ExperienceOlhPhotographieAcc1" xml:space="preserve">
+    <value>J’ai développé mon propre logiciel pour améliorer mon workflow de retouche photo, en mettant à profit mes compétences en programmation afin d’innover et de peaufiner l’UI/UX dans ma pratique photo.</value>
+</data>
+  <data name="ExperienceOlhPhotographieAcc2" xml:space="preserve">
+    <value>Plus de 20 ans d’expérience en retouche photo, depuis 2001.</value>
+</data>
+  <data name="ExperienceOlhPhotographieAcc3" xml:space="preserve">
+    <value>Photographe pigiste professionnel depuis 2010, avec un portfolio dédié sur Instagram (@olhphoto).</value>
+</data>
+  <data name="ExperienceOlhPhotographieAcc4" xml:space="preserve">
+    <value>Domaines d’expertise : photo sportive, événements, paysage et voyage.</value>
+</data>
+  <data name="ExperienceOlhPhotographieAcc5" xml:space="preserve">
+    <value>Passionné par la capture de moments uniques et inoubliables qui résonnent avec le public.</value>
+</data>
+  <data name="ExperienceOlhPhotographieAcc6" xml:space="preserve">
+    <value>Engagé à livrer de façon constante des images de grande qualité, fortes visuellement.</value>
+</data>
+  <data name="ExperienceOlhPhotographieAcc7" xml:space="preserve">
+    <value>Habileté à créer des images qui captivent, tout en racontant une histoire et en transmettant un fort sentiment de lieu.</value>
+</data>
+  <data name="ExperienceOlhPhotographieCompany" xml:space="preserve">
+    <value>OLH PHOTOGRAPHIE</value>
+</data>
+  <data name="ExperienceOlhPhotographieEndIso" xml:space="preserve">
+    <value></value>
+</data>
+  <data name="ExperienceOlhPhotographieLocation" xml:space="preserve">
+    <value>Québec, Canada</value>
+</data>
+  <data name="ExperienceOlhPhotographieRole" xml:space="preserve">
+    <value>Photographe pigiste d’expérience</value>
+</data>
+  <data name="ExperienceOlhPhotographieScope" xml:space="preserve">
+    <value>Photographie pigiste et postproduction de bout en bout pour des projets de sport, d’événements, de paysage et de voyage.</value>
+</data>
+  <data name="ExperienceOlhPhotographieStartIso" xml:space="preserve">
+    <value>2010-06-01</value>
+</data>
+  <data name="ExperienceOlhPhotographieTech" xml:space="preserve">
+    <value>Adobe Lightroom, Adobe Photoshop, outils personnalisés en C# / WPF.</value>
+</data>
+  <data name="ExperiencePageSubtitle" xml:space="preserve">
+  <value>Role timeline with scope, highlights, and tech stack.</value>
+</data>
+  <data name="GlyphBullet" xml:space="preserve">
+  <value>•</value>
+</data>
+  <data name="GlyphMarkerCircle" xml:space="preserve">
+  <value>●</value>
+</data>
+  <data name="GlyphMarkerDiamond" xml:space="preserve">
+  <value>◆</value>
+</data>
+  <data name="GlyphMarkerSample" xml:space="preserve">
+  <value>●</value>
+</data>
+  <data name="GlyphMarkerSquare" xml:space="preserve">
+  <value>■</value>
+</data>
+  <data name="GlyphMarkerTriangle" xml:space="preserve">
+  <value>▲</value>
+</data>
+  <data name="HeaderEmailValue" xml:space="preserve">
+    <value>olivier.la.haye@hotmail.com</value>
+  </data>
+  <data name="HeaderFullNameValue" xml:space="preserve">
+    <value>Olivier La Haye</value>
+  </data>
+  <data name="HeaderGitHubValue" xml:space="preserve">
+    <value>https://github.com/OlivierLaHaye</value>
+  </data>
+  <data name="HeaderLinkedInValue" xml:space="preserve">
+    <value>https://www.linkedin.com/in/olivier-la-haye/</value>
+  </data>
+  <data name="HeaderLocationValue" xml:space="preserve">
+    <value>Québec, QC, Canada</value>
+  </data>
+  <data name="HeaderPortfolioValue" xml:space="preserve">
+    <value>https://olhphotographie.com</value>
+  </data>
+  <data name="HeaderTargetTitlesValue" xml:space="preserve">
+    <value>Ingénieur UI senior (WPF) | Ingénieur UI/UX (applications desktop) | Lead UI (plateforme UI, desktop)</value>
+  </data>
+  <data name="HeaderWorkPreferenceValue" xml:space="preserve">
+    <value>100% à distance, équipes basées sur la confiance, culture produit orientée design, vacances flexibles</value>
+  </data>
+  <data name="HighlightBullet1" xml:space="preserve">
+    <value>Mené la modernisation front-end d’un logiciel desktop principal en migrant l’UI vers WPF et en rafraîchissant le langage visuel dans la transition vers Creaform.OS, avec des retours internes très positifs. [Ajoute la portée: modules, écrans, utilisateurs.]</value>
+  </data>
+  <data name="HighlightBullet2" xml:space="preserve">
+    <value>Donner la direction UI sur plusieurs projets en définissant les règles de style et les patterns d’interaction, pour livrer une UI cohérente et soignée à grande échelle. [Ajoute 2 à 3 exemples concrets.]</value>
+  </data>
+  <data name="HighlightBullet3" xml:space="preserve">
+    <value>Produire des maquettes UI Photoshop haute fidélité et des prototypes cliquables pour le marketing et le développement, permettant de valider tôt et d’itérer plus vite avant l’intégration. [Ajoute l’impact: rework réduit de %, cycle time amélioré de %.]</value>
+  </data>
+  <data name="HighlightBullet4" xml:space="preserve">
+    <value>Conçu et livré une nouvelle interface pour peel.OS et contribué à peel 3 by Creaform, reconnu par l’AMETEK Innovation Award 2022. [Ajoute ta contribution précise.]</value>
+  </data>
+  <data name="HighlightBullet5" xml:space="preserve">
+    <value>Développé un outil personnel WPF pour accélérer le workflow de retouche photo, utilisé comme terrain de jeu UI (theming, localisation, contrôles interactifs). [Ajoute 2 à 3 features fortes.]</value>
+  </data>
+  <data name="LabelAccomplishments" xml:space="preserve">
+    <value>Réalisations</value>
+  </data>
+  <data name="LabelActiveLanguage" xml:space="preserve">
+    <value>Langue active</value>
+  </data>
+  <data name="LabelCompany" xml:space="preserve">
+    <value>Entreprise</value>
+  </data>
+  <data name="LabelDates" xml:space="preserve">
+    <value>Dates</value>
+  </data>
+  <data name="LabelEmail" xml:space="preserve">
+    <value>Courriel</value>
+  </data>
+  <data name="LabelEndDate" xml:space="preserve">
+    <value>Date fin</value>
+  </data>
+  <data name="LabelFullName" xml:space="preserve">
+    <value>Nom complet</value>
+  </data>
+  <data name="LabelGitHub" xml:space="preserve">
+    <value>GitHub</value>
+  </data>
+  <data name="LabelLinkedIn" xml:space="preserve">
+    <value>LinkedIn</value>
+  </data>
+  <data name="LabelLocation" xml:space="preserve">
+    <value>Lieu</value>
+  </data>
+  <data name="LabelLocationWork" xml:space="preserve">
+    <value>Lieu de travail</value>
+  </data>
+  <data name="LabelPhone" xml:space="preserve">
+    <value>Téléphone</value>
+  </data>
+  <data name="LabelPhotoCaption" xml:space="preserve">
+    <value>Légende de la photo</value>
+  </data>
+  <data name="LabelPortfolio" xml:space="preserve">
+    <value>Portfolio</value>
+  </data>
+  <data name="LabelPresent" xml:space="preserve">
+    <value>Présent</value>
+  </data>
+  <data name="LabelProjectConstraints" xml:space="preserve">
+    <value>Contraintes</value>
+  </data>
+  <data name="LabelProjectContext" xml:space="preserve">
+    <value>Contexte</value>
+  </data>
+  <data name="LabelProjectImpact" xml:space="preserve">
+    <value>Impact</value>
+  </data>
+  <data name="LabelProjectLinks" xml:space="preserve">
+    <value>Liens</value>
+  </data>
+  <data name="LabelProjectWhatIBuilt" xml:space="preserve">
+    <value>Ce que j’ai fait</value>
+  </data>
+  <data name="LabelRole" xml:space="preserve">
+    <value>Titre</value>
+  </data>
+  <data name="LabelScope" xml:space="preserve">
+    <value>Portée</value>
+  </data>
+  <data name="LabelStartDate" xml:space="preserve">
+    <value>Date début</value>
+  </data>
+  <data name="LabelTargetTitles" xml:space="preserve">
+    <value>Titres ciblés</value>
+  </data>
+  <data name="LabelTech" xml:space="preserve">
+    <value>Tech</value>
+  </data>
+  <data name="LabelWorkPreference" xml:space="preserve">
+    <value>Préférence de travail</value>
+  </data>
+  <data name="LanguageEnglishCanadaDisplayName" xml:space="preserve">
+    <value>Anglais (Canada)</value>
+  </data>
+  <data name="LanguageFrenchCanadaDisplayName" xml:space="preserve">
+    <value>Français (Canada)</value>
+  </data>
+  <data name="Project1Bullet1" xml:space="preserve">
+    <value>Migration UI vers WPF et amélioration de la cohérence visuelle à travers le produit.</value>
+  </data>
+  <data name="Project1Bullet2" xml:space="preserve">
+    <value>Standardisation de patterns UI et support aux décisions de style pour garder une expérience cohérente.</value>
+  </data>
+  <data name="Project1Constraints" xml:space="preserve">
+    <value>Contraintes: grande surface UI, langage visuel cohérent, maintenabilité, échéanciers.</value>
+  </data>
+  <data name="Project1Context" xml:space="preserve">
+    <value>Contexte: Modernisation d’un logiciel desktop principal et rafraîchissement UI pendant la migration vers WPF.</value>
+  </data>
+  <data name="Project1Impact" xml:space="preserve">
+    <value>Impact: retours internes très positifs sur le look modernisé. [Ajoute portée et métriques si possible.]</value>
+  </data>
+  <data name="Project1Tech" xml:space="preserve">
+    <value>Tech: WPF, XAML, C# 7.3, MVVM</value>
+  </data>
+  <data name="Project1Title" xml:space="preserve">
+    <value>Modernisation UI Creaform.OS (interne)</value>
+  </data>
+  <data name="Project1WhatIBuiltHeader" xml:space="preserve">
+    <value>Ce que j’ai fait:</value>
+  </data>
+  <data name="Project2Bullet1" xml:space="preserve">
+    <value>Conception et intégration d’une nouvelle UI, axée sur la clarté, la cohérence, et l’utilisabilité.</value>
+  </data>
+  <data name="Project2Constraints" xml:space="preserve">
+    <value>Contraintes: améliorer l’UX sans perturber les workflows, hiérarchie visuelle claire, patterns cohérents.</value>
+  </data>
+  <data name="Project2Context" xml:space="preserve">
+    <value>Contexte: Refonte de l’interface d’un produit peel pour améliorer la clarté et l’utilisabilité.</value>
+  </data>
+  <data name="Project2Impact" xml:space="preserve">
+    <value>Impact: [Ajoute métrique ou feedback.]</value>
+  </data>
+  <data name="Project2Tech" xml:space="preserve">
+    <value>Tech: WPF, XAML, C#, MVVM</value>
+  </data>
+  <data name="Project2Title" xml:space="preserve">
+    <value>Refonte UI peel.OS</value>
+  </data>
+  <data name="Project2WhatIBuiltHeader" xml:space="preserve">
+    <value>Ce que j’ai fait:</value>
+  </data>
+  <data name="Project3Bullet1" xml:space="preserve">
+    <value>App WPF MVVM complète utilisée comme terrain de jeu UI (theming, localisation, contrôles interactifs).</value>
+  </data>
+  <data name="Project3Bullet2" xml:space="preserve">
+    <value>Itérations continues pour réduire le manuel et augmenter la vitesse dans un workflow réel.</value>
+  </data>
+  <data name="Project3Constraints" xml:space="preserve">
+    <value>Contraintes: interactions rapides, fiabilité, expérimentation UI, préparation multi-langues.</value>
+  </data>
+  <data name="Project3Context" xml:space="preserve">
+    <value>Contexte: Logiciel personnel pour accélérer le workflow de retouche photo (import, renommage, étapes répétitives) sans réduire la qualité.</value>
+  </data>
+  <data name="Project3Impact" xml:space="preserve">
+    <value>Impact: gains de productivité personnels. [Optionnel: estimation de temps sauvé par séance ou par batch.]</value>
+  </data>
+  <data name="Project3Tech" xml:space="preserve">
+    <value>Tech: WPF, XAML, C# 7.3, MVVM</value>
+  </data>
+  <data name="Project3Title" xml:space="preserve">
+    <value>OLHphotographie Workflow App (personnel)</value>
+  </data>
+  <data name="Project3WhatIBuiltHeader" xml:space="preserve">
+    <value>Ce que j’ai fait:</value>
+  </data>
+  <data name="Project4Bullet1" xml:space="preserve">
+    <value>CV présenté en app avec sections structurées, style cohérent, et ressources de localisation.</value>
+  </data>
+  <data name="Project4Constraints" xml:space="preserve">
+    <value>Contraintes: UI propre, contenu scannable, bilingue EN-CA et FR-CA, clair et sombre.</value>
+  </data>
+  <data name="Project4Context" xml:space="preserve">
+    <value>Contexte: CV interactif construit en application WPF MVVM avec changement de thème et de langue.</value>
+  </data>
+  <data name="Project4Links" xml:space="preserve">
+    <value>Liens: https://github.com/OlivierLaHaye [Ajoute le repo quand il existe.]</value>
+  </data>
+  <data name="Project4Tech" xml:space="preserve">
+    <value>Tech: WPF, XAML, C# 7.3, MVVM, localisation resx</value>
+  </data>
+  <data name="Project4Title" xml:space="preserve">
+    <value>App CV WPF (ce CV)</value>
+  </data>
+  <data name="Project4WhatIBuiltHeader" xml:space="preserve">
+    <value>Ce que j’ai fait:</value>
+  </data>
+  <data name="SectionHeaderCoreSkills" xml:space="preserve">
+    <value>Compétences clés</value>
+  </data>
+  <data name="SectionHeaderDesignSystem" xml:space="preserve">
+    <value>Design system et ingénierie UI</value>
+  </data>
+  <data name="SectionHeaderEducation" xml:space="preserve">
+    <value>Formation</value>
+  </data>
+  <data name="SectionHeaderExperience" xml:space="preserve">
+    <value>Expérience</value>
+  </data>
+  <data name="SectionHeaderHeader" xml:space="preserve">
+    <value>En-tête</value>
+  </data>
+  <data name="SectionHeaderHighlights" xml:space="preserve">
+    <value>Faits saillants UI/UX</value>
+  </data>
+  <data name="SectionHeaderProjects" xml:space="preserve">
+    <value>Projets</value>
+  </data>
+  <data name="SectionHeaderSummary" xml:space="preserve">
+    <value>Résumé</value>
+  </data>
+  <data name="SectionHeaderVisualCraft" xml:space="preserve">
+    <value>Savoir-faire visuel (photographie)</value>
+  </data>
+  <data name="SectionHeaderWorkPreferences" xml:space="preserve">
+    <value>Préférences de travail</value>
+  </data>
+  <data name="SkillsPageSubtitle" xml:space="preserve">
+    <value>Groupes de compétences faciles à scanner, axés sur l’UI desktop, le design system et la livraison WPF.</value>
+</data>
+  <data name="SkillsSectionCollaborationItem1" xml:space="preserve">
+    <value>Direction UI et standards</value>
+</data>
+  <data name="SkillsSectionCollaborationItem2" xml:space="preserve">
+    <value>Reviews design et support aux devs</value>
+</data>
+  <data name="SkillsSectionCollaborationItem3" xml:space="preserve">
+    <value>Alignement avec les parties prenantes</value>
+</data>
+  <data name="SkillsSectionCollaborationItem4" xml:space="preserve">
+    <value>Partenariat QA et itération</value>
+</data>
+  <data name="SkillsSectionCollaborationItem5" xml:space="preserve">
+    <value>Structure prête pour la localisation</value>
+</data>
+  <data name="SkillsSectionCollaborationItem6" xml:space="preserve">
+    <value>Communication claire inter-équipes</value>
+</data>
+  <data name="SkillsSectionCollaborationTitle" xml:space="preserve">
+    <value>Collaboration et leadership</value>
+</data>
+  <data name="SkillsSectionDesignSystemsItem1" xml:space="preserve">
+    <value>Patterns de composants et UI réutilisable</value>
+</data>
+  <data name="SkillsSectionDesignSystemsItem2" xml:space="preserve">
+    <value>Styles WPF et templating</value>
+</data>
+  <data name="SkillsSectionDesignSystemsItem3" xml:space="preserve">
+    <value>Mentalité design tokens</value>
+</data>
+  <data name="SkillsSectionDesignSystemsItem4" xml:space="preserve">
+    <value>États visuels et finition d’interaction</value>
+</data>
+  <data name="SkillsSectionDesignSystemsItem5" xml:space="preserve">
+    <value>Rythme d’espacement et hiérarchie de layout</value>
+</data>
+  <data name="SkillsSectionDesignSystemsItem6" xml:space="preserve">
+    <value>Structure ResourceDictionary centralisée</value>
+</data>
+  <data name="SkillsSectionDesignSystemsTitle" xml:space="preserve">
+    <value>Design system et craft UI</value>
+</data>
+  <data name="SkillsSectionPrototypingItem1" xml:space="preserve">
+    <value>Maquettes Photoshop haute fidélité</value>
+</data>
+  <data name="SkillsSectionPrototypingItem2" xml:space="preserve">
+    <value>Prototypes cliquables</value>
+</data>
+  <data name="SkillsSectionPrototypingItem3" xml:space="preserve">
+    <value>Composition et discipline d’espacement</value>
+</data>
+  <data name="SkillsSectionPrototypingItem4" xml:space="preserve">
+    <value>Hiérarchie typographique</value>
+</data>
+  <data name="SkillsSectionPrototypingItem5" xml:space="preserve">
+    <value>Passage design vers WPF</value>
+</data>
+  <data name="SkillsSectionPrototypingItem6" xml:space="preserve">
+    <value>Finition et souci du détail</value>
+</data>
+  <data name="SkillsSectionPrototypingTitle" xml:space="preserve">
+    <value>Prototypage et design visuel</value>
+</data>
+  <data name="SkillsSectionWpfItem1" xml:space="preserve">
+    <value>MVVM, binding et commandes</value>
+</data>
+  <data name="SkillsSectionWpfItem2" xml:space="preserve">
+    <value>Behaviors et patterns d’interaction</value>
+</data>
+  <data name="SkillsSectionWpfItem3" xml:space="preserve">
+    <value>DependencyProperty et contrôles custom</value>
+</data>
+  <data name="SkillsSectionWpfItem4" xml:space="preserve">
+    <value>ControlTemplate et DataTemplate</value>
+</data>
+  <data name="SkillsSectionWpfItem5" xml:space="preserve">
+    <value>Converters et MultiBinding</value>
+</data>
+  <data name="SkillsSectionWpfItem6" xml:space="preserve">
+    <value>Livraison UI avec focus performance</value>
+</data>
+  <data name="SkillsSectionWpfTitle" xml:space="preserve">
+    <value>WPF et MVVM</value>
+</data>
+  <data name="SummaryExperienceLine" xml:space="preserve">
+    <value>Expérience: 7+ ans en développement logiciel, 5+ ans en ingénierie UI WPF.</value>
+  </data>
+  <data name="SummaryText" xml:space="preserve">
+    <value>Ingénieur front-end senior orienté UI, spécialisé en applications desktop WPF, modernisation UI, et exécution design system. Je mène la livraison UI avec un standard élevé de cohérence, de finition d’interaction, et d’utilisabilité, en gardant l’équilibre entre le beau et les contraintes réelles du produit. Reconnu pour des maquettes Photoshop haute fidélité qui accélèrent l’alignement et réduisent le rework, ainsi que des habitudes d’intégration WPF solides (composants réutilisables, style centralisé, patterns d’interaction propres, structure prête pour la localisation).</value>
+  </data>
+  <data name="TabContactTitle" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="TabEducationTitle" xml:space="preserve">
+    <value>Formation</value>
+  </data>
+  <data name="TabExperienceTitle" xml:space="preserve">
+    <value>Expérience</value>
+  </data>
+  <data name="TabProjectsTitle" xml:space="preserve">
+    <value>Projets</value>
+  </data>
+  <data name="TabResumeTitle" xml:space="preserve">
+    <value>CV</value>
+  </data>
+  <data name="TabSkillsTitle" xml:space="preserve">
+    <value>Compétences</value>
+  </data>
+  <data name="TabVisualCraftTitle" xml:space="preserve">
+    <value>Savoir-faire visuel</value>
+  </data>
+  <data name="ValueFullRemoteOnly" xml:space="preserve">
+    <value>100% à distance</value>
+  </data>
+  <data name="VisualCraftPortfolioLine" xml:space="preserve">
+    <value>Portfolio: https://olhphotographie.com</value>
+  </data>
+  <data name="VisualCraftText" xml:space="preserve">
+    <value>Photographe professionnel depuis 2010, avec plus de 20 ans d’expérience en retouche photo (depuis 2001). Le savoir-faire visuel renforce les résultats UI via une composition disciplinée, une hiérarchie visuelle claire, une cohérence de marque, et une finition attentive aux détails.</value>
+  </data>
+</root>

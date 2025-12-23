@@ -1,0 +1,113 @@
+<UserControl
+    x:Class="ResumeApp.Pages.SkillsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="mSkillsPageRoot"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True">
+
+    <UserControl.Resources>
+        <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
+            <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+
+        <Style
+            x:Key="PageTitleTextBlockStyle"
+            BasedOn="{StaticResource {x:Type TextBlock}}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="{StaticResource LargeFontSize}" />
+        </Style>
+
+        <Style
+            x:Key="PageSubtitleTextBlockStyle"
+            BasedOn="{StaticResource {x:Type TextBlock}}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
+        </Style>
+
+        <Style
+            x:Key="SectionTitleTextBlockStyle"
+            BasedOn="{StaticResource {x:Type TextBlock}}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}" />
+            <Setter Property="FontSize" Value="{StaticResource CommonFontSize}" />
+            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
+        </Style>
+
+        <Style x:Key="ChipBorderStyle" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="{DynamicResource CommonGrayBrush}" />
+            <Setter Property="CornerRadius" Value="{StaticResource ExtraSmallCornerRadius}" />
+            <Setter Property="Margin" Value="{StaticResource ExtraSmallThickness}" />
+        </Style>
+
+        <Style
+            x:Key="ChipTextBlockStyle"
+            BasedOn="{StaticResource {x:Type TextBlock}}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}" />
+            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer
+        x:Name="mSkillsScrollViewer"
+        HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto">
+        <StackPanel x:Name="mSkillsLayoutRoot" Margin="{StaticResource LargeThickness}">
+            <Border x:Name="mSkillsHeaderBorder" Style="{StaticResource SubSectionCardBorderStyle}">
+                <StackPanel x:Name="mSkillsHeaderStackPanel" Margin="{StaticResource CommonThickness}">
+                    <TextBlock
+                        x:Name="mSkillsTitleTextBlock"
+                        Style="{StaticResource PageTitleTextBlockStyle}"
+                        Text="{Binding PageTitleText}" />
+                    <TextBlock
+                        x:Name="mSkillsSubtitleTextBlock"
+                        Margin="{StaticResource SmallThickness}"
+                        Style="{StaticResource PageSubtitleTextBlockStyle}"
+                        Text="{Binding PageSubtitleText}" />
+                </StackPanel>
+            </Border>
+
+            <ItemsControl x:Name="mSkillSectionsItemsControl" ItemsSource="{Binding Sections}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border x:Name="mSkillSectionBorder" Style="{StaticResource SubSectionCardBorderStyle}">
+                            <StackPanel x:Name="mSkillSectionStackPanel" Margin="{StaticResource CommonThickness}">
+                                <TextBlock
+                                    x:Name="mSkillSectionTitleTextBlock"
+                                    Style="{StaticResource SectionTitleTextBlockStyle}"
+                                    Text="{Binding TitleText}" />
+
+                                <ItemsControl
+                                    x:Name="mSkillChipsItemsControl"
+                                    Margin="{StaticResource SmallThickness}"
+                                    ItemsSource="{Binding Items}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel x:Name="mSkillWrapPanel" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border x:Name="mSkillChipBorder" Style="{StaticResource ChipBorderStyle}">
+                                                <TextBlock
+                                                    x:Name="mSkillChipTextBlock"
+                                                    Margin="{StaticResource SmallThickness}"
+                                                    Style="{StaticResource ChipTextBlockStyle}"
+                                                    Text="{Binding DisplayText}" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

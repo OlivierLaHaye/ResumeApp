@@ -1,0 +1,266 @@
+<UserControl
+    x:Class="ResumeApp.Pages.ExperiencePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="clr-namespace:ResumeApp.Behaviors"
+    xmlns:controls="clr-namespace:ResumeApp.Controls"
+    xmlns:converters="clr-namespace:ResumeApp.Converters"
+    x:Name="mExperiencePageRoot"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True">
+
+    <UserControl.Resources>
+        <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
+            <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+
+        <Style x:Key="ExperienceCardFocusVisualStyle" TargetType="{x:Type Control}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Control}">
+                        <Border
+                            x:Name="mFocusBorder"
+                            BorderBrush="{DynamicResource CommonBrush}"
+                            BorderThickness="{StaticResource CommonBorderThickness}"
+                            CornerRadius="{StaticResource CommonCornerRadius}"
+                            Opacity="{StaticResource CommonOpacity}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ExperienceCardButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="{x:Null}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
+            <Setter Property="Focusable" Value="True" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource ExperienceCardFocusVisualStyle}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="mButtonRootBorder" Background="{TemplateBinding Background}">
+                            <ContentPresenter />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid x:Name="mExperiencePageLayoutRoot" Margin="{StaticResource LargeThickness}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel
+            x:Name="mHeaderStackPanel"
+            Grid.Row="0"
+            Orientation="Vertical">
+            <TextBlock
+                x:Name="mSectionTitleTextBlock"
+                FontSize="{StaticResource LargeFontSize}"
+                Text="{Binding ResourcesService[SectionHeaderExperience]}" />
+            <TextBlock
+                x:Name="mSectionSubtitleTextBlock"
+                Margin="{StaticResource SmallThickness}"
+                FontSize="{StaticResource SmallFontSize}"
+                Opacity="{StaticResource LowOpacity}"
+                Text="{Binding ResourcesService[ExperiencePageSubtitle]}" />
+        </StackPanel>
+
+        <Border
+            x:Name="mTimelineBorder"
+            Grid.Row="1"
+            Margin="{StaticResource CommonTopBottomThickness}"
+            Style="{StaticResource SubSectionCardBorderStyle}">
+            <Grid x:Name="mTimelineLayoutGrid" Margin="{StaticResource CommonThickness}">
+                <controls:TimelineControl
+                    x:Name="mExperienceTimelineControl"
+                    Focusable="True"
+                    MinDate="{Binding TimelineMinDate}"
+                    SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedTimeFrame="{Binding SelectedTimeFrame, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    TimeFrames="{Binding ExperienceTimeFrames}" />
+            </Grid>
+        </Border>
+
+        <ScrollViewer
+            x:Name="mExperienceScrollViewer"
+            Grid.Row="2"
+            behaviors:ExperienceTimelineScrollSyncBehavior.IsEnabled="True"
+            behaviors:ExperienceTimelineScrollSyncBehavior.ItemsControl="{Binding ElementName=mExperienceItemsControl}"
+            behaviors:ExperienceTimelineScrollSyncBehavior.SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            behaviors:ExperienceTimelineScrollSyncBehavior.SelectedItem="{Binding SelectedTimelineEntry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            CanContentScroll="False"
+            HorizontalScrollBarVisibility="Disabled"
+            VerticalScrollBarVisibility="Auto">
+            <ItemsControl x:Name="mExperienceItemsControl" ItemsSource="{Binding TimelineEntries}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel x:Name="mExperienceItemsStackPanel" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button
+                            x:Name="mExperienceCardButton"
+                            Margin="{StaticResource CommonTopBottomThickness}"
+                            Command="{Binding DataContext.SelectExperienceCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            CommandParameter="{Binding}"
+                            Style="{StaticResource ExperienceCardButtonStyle}">
+                            <Grid x:Name="mTimelineItemGrid">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Grid x:Name="mRailGrid" Grid.Column="0">
+                                    <Border
+                                        x:Name="mRailLineBorder"
+                                        Width="{StaticResource ExtraSmallThicknessValue}"
+                                        HorizontalAlignment="Center"
+                                        Background="{DynamicResource OnSurfaceDividerOnDarkBrush}" />
+
+                                    <Border
+                                        x:Name="mMarkerBorder"
+                                        Width="{StaticResource CommonWidth}"
+                                        Height="{StaticResource CommonHeight}"
+                                        Margin="{StaticResource SmallThickness}"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Top"
+                                        Background="{Binding PaletteIndex, Converter={StaticResource PaletteIndexToBrushConverter}}"
+                                        CornerRadius="{StaticResource CommonCornerRadius}">
+                                        <TextBlock
+                                            x:Name="mMarkerGlyphTextBlock"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontSize="{StaticResource SmallFontSize}"
+                                            Text="{Binding MarkerGlyph}" />
+                                    </Border>
+                                </Grid>
+
+                                <Grid
+                                    x:Name="mContentGrid"
+                                    Grid.Column="1"
+                                    Margin="{Binding LaneLeftMargin}">
+                                    <Border x:Name="mCardBorder" Style="{StaticResource SubSectionCardBorderStyle}">
+                                        <Grid x:Name="mCardLayoutGrid" Margin="{StaticResource CommonThickness}">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <StackPanel x:Name="mHeaderRowStackPanel" Orientation="Vertical">
+                                                <TextBlock
+                                                    x:Name="mRoleTextBlock"
+                                                    FontSize="{StaticResource CommonFontSize}"
+                                                    Text="{Binding RoleText}" />
+                                                <TextBlock
+                                                    x:Name="mCompanyTextBlock"
+                                                    FontSize="{StaticResource SmallFontSize}"
+                                                    Opacity="{StaticResource CommonOpacity}"
+                                                    Text="{Binding CompanyText}" />
+                                            </StackPanel>
+
+                                            <Grid
+                                                x:Name="mMetaGrid"
+                                                Grid.Row="1"
+                                                Margin="{StaticResource SmallThickness}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <Border
+                                                    x:Name="mDatesPillBorder"
+                                                    Background="{DynamicResource CommonGrayBrush}"
+                                                    CornerRadius="{StaticResource ExtraSmallCornerRadius}">
+                                                    <TextBlock
+                                                        x:Name="mDatesTextBlock"
+                                                        Margin="{StaticResource SmallThickness}"
+                                                        FontFamily="{StaticResource MonoFontFamily}"
+                                                        FontSize="{StaticResource SmallFontSize}"
+                                                        Text="{Binding DateRangeText}" />
+                                                </Border>
+
+                                                <TextBlock
+                                                    x:Name="mLocationTextBlock"
+                                                    Grid.Column="1"
+                                                    Margin="{StaticResource SmallLeftRightThickness}"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="{StaticResource SmallFontSize}"
+                                                    Opacity="{StaticResource CommonOpacity}"
+                                                    Text="{Binding LocationText}" />
+                                            </Grid>
+
+                                            <TextBlock
+                                                x:Name="mScopeTextBlock"
+                                                Grid.Row="2"
+                                                Margin="{StaticResource SmallThickness}"
+                                                FontSize="{StaticResource SmallFontSize}"
+                                                Opacity="{StaticResource CommonOpacity}"
+                                                Text="{Binding ScopeText}" />
+
+                                            <ItemsControl
+                                                x:Name="mAccomplishmentsItemsControl"
+                                                Grid.Row="3"
+                                                Margin="{StaticResource SmallThickness}"
+                                                ItemsSource="{Binding Accomplishments}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <DockPanel x:Name="mBulletDockPanel" LastChildFill="True">
+                                                            <TextBlock
+                                                                x:Name="mBulletGlyphTextBlock"
+                                                                Margin="{StaticResource SmallLeftRightThickness}"
+                                                                DockPanel.Dock="Left"
+                                                                Opacity="{StaticResource CommonOpacity}"
+                                                                Text="{Binding DataContext.ResourcesService[GlyphBullet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                                            <TextBlock
+                                                                x:Name="mBulletTextBlock"
+                                                                FontSize="{StaticResource SmallFontSize}"
+                                                                Text="{Binding}" />
+                                                        </DockPanel>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+
+                                            <DockPanel
+                                                x:Name="mTechDockPanel"
+                                                Grid.Row="4"
+                                                Margin="{StaticResource SmallThickness}"
+                                                LastChildFill="True">
+                                                <TextBlock
+                                                    x:Name="mTechLabelTextBlock"
+                                                    DockPanel.Dock="Left"
+                                                    FontFamily="{StaticResource MonoFontFamily}"
+                                                    FontSize="{StaticResource SmallFontSize}"
+                                                    Opacity="{StaticResource CommonOpacity}"
+                                                    Text="{Binding DataContext.ResourcesService[LabelTech], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                                <TextBlock
+                                                    x:Name="mTechValueTextBlock"
+                                                    Margin="{StaticResource SmallLeftRightThickness}"
+                                                    FontFamily="{StaticResource MonoFontFamily}"
+                                                    FontSize="{StaticResource SmallFontSize}"
+                                                    Opacity="{StaticResource CommonOpacity}"
+                                                    Text="{Binding TechText}" />
+                                            </DockPanel>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

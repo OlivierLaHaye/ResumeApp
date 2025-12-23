@@ -1,0 +1,89 @@
+<UserControl
+    x:Class="ResumeApp.Pages.EducationPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="mEducationPageRoot"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True">
+
+    <UserControl.Resources>
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
+            <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+
+        <Style x:Key="PageTitleTextBlockStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="FontSize" Value="{StaticResource LargeFontSize}" />
+        </Style>
+
+        <Style x:Key="PageSubtitleTextBlockStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
+        </Style>
+
+        <Style x:Key="ItemTitleTextBlockStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}" />
+            <Setter Property="FontSize" Value="{StaticResource CommonFontSize}" />
+        </Style>
+
+        <Style x:Key="ItemMetaTextBlockStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
+        </Style>
+
+        <Style x:Key="ItemNotesTextBlockStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer
+        x:Name="mEducationScrollViewer"
+        HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto">
+        <StackPanel x:Name="mEducationLayoutRoot" Margin="{StaticResource LargeThickness}">
+            <Border x:Name="mEducationHeaderBorder" Style="{StaticResource SubSectionCardBorderStyle}">
+                <StackPanel x:Name="mEducationHeaderStackPanel" Margin="{StaticResource CommonThickness}">
+                    <TextBlock
+                        x:Name="mEducationTitleTextBlock"
+                        Style="{StaticResource PageTitleTextBlockStyle}"
+                        Text="{Binding PageTitleText}" />
+                    <TextBlock
+                        x:Name="mEducationSubtitleTextBlock"
+                        Margin="{StaticResource SmallThickness}"
+                        Style="{StaticResource PageSubtitleTextBlockStyle}"
+                        Text="{Binding PageSubtitleText}" />
+                </StackPanel>
+            </Border>
+
+            <ItemsControl x:Name="mEducationItemsControl" ItemsSource="{Binding Items}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border x:Name="mEducationItemBorder" Style="{StaticResource SubSectionCardBorderStyle}">
+                            <StackPanel x:Name="mEducationItemStackPanel" Margin="{StaticResource CommonThickness}">
+                                <TextBlock
+                                    x:Name="mEducationItemTitleTextBlock"
+                                    Style="{StaticResource ItemTitleTextBlockStyle}"
+                                    Text="{Binding TitleText}" />
+
+                                <TextBlock
+                                    x:Name="mEducationItemLocationDatesTextBlock"
+                                    Margin="{StaticResource SmallThickness}"
+                                    Style="{StaticResource ItemMetaTextBlockStyle}"
+                                    Text="{Binding LocationDatesText}" />
+
+                                <TextBlock
+                                    x:Name="mEducationItemNotesTextBlock"
+                                    Margin="{StaticResource SmallThickness}"
+                                    Style="{StaticResource ItemNotesTextBlockStyle}"
+                                    Text="{Binding NotesText}"
+                                    Visibility="{Binding HasNotes, Converter={StaticResource BoolToCollapseConverter}}" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

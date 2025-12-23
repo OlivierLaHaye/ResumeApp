@@ -1,0 +1,245 @@
+﻿<!--  Controls/ProjectImageCarouselControl.xaml  -->
+<UserControl
+    x:Class="ResumeApp.Controls.ProjectImageCarouselControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="mProjectImageCarouselControlRoot"
+    Focusable="True"
+    KeyboardNavigation.TabNavigation="Local"
+    PreviewKeyDown="OnRootPreviewKeyDown"
+    PreviewMouseLeftButtonDown="OnRootPreviewMouseLeftButtonDown"
+    PreviewMouseWheel="OnRootPreviewMouseWheel"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True">
+
+    <UserControl.Resources>
+        <Style x:Key="NavigationButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Width" Value="38" />
+            <Setter Property="Height" Value="38" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="{DynamicResource CommonBlackBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CommonGrayBrush}" />
+            <Setter Property="BorderThickness" Value="{StaticResource ExtraSmallThickness}" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Opacity" Value="0.35" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border
+                            x:Name="mNavigationButtonBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="999"
+                            SnapsToDevicePixels="True">
+                            <ContentPresenter
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="mNavigationButtonBorder" Property="BorderBrush" Value="{DynamicResource CommonBrush}" />
+                                <Setter Property="Opacity" Value="0.75" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Opacity" Value="0.95" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.15" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="mNavigationButtonBorder" Property="BorderBrush" Value="{DynamicResource CommonBrush}" />
+                                <Setter Property="Opacity" Value="0.85" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DotsListBoxItemStyle" TargetType="{x:Type ListBoxItem}">
+            <Setter Property="Width" Value="10" />
+            <Setter Property="Height" Value="10" />
+            <Setter Property="Margin" Value="4,4,4,4" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border
+                            x:Name="mDotBorder"
+                            Background="{DynamicResource CommonWhiteBrush}"
+                            CornerRadius="999"
+                            Opacity="0.35"
+                            SnapsToDevicePixels="True" />
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="mDotBorder" Property="Opacity" Value="0.7" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="mDotBorder" Property="Background" Value="{DynamicResource CommonBrush}" />
+                                <Setter TargetName="mDotBorder" Property="Opacity" Value="0.9" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="mDotBorder" Property="Opacity" Value="0.15" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PlaceholderTextBlockStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
+            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
+            <Setter Property="TextAlignment" Value="Center" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid x:Name="mCarouselLayoutRoot">
+        <Border
+            x:Name="mMediaCardBorder"
+            Height="180"
+            Background="{DynamicResource CommonGrayBrush}"
+            BorderBrush="{DynamicResource CommonGrayBrush}"
+            BorderThickness="{StaticResource ExtraSmallThickness}"
+            CornerRadius="{StaticResource ExtraSmallCornerRadius}"
+            SnapsToDevicePixels="True">
+            <Grid
+                x:Name="mMediaRootGrid"
+                ClipToBounds="True"
+                SizeChanged="OnMediaRootGridSizeChanged"
+                SnapsToDevicePixels="True">
+
+                <Image
+                    x:Name="mCurrentImageImage"
+                    Opacity="0"
+                    RenderOptions.BitmapScalingMode="HighQuality"
+                    Stretch="UniformToFill" />
+
+                <Grid x:Name="mPlaceholderGrid" Visibility="Collapsed">
+                    <StackPanel
+                        x:Name="mPlaceholderStackPanel"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                        <Viewbox
+                            x:Name="mPlaceholderIconViewbox"
+                            Width="34"
+                            Height="34">
+                            <Path
+                                x:Name="mPlaceholderIconPath"
+                                Fill="{DynamicResource CommonWhiteBrush}"
+                                Data="M2,5 C2,3.343 3.343,2 5,2 H19 C20.657,2 22,3.343 22,5 V19 C22,20.657 20.657,22 19,22 H5 C3.343,22 2,20.657 2,19 Z M6,7 A2,2 0 1 0 6,3 A2,2 0 1 0 6,7 Z M4,19 H20 V16 L16,12 L12,16 L9,13 Z"
+                                Opacity="{StaticResource LowOpacity}" />
+                        </Viewbox>
+
+                        <TextBlock
+                            x:Name="mPlaceholderTextBlock"
+                            Margin="{StaticResource SmallThickness}"
+                            Style="{StaticResource PlaceholderTextBlockStyle}"
+                            Text="{Binding PlaceholderText, ElementName=mProjectImageCarouselControlRoot}" />
+                    </StackPanel>
+                </Grid>
+
+                <Grid x:Name="mNavigationOverlayGrid" Visibility="Collapsed">
+                    <Grid.Style>
+                        <Style TargetType="{x:Type Grid}">
+                            <Setter Property="Opacity" Value="0.4" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMouseOver, ElementName=mMediaRootGrid}" Value="True">
+                                    <Setter Property="Opacity" Value="1" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsKeyboardFocusWithin, ElementName=mProjectImageCarouselControlRoot}" Value="True">
+                                    <Setter Property="Opacity" Value="1" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button
+                        x:Name="mPreviousButton"
+                        Margin="12,0,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Click="OnPreviousButtonClick"
+                        Content="‹"
+                        Style="{StaticResource NavigationButtonStyle}" />
+
+                    <Button
+                        x:Name="mNextButton"
+                        Grid.Column="2"
+                        Margin="0,0,12,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Click="OnNextButtonClick"
+                        Content="›"
+                        Style="{StaticResource NavigationButtonStyle}" />
+
+                    <Border
+                        x:Name="mDotsBackgroundBorder"
+                        Grid.ColumnSpan="3"
+                        Margin="0,0,0,10"
+                        Padding="10,6"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Background="{DynamicResource CommonBlackBrush}"
+                        CornerRadius="999"
+                        Opacity="0.25"
+                        SnapsToDevicePixels="True">
+                        <ListBox
+                            x:Name="mDotsListBox"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Focusable="False"
+                            ItemsSource="{Binding Images, ElementName=mProjectImageCarouselControlRoot}"
+                            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                            ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                            SelectedIndex="{Binding SelectedIndex, ElementName=mProjectImageCarouselControlRoot, Mode=TwoWay}">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel x:Name="mDotsStackPanel" Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemContainerStyle>
+                                <Style BasedOn="{StaticResource DotsListBoxItemStyle}" TargetType="{x:Type ListBoxItem}" />
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                    </Border>
+                </Grid>
+
+                <Border
+                    x:Name="mFocusRingBorder"
+                    BorderBrush="{DynamicResource CommonBrush}"
+                    BorderThickness="{StaticResource ExtraSmallThickness}"
+                    CornerRadius="{StaticResource ExtraSmallCornerRadius}"
+                    IsHitTestVisible="False"
+                    Opacity="0"
+                    SnapsToDevicePixels="True">
+                    <Border.Style>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="Opacity" Value="0" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsKeyboardFocusWithin, ElementName=mProjectImageCarouselControlRoot}" Value="True">
+                                    <Setter Property="Opacity" Value="0.9" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

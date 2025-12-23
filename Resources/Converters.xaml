@@ -1,0 +1,32 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:ResumeApp.Converters">
+    <converters:ValuesEqualConverter x:Key="ValuesEqualConverter" />
+    <converters:SquircleCornerDataConverter x:Key="SquircleCornerDataConverter" />
+    <converters:TopOffsetConverter x:Key="TopOffsetConverter" />
+    <converters:BottomOffsetConverter x:Key="BottomOffsetConverter" />
+    <converters:RightOffsetConverter x:Key="RightOffsetConverter" />
+    <converters:LeftOffsetConverter x:Key="LeftOffsetConverter" />
+    <converters:MathOperationConverter x:Key="MathOperationConverter" />
+    <converters:BoolToCollapseConverter x:Key="BoolToCollapseConverter" />
+    <converters:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />
+    <converters:BoolToCollapseConverter
+        x:Key="InverseBoolToCollapseConverter"
+        FalseValue="Visible"
+        TrueValue="Collapsed" />
+    <converters:BoolOrToVisibilityConverter x:Key="BoolOrToCollapseConverter" />
+    <converters:BoolAndToVisibilityConverter x:Key="BoolAndToCollapseConverter" />
+    <converters:BoolAndToVisibilityConverter
+        x:Key="InverseBoolAndToCollapseConverter"
+        FalseValue="Visible"
+        TrueValue="Collapsed" />
+    <converters:StringNullOrEmptyToVisibilityConverter x:Key="StringNullOrEmptyToVisibilityConverter" />
+    <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+    <converters:IsNullToCollapseConverter x:Key="IsNullToCollapseConverter" />
+    <converters:AnyNotNullOrEmptyToVisibilityConverter x:Key="AnyNotNullOrEmptyToCollapseConverter" />
+    <converters:CollectionToVisibilityConverter x:Key="CollectionToVisibilityConverter" />
+
+    <converters:IsDarkBrushConverter x:Key="IsDarkBrushConverter" />
+    <converters:PaletteIndexToBrushConverter x:Key="PaletteIndexToBrushConverter" />
+</ResourceDictionary>

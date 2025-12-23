@@ -1,0 +1,266 @@
+<!--  Pages/ProjectsPage.xaml  -->
+<UserControl
+    x:Class="ResumeApp.Pages.ProjectsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ResumeApp.Controls"
+    x:Name="mProjectsPageRoot"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True">
+
+    <UserControl.Resources>
+        <Style x:Key="BaseTextBlockStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
+            <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+
+        <Style BasedOn="{StaticResource BaseTextBlockStyle}" TargetType="{x:Type TextBlock}" />
+
+        <Style
+            x:Key="PageTitleTextBlockStyle"
+            BasedOn="{StaticResource BaseTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="{StaticResource LargeFontSize}" />
+        </Style>
+
+        <Style
+            x:Key="CardTitleTextBlockStyle"
+            BasedOn="{StaticResource BaseTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="{StaticResource CommonFontSize}" />
+        </Style>
+
+        <Style
+            x:Key="LabelTextBlockStyle"
+            BasedOn="{StaticResource BaseTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+            <Setter Property="Opacity" Value="{StaticResource LowOpacity}" />
+        </Style>
+
+        <Style
+            x:Key="BodyTextBlockStyle"
+            BasedOn="{StaticResource BaseTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
+        </Style>
+
+        <Style
+            x:Key="MonoBodyTextBlockStyle"
+            BasedOn="{StaticResource BaseTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}" />
+            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
+        </Style>
+
+        <Style x:Key="ChipBorderStyle" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="{DynamicResource CommonGrayBrush}" />
+            <Setter Property="CornerRadius" Value="{StaticResource ExtraSmallCornerRadius}" />
+            <Setter Property="Margin" Value="{StaticResource ExtraSmallThickness}" />
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer
+        x:Name="mProjectsScrollViewer"
+        HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto">
+        <Grid x:Name="mProjectsLayoutRoot" Margin="{StaticResource LargeThickness}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <TextBlock
+                x:Name="mProjectsTitleTextBlock"
+                Style="{StaticResource PageTitleTextBlockStyle}"
+                Text="{Binding ResourcesService[SectionHeaderProjects]}" />
+
+            <ItemsControl
+                x:Name="mProjectsItemsControl"
+                Grid.Row="1"
+                ItemsSource="{Binding Projects}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border x:Name="mProjectCardBorder" Style="{StaticResource SubSectionCardBorderStyle}">
+                            <Grid x:Name="mProjectCardLayoutRoot" Margin="{StaticResource CommonThickness}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <Grid x:Name="mProjectTitleGrid" Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border
+                                        x:Name="mProjectAccentBorder"
+                                        Width="{StaticResource ExtraSmallThicknessValue}"
+                                        Margin="{StaticResource SmallLeftRightThickness}"
+                                        Background="{DynamicResource CommonBrush}"
+                                        CornerRadius="{StaticResource ExtraExtraSmallCornerRadius}" />
+
+                                    <TextBlock
+                                        x:Name="mProjectTitleTextBlock"
+                                        Grid.Column="1"
+                                        Style="{StaticResource CardTitleTextBlockStyle}"
+                                        Text="{Binding TitleText}" />
+                                </Grid>
+
+                                <Border
+                                    x:Name="mProjectDividerBorder"
+                                    Grid.Row="1"
+                                    Height="{StaticResource ExtraSmallThicknessValue}"
+                                    Margin="{StaticResource CommonTopBottomThickness}"
+                                    Background="{DynamicResource OnSurfaceDividerOnDarkBrush}" />
+
+                                <controls:ProjectImageCarouselControl
+                                    x:Name="mProjectImageCarouselControl"
+                                    Grid.Row="2"
+                                    Margin="{StaticResource SmallThickness}"
+                                    Images="{Binding Images}"
+                                    PlaceholderText="{Binding DataContext.ResourcesService[LabelProjectNoImagesYet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+
+                                <Grid x:Name="mProjectMetaGrid" Grid.Row="3">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <StackPanel
+                                        x:Name="mProjectContextStackPanel"
+                                        Grid.Row="0"
+                                        Orientation="Vertical">
+                                        <TextBlock
+                                            x:Name="mProjectContextLabelTextBlock"
+                                            Style="{StaticResource LabelTextBlockStyle}"
+                                            Text="{Binding DataContext.ResourcesService[LabelProjectContext], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                        <TextBlock
+                                            x:Name="mProjectContextValueTextBlock"
+                                            Margin="{StaticResource ExtraSmallThickness}"
+                                            Style="{StaticResource BodyTextBlockStyle}"
+                                            Text="{Binding ContextValueText}" />
+                                    </StackPanel>
+
+                                    <StackPanel
+                                        x:Name="mProjectConstraintsStackPanel"
+                                        Grid.Row="1"
+                                        Margin="{StaticResource SmallThickness}"
+                                        Orientation="Vertical">
+                                        <TextBlock
+                                            x:Name="mProjectConstraintsLabelTextBlock"
+                                            Style="{StaticResource LabelTextBlockStyle}"
+                                            Text="{Binding DataContext.ResourcesService[LabelProjectConstraints], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                        <TextBlock
+                                            x:Name="mProjectConstraintsValueTextBlock"
+                                            Margin="{StaticResource ExtraSmallThickness}"
+                                            Style="{StaticResource BodyTextBlockStyle}"
+                                            Text="{Binding ConstraintsValueText}" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <StackPanel
+                                    x:Name="mWhatIBuiltStackPanel"
+                                    Grid.Row="4"
+                                    Margin="{StaticResource SmallThickness}"
+                                    Orientation="Vertical">
+                                    <TextBlock
+                                        x:Name="mWhatIBuiltLabelTextBlock"
+                                        Style="{StaticResource LabelTextBlockStyle}"
+                                        Text="{Binding DataContext.ResourcesService[LabelProjectWhatIBuilt], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+
+                                    <ItemsControl
+                                        x:Name="mWhatIBuiltItemsControl"
+                                        Margin="{StaticResource ExtraSmallThickness}"
+                                        ItemsSource="{Binding WhatIBuiltItems}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <DockPanel x:Name="mWhatIBuiltDockPanel" LastChildFill="True">
+                                                    <TextBlock
+                                                        x:Name="mWhatIBuiltBulletTextBlock"
+                                                        Margin="{StaticResource SmallLeftRightThickness}"
+                                                        DockPanel.Dock="Left"
+                                                        Opacity="{StaticResource CommonOpacity}"
+                                                        Text="{Binding DataContext.ResourcesService[GlyphBullet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                                    <TextBlock
+                                                        x:Name="mWhatIBuiltTextBlock"
+                                                        Style="{StaticResource BodyTextBlockStyle}"
+                                                        Text="{Binding DisplayText}" />
+                                                </DockPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+
+                                <Grid
+                                    x:Name="mImpactAndTechGrid"
+                                    Grid.Row="5"
+                                    Margin="{StaticResource SmallThickness}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel
+                                        x:Name="mImpactStackPanel"
+                                        Grid.Column="0"
+                                        Orientation="Vertical">
+                                        <TextBlock
+                                            x:Name="mImpactLabelTextBlock"
+                                            Style="{StaticResource LabelTextBlockStyle}"
+                                            Text="{Binding DataContext.ResourcesService[LabelProjectImpact], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                        <TextBlock
+                                            x:Name="mImpactValueTextBlock"
+                                            Margin="{StaticResource ExtraSmallThickness}"
+                                            Style="{StaticResource BodyTextBlockStyle}"
+                                            Text="{Binding ImpactValueText}" />
+                                    </StackPanel>
+
+                                    <StackPanel
+                                        x:Name="mTechStackPanel"
+                                        Grid.Column="1"
+                                        Orientation="Vertical">
+                                        <TextBlock
+                                            x:Name="mTechLabelTextBlock"
+                                            Style="{StaticResource LabelTextBlockStyle}"
+                                            Text="{Binding DataContext.ResourcesService[LabelTech], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+
+                                        <ItemsControl
+                                            x:Name="mTechChipsItemsControl"
+                                            Margin="{StaticResource ExtraSmallThickness}"
+                                            ItemsSource="{Binding TechItems}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel x:Name="mTechWrapPanel" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border x:Name="mTechChipBorder" Style="{StaticResource ChipBorderStyle}">
+                                                        <TextBlock
+                                                            x:Name="mTechChipTextBlock"
+                                                            Margin="{StaticResource SmallThickness}"
+                                                            Style="{StaticResource MonoBodyTextBlockStyle}"
+                                                            Text="{Binding}" />
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

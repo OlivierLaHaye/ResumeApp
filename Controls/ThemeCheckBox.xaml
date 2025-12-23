@@ -1,0 +1,34 @@
+<UserControl
+    x:Class="ResumeApp.Controls.ThemeCheckBox"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="mThemeCheckBoxControlRoot"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True">
+    <Grid x:Name="mThemeCheckBoxLayoutGrid" Margin="{StaticResource SmallThickness}">
+        <CheckBox
+            x:Name="mCheckBoxThemeButton"
+            Command="{Binding CheckBoxThemeCommand, ElementName=mThemeCheckBoxControlRoot}"
+            Style="{StaticResource TextCheckBoxStyle}">
+            <StackPanel x:Name="mCheckBoxThemeStackPanel">
+                <TextBlock
+                    x:Name="mCheckBoxThemeLabelTextBlock"
+                    Margin="{StaticResource SmallThickness}"
+                    HorizontalAlignment="Center"
+                    Text="{Binding LabelText, ElementName=mThemeCheckBoxControlRoot}" />
+                <TextBlock x:Name="mCheckBoxThemeStateTextBlock" HorizontalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style BasedOn="{StaticResource SmallTextBlock}" TargetType="{x:Type TextBlock}">
+                            <Setter Property="Text" Value="{Binding LightModeText, ElementName=mThemeCheckBoxControlRoot}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsDarkThemeActive, ElementName=mThemeCheckBoxControlRoot}" Value="True">
+                                    <Setter Property="Text" Value="{Binding DarkModeText, ElementName=mThemeCheckBoxControlRoot}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+        </CheckBox>
+    </Grid>
+</UserControl>

@@ -1,0 +1,197 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <Duration x:Key="FastDuration">0:0:0.35</Duration>
+    <Duration x:Key="NormalDuration">0:0:0.55</Duration>
+    <Duration x:Key="CheckMarkSlideDuration">0:0:0.55</Duration>
+    <QuadraticEase x:Key="EaseOut" EasingMode="EaseOut" />
+
+    <system:Double x:Key="UniformScaleNormal">1</system:Double>
+    <system:Double x:Key="UniformScaleHover">1.12</system:Double>
+    <system:Double x:Key="UniformScalePressed">0.90</system:Double>
+
+    <Storyboard x:Key="SbScaleToHover">
+        <DoubleAnimation
+            EasingFunction="{StaticResource EaseOut}"
+            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+            To="{StaticResource UniformScaleHover}"
+            Duration="{StaticResource FastDuration}" />
+        <DoubleAnimation
+            EasingFunction="{StaticResource EaseOut}"
+            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+            To="{StaticResource UniformScaleHover}"
+            Duration="{StaticResource FastDuration}" />
+    </Storyboard>
+
+    <Storyboard x:Key="SbScaleToNormal">
+        <DoubleAnimation
+            EasingFunction="{StaticResource EaseOut}"
+            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+            To="{StaticResource UniformScaleNormal}"
+            Duration="{StaticResource NormalDuration}" />
+        <DoubleAnimation
+            EasingFunction="{StaticResource EaseOut}"
+            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+            To="{StaticResource UniformScaleNormal}"
+            Duration="{StaticResource NormalDuration}" />
+    </Storyboard>
+
+    <Storyboard x:Key="SbScaleToPressed">
+        <DoubleAnimation
+            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+            To="{StaticResource UniformScalePressed}"
+            Duration="{StaticResource FastDuration}" />
+        <DoubleAnimation
+            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+            To="{StaticResource UniformScalePressed}"
+            Duration="{StaticResource FastDuration}" />
+    </Storyboard>
+
+    <Thickness x:Key="CommonBorderThickness">0</Thickness>
+    <Thickness x:Key="ExtraSmallBorderThickness">2</Thickness>
+    <Thickness x:Key="SmallBorderThickness">4</Thickness>
+    <system:Double x:Key="ExtraSmallThicknessValue">2</system:Double>
+    <Thickness
+        x:Key="ExtraSmallThickness"
+        Bottom="{StaticResource ExtraSmallThicknessValue}"
+        Left="{StaticResource ExtraSmallThicknessValue}"
+        Right="{StaticResource ExtraSmallThicknessValue}"
+        Top="{StaticResource ExtraSmallThicknessValue}" />
+    <system:Double x:Key="SmallThicknessValue">5</system:Double>
+    <Thickness
+        x:Key="SmallThickness"
+        Bottom="{StaticResource SmallThicknessValue}"
+        Left="{StaticResource SmallThicknessValue}"
+        Right="{StaticResource SmallThicknessValue}"
+        Top="{StaticResource SmallThicknessValue}" />
+    <Thickness
+        x:Key="SmallLeftRightThickness"
+        Bottom="0"
+        Left="{StaticResource SmallThicknessValue}"
+        Right="{StaticResource SmallThicknessValue}"
+        Top="0" />
+    <system:Double x:Key="CommonThicknessValue">10</system:Double>
+    <Thickness
+        x:Key="CommonThickness"
+        Bottom="{StaticResource CommonThicknessValue}"
+        Left="{StaticResource CommonThicknessValue}"
+        Right="{StaticResource CommonThicknessValue}"
+        Top="{StaticResource CommonThicknessValue}" />
+    <Thickness
+        x:Key="CommonTopBottomThickness"
+        Bottom="{StaticResource CommonThicknessValue}"
+        Left="0"
+        Right="0"
+        Top="{StaticResource CommonThicknessValue}" />
+    <Thickness
+        x:Key="CommonLeftRightThickness"
+        Bottom="0"
+        Left="{StaticResource CommonThicknessValue}"
+        Right="{StaticResource CommonThicknessValue}"
+        Top="0" />
+    <system:Double x:Key="LargeThicknessValue">20</system:Double>
+    <Thickness
+        x:Key="LargeThickness"
+        Bottom="{StaticResource LargeThicknessValue}"
+        Left="{StaticResource LargeThicknessValue}"
+        Right="{StaticResource LargeThicknessValue}"
+        Top="{StaticResource LargeThicknessValue}" />
+    <Thickness
+        x:Key="LargeLeftRightThickness"
+        Bottom="0"
+        Left="{StaticResource LargeThicknessValue}"
+        Right="{StaticResource LargeThicknessValue}"
+        Top="0" />
+    <Thickness
+        x:Key="LargeTopBottomThickness"
+        Bottom="{StaticResource LargeThicknessValue}"
+        Left="0"
+        Right="0"
+        Top="{StaticResource LargeThicknessValue}" />
+    <system:Double x:Key="ExtraLargeThicknessValue">40</system:Double>
+    <Thickness
+        x:Key="ExtraLargeThickness"
+        Bottom="{StaticResource ExtraLargeThicknessValue}"
+        Left="{StaticResource ExtraLargeThicknessValue}"
+        Right="{StaticResource ExtraLargeThicknessValue}"
+        Top="{StaticResource ExtraLargeThicknessValue}" />
+    <Thickness
+        x:Key="ExtraLargeLeftRightThickness"
+        Bottom="0"
+        Left="{StaticResource ExtraLargeThicknessValue}"
+        Right="{StaticResource ExtraLargeThicknessValue}"
+        Top="0" />
+
+    <system:Double x:Key="ExtraExtraSmallHeight">15</system:Double>
+    <system:Double x:Key="ExtraExtraSmallWidth">15</system:Double>
+    <system:Double x:Key="ExtraSmallHeight">22</system:Double>
+    <system:Double x:Key="ExtraSmallWidth">22</system:Double>
+    <system:Double x:Key="SmallHeight">35</system:Double>
+    <system:Double x:Key="SmallWidth">35</system:Double>
+    <system:Double x:Key="CommonHeight">40</system:Double>
+    <system:Double x:Key="CommonWidth">40</system:Double>
+
+    <system:Double x:Key="ColorEditorTextBoxWidth">100</system:Double>
+
+    <Cursor x:Key="HandCursor">Hand</Cursor>
+    <system:Double x:Key="ExtraExtraSmallCornerRadiusValue">5</system:Double>
+    <CornerRadius
+        x:Key="ExtraExtraSmallCornerRadius"
+        BottomLeft="{StaticResource ExtraExtraSmallCornerRadiusValue}"
+        BottomRight="{StaticResource ExtraExtraSmallCornerRadiusValue}"
+        TopLeft="{StaticResource ExtraExtraSmallCornerRadiusValue}"
+        TopRight="{StaticResource ExtraExtraSmallCornerRadiusValue}" />
+    <system:Double x:Key="ExtraSmallCornerRadiusValue">10</system:Double>
+    <CornerRadius
+        x:Key="ExtraSmallCornerRadius"
+        BottomLeft="{StaticResource ExtraSmallCornerRadiusValue}"
+        BottomRight="{StaticResource ExtraSmallCornerRadiusValue}"
+        TopLeft="{StaticResource ExtraSmallCornerRadiusValue}"
+        TopRight="{StaticResource ExtraSmallCornerRadiusValue}" />
+    <system:Double x:Key="SmallCornerRadiusValue">15</system:Double>
+    <CornerRadius
+        x:Key="SmallCornerRadius"
+        BottomLeft="{StaticResource SmallCornerRadiusValue}"
+        BottomRight="{StaticResource SmallCornerRadiusValue}"
+        TopLeft="{StaticResource SmallCornerRadiusValue}"
+        TopRight="{StaticResource SmallCornerRadiusValue}" />
+    <system:Double x:Key="CommonCornerRadiusValue">20</system:Double>
+    <CornerRadius
+        x:Key="CommonCornerRadius"
+        BottomLeft="{StaticResource CommonCornerRadiusValue}"
+        BottomRight="{StaticResource CommonCornerRadiusValue}"
+        TopLeft="{StaticResource CommonCornerRadiusValue}"
+        TopRight="{StaticResource CommonCornerRadiusValue}" />
+    <system:Double x:Key="LargeCornerRadiusValue">30</system:Double>
+    <CornerRadius
+        x:Key="LargeCornerRadius"
+        BottomLeft="{StaticResource LargeCornerRadiusValue}"
+        BottomRight="{StaticResource LargeCornerRadiusValue}"
+        TopLeft="{StaticResource LargeCornerRadiusValue}"
+        TopRight="{StaticResource LargeCornerRadiusValue}" />
+    <system:Double x:Key="ExtraLargeCornerRadiusValue">50</system:Double>
+    <FontFamily x:Key="CommonFontFamily">
+        pack://application:,,,/ResumeApp;component/Resources/Fonts/#Inter 24pt
+    </FontFamily>
+    <FontFamily x:Key="MonoFontFamily">
+        pack://application:,,,/ResumeApp;component/Resources/Fonts/#Inconsolata
+    </FontFamily>
+    <system:Double x:Key="SmallFontSize">14</system:Double>
+    <system:Double x:Key="CommonFontSize">22</system:Double>
+    <system:Double x:Key="LargeFontSize">36</system:Double>
+    <system:Double x:Key="ExtraLargeFontSize">45</system:Double>
+    <system:Double x:Key="CommonDisableOpacity">0.5</system:Double>
+    <system:Double x:Key="LowOpacity">0.4</system:Double>
+    <system:Double x:Key="CommonOpacity">0.5</system:Double>
+
+    <system:Double x:Key="BlurRadiusInGhostMode">15</system:Double>
+    <system:Double x:Key="NoBlurRadius">0</system:Double>
+
+    <Duration x:Key="FadeDuration">0:0:1.5</Duration>
+
+    <system:Double x:Key="ModuleGradientOffsetPixels">300.0</system:Double>
+    <system:Double x:Key="MaxHeightDraggableControl">1500</system:Double>
+
+</ResourceDictionary>

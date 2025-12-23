@@ -1,0 +1,125 @@
+<Window
+    x:Class="ResumeApp.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ResumeApp.Controls"
+    xmlns:pages="clr-namespace:ResumeApp.Pages"
+    xmlns:services="clr-namespace:ResumeApp.Services"
+    x:Name="mMainWindowRoot"
+    Title="{Binding ResourcesService[AppTitle], Mode=OneWay}"
+    Background="{DynamicResource CommonBlackBrush}"
+    Foreground="{DynamicResource CommonWhiteBrush}"
+    WindowStartupLocation="CenterScreen">
+
+    <Grid x:Name="mMainWindowLayoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border
+            x:Name="mTopBarBorder"
+            Grid.Row="0"
+            Margin="{StaticResource LargeThickness}"
+            Style="{StaticResource SectionCardBorderStyle}">
+            <Grid x:Name="mTopBarLayoutGrid" Margin="{StaticResource SmallThickness}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel x:Name="mTitleStackPanel" Orientation="Vertical">
+                    <TextBlock
+                        x:Name="mAppTitleTextBlock"
+                        FontSize="{StaticResource LargeFontSize}"
+                        FontWeight="SemiBold"
+                        Text="{Binding ResourcesService[AppTitle], Mode=OneWay}" />
+                    <TextBlock
+                        x:Name="mAppSubtitleTextBlock"
+                        FontSize="{StaticResource SmallFontSize}"
+                        Opacity="{StaticResource LowOpacity}"
+                        Text="{Binding ResourcesService[AppSubtitle], Mode=OneWay}" />
+                </StackPanel>
+
+                <StackPanel
+                    x:Name="mTopBarActionsStackPanel"
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+
+                    <controls:ThemeCheckBox
+                        x:Name="mThemeToggleControl"
+                        CheckBoxThemeCommand="{Binding CheckBoxThemeCommand}"
+                        IsDarkThemeActive="{Binding IsDarkThemeActive}"
+                        LabelResourceKey="ButtonToggleTheme"
+                        ResourcesService="{Binding ResourcesService}" />
+
+                    <controls:LanguageCheckBoxControl
+                        x:Name="mLanguageToggleControl"
+                        CheckBoxLanguageCommand="{Binding CheckBoxLanguageCommand}"
+                        IsFrenchLanguageActive="{Binding IsFrenchLanguageActive}"
+                        LabelResourceKey="LabelActiveLanguage"
+                        ResourcesService="{Binding ResourcesService}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <TabControl
+            x:Name="mMainTabControl"
+            Grid.Row="1"
+            Margin="{StaticResource LargeLeftRightThickness}"
+            Style="{StaticResource MainTabControlStyle}">
+
+            <TabItem x:Name="mOverviewTabItem">
+                <TabItem.Header>
+                    <TextBlock
+                        x:Name="mOverviewTabHeaderTextBlock"
+                        Text="{Binding ResourcesService[TabResumeTitle], Mode=OneWay}"
+                        TextAlignment="Center" />
+                </TabItem.Header>
+                <pages:OverviewPage x:Name="mOverviewPage" DataContext="{Binding OverviewPageViewModel}" />
+            </TabItem>
+
+            <TabItem x:Name="mExperienceTabItem">
+                <TabItem.Header>
+                    <TextBlock
+                        x:Name="mExperienceTabHeaderTextBlock"
+                        Text="{Binding ResourcesService[TabExperienceTitle], Mode=OneWay}"
+                        TextAlignment="Center" />
+                </TabItem.Header>
+                <pages:ExperiencePage x:Name="mExperiencePage" DataContext="{Binding ExperiencePageViewModel}" />
+            </TabItem>
+
+            <TabItem x:Name="mSkillsTabItem">
+                <TabItem.Header>
+                    <TextBlock
+                        x:Name="mSkillsTabHeaderTextBlock"
+                        Text="{Binding ResourcesService[TabSkillsTitle], Mode=OneWay}"
+                        TextAlignment="Center" />
+                </TabItem.Header>
+                <pages:SkillsPage x:Name="mSkillsPage" DataContext="{Binding SkillsPageViewModel}" />
+            </TabItem>
+
+            <TabItem x:Name="mProjectsTabItem">
+                <TabItem.Header>
+                    <TextBlock
+                        x:Name="mProjectsTabHeaderTextBlock"
+                        Text="{Binding ResourcesService[TabProjectsTitle], Mode=OneWay}"
+                        TextAlignment="Center" />
+                </TabItem.Header>
+                <pages:ProjectsPage x:Name="mProjectsPage" DataContext="{Binding ProjectsPageViewModel}" />
+            </TabItem>
+
+            <TabItem x:Name="mEducationTabItem">
+                <TabItem.Header>
+                    <TextBlock
+                        x:Name="mEducationTabHeaderTextBlock"
+                        Text="{Binding ResourcesService[TabEducationTitle], Mode=OneWay}"
+                        TextAlignment="Center" />
+                </TabItem.Header>
+                <pages:EducationPage x:Name="mEducationPage" DataContext="{Binding EducationPageViewModel}" />
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</Window>

@@ -1,0 +1,34 @@
+﻿<UserControl
+    x:Class="ResumeApp.Controls.LanguageCheckBoxControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="mLanguageCheckBoxControlRoot"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True">
+    <Grid x:Name="mLanguageCheckBoxLayoutGrid" Margin="{StaticResource SmallThickness}">
+        <CheckBox
+            x:Name="mCheckBoxLanguageButton"
+            Command="{Binding CheckBoxLanguageCommand, ElementName=mLanguageCheckBoxControlRoot}"
+            Style="{StaticResource TextCheckBoxStyle}">
+            <StackPanel x:Name="mCheckBoxLanguageStackPanel">
+                <TextBlock
+                    x:Name="mCheckBoxLanguageLabelTextBlock"
+                    Margin="{StaticResource SmallThickness}"
+                    HorizontalAlignment="Center"
+                    Text="{Binding LabelText, ElementName=mLanguageCheckBoxControlRoot}" />
+                <TextBlock x:Name="mCheckBoxLanguageStateTextBlock" HorizontalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style BasedOn="{StaticResource SmallTextBlock}" TargetType="{x:Type TextBlock}">
+                            <Setter Property="Text" Value="{Binding EnglishLanguageText, ElementName=mLanguageCheckBoxControlRoot}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsFrenchLanguageActive, ElementName=mLanguageCheckBoxControlRoot}" Value="True">
+                                    <Setter Property="Text" Value="{Binding FrenchLanguageText, ElementName=mLanguageCheckBoxControlRoot}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
+        </CheckBox>
+    </Grid>
+</UserControl>
