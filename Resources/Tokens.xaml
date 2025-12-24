@@ -178,6 +178,7 @@
     <FontFamily x:Key="MonoFontFamily">
         pack://application:,,,/ResumeApp;component/Resources/Fonts/#Inconsolata
     </FontFamily>
+    <system:Double x:Key="ExtraSmallFontSize">10</system:Double>
     <system:Double x:Key="SmallFontSize">14</system:Double>
     <system:Double x:Key="CommonFontSize">22</system:Double>
     <system:Double x:Key="LargeFontSize">36</system:Double>

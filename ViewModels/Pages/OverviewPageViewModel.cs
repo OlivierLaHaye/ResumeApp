@@ -6,17 +6,64 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Windows.Input;
 
 namespace ResumeApp.ViewModels.Pages
 {
 	public sealed class OverviewPageViewModel : ViewModelBase
 	{
+		private sealed class DelegateCommand : ICommand
+		{
+			public event EventHandler CanExecuteChanged
+			{
+				add
+				{
+					CommandManager.RequerySuggested += value;
+				}
+				remove
+				{
+					CommandManager.RequerySuggested -= value;
+				}
+			}
+
+			private readonly Action<object> mExecuteAction;
+			private readonly Func<object, bool> mCanExecuteFunc;
+
+			public DelegateCommand( Action<object> pExecuteAction, Func<object, bool> pCanExecuteFunc )
+			{
+				mExecuteAction = pExecuteAction;
+				mCanExecuteFunc = pCanExecuteFunc;
+			}
+
+			public bool CanExecute( object pParameter )
+			{
+				return mCanExecuteFunc == null || mCanExecuteFunc( pParameter );
+			}
+
+			public void Execute( object pParameter )
+			{
+				mExecuteAction?.Invoke( pParameter );
+			}
+		}
+
+		private const string MailtoSchemePrefix = "mailto:";
+		private const string HttpsSchemePrefix = "https://";
+
 		public ObservableCollection<LocalizedResourceItemViewModel> Highlights { get; }
 
 		public ObservableCollection<LocalizedResourceItemViewModel> DesignSystemPoints { get; }
 
 		public ObservableCollection<LocalizedResourceItemViewModel> CoreSkillsLines { get; }
+
+		public ICommand ComposeEmailCommand { get; }
+
+		public ICommand OpenUrlCommand { get; }
+
+		public string ComposeEmailButtonText => ResourcesService[ "OverviewContactComposeEmailButtonText" ];
+
+		public string OpenUrlButtonText => ResourcesService[ "OverviewContactOpenUrlButtonText" ];
 
 		public string FullNameText => ResourcesService[ "HeaderFullNameValue" ];
 
@@ -39,6 +86,9 @@ namespace ResumeApp.ViewModels.Pages
 		public OverviewPageViewModel( ResourcesService pResourcesService, ThemeService pThemeService )
 			: base( pResourcesService, pThemeService )
 		{
+			ComposeEmailCommand = new DelegateCommand( ExecuteComposeEmail, CanExecuteNonEmptyString );
+			OpenUrlCommand = new DelegateCommand( ExecuteOpenUrl, CanExecuteNonEmptyString );
+
 			Highlights = new ObservableCollection<LocalizedResourceItemViewModel>(
 				BuildKeys( "HighlightBullet", 5 )
 					.Select( pKey => new LocalizedResourceItemViewModel( ResourcesService, pKey ) ) );
@@ -64,8 +114,93 @@ namespace ResumeApp.ViewModels.Pages
 			return pCount <= 0 ? Array.Empty<string>() : Enumerable.Range( 1, pCount ).Select( pIndex => pPrefix + pIndex ).ToArray();
 		}
 
+		private static bool CanExecuteNonEmptyString( object pParameter )
+		{
+			if ( pParameter is string lText )
+			{
+				return !string.IsNullOrWhiteSpace( lText );
+			}
+
+			return false;
+		}
+
+		private static void ExecuteComposeEmail( object pParameter )
+		{
+			if ( !( pParameter is string lEmailAddress ) )
+			{
+				return;
+			}
+
+			var lMailtoUri = BuildMailtoUri( lEmailAddress );
+			OpenUri( lMailtoUri );
+		}
+
+		private static void ExecuteOpenUrl( object pParameter )
+		{
+			if ( !( pParameter is string lUrl ) )
+			{
+				return;
+			}
+
+			var lNormalizedUrl = NormalizeUrl( lUrl );
+			OpenUri( lNormalizedUrl );
+		}
+
+		private static string BuildMailtoUri( string pEmailAddress )
+		{
+			if ( string.IsNullOrWhiteSpace( pEmailAddress ) )
+			{
+				return string.Empty;
+			}
+
+			return pEmailAddress.StartsWith( MailtoSchemePrefix, StringComparison.OrdinalIgnoreCase )
+				? pEmailAddress
+				: MailtoSchemePrefix + pEmailAddress;
+		}
+
+		private static string NormalizeUrl( string pUrl )
+		{
+			if ( string.IsNullOrWhiteSpace( pUrl ) )
+			{
+				return string.Empty;
+			}
+
+			if ( Uri.TryCreate( pUrl, UriKind.Absolute, out var lAbsoluteUri ) )
+			{
+				return lAbsoluteUri.AbsoluteUri;
+			}
+
+			var lPrefixedUrl = HttpsSchemePrefix + pUrl.Trim();
+			return Uri.TryCreate( lPrefixedUrl, UriKind.Absolute, out var lPrefixedUri ) ? lPrefixedUri.AbsoluteUri : pUrl;
+		}
+
+		private static void OpenUri( string pUri )
+		{
+			if ( string.IsNullOrWhiteSpace( pUri ) )
+			{
+				return;
+			}
+
+			try
+			{
+				var lProcessStartInfo = new ProcessStartInfo
+				{
+					FileName = pUri,
+					UseShellExecute = true
+				};
+
+				Process.Start( lProcessStartInfo );
+			}
+			catch ( Exception )
+			{
+				// ignored
+			}
+		}
+
 		private void OnResourcesServicePropertyChanged( object pSender, PropertyChangedEventArgs pArgs )
 		{
+			RaisePropertyChanged( nameof( ComposeEmailButtonText ) );
+			RaisePropertyChanged( nameof( OpenUrlButtonText ) );
 			RaisePropertyChanged( nameof( FullNameText ) );
 			RaisePropertyChanged( nameof( TargetTitlesText ) );
 			RaisePropertyChanged( nameof( LocationText ) );

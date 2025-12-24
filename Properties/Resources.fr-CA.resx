@@ -574,6 +574,12 @@
   <data name="LanguageFrenchCanadaDisplayName" xml:space="preserve">
     <value>Français (Canada)</value>
   </data>
+  <data name="OverviewContactComposeEmailButtonText" xml:space="preserve">
+  <value>Écrire</value>
+</data>
+  <data name="OverviewContactOpenUrlButtonText" xml:space="preserve">
+  <value>Ouvrir</value>
+</data>
   <data name="Project1Bullet1" xml:space="preserve">
     <value>Migration UI vers WPF et amélioration de la cohérence visuelle à travers le produit.</value>
   </data>
