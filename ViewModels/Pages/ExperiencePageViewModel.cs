@@ -1,6 +1,3 @@
-// Copyright (C) Olivier La Haye
-// All rights reserved.
-
 using ResumeApp.Helpers;
 using ResumeApp.Infrastructure;
 using ResumeApp.Models;
@@ -148,39 +145,16 @@ namespace ResumeApp.ViewModels.Pages
 			}
 
 			List<ExperienceTimelineEntryViewModel> lOrderedByStartDate = lValidEntries
-				.OrderBy( pItem => pItem.StartDate )
-				.ThenBy( pItem => pItem.EndDate ?? DateTime.Today )
-				.ThenBy( pItem => pItem.CompanyText )
-				.ThenBy( pItem => pItem.RoleText )
+				.OrderBy( pEntry => pEntry.StartDate )
+				.ThenBy( pEntry => pEntry.EndDate ?? DateTime.Today )
+				.ThenBy( pEntry => pEntry.CompanyText )
+				.ThenBy( pEntry => pEntry.RoleText )
 				.ToList();
 
-			var lLaneEndDates = new List<DateTime>();
-
-			foreach ( ExperienceTimelineEntryViewModel lEntry in lOrderedByStartDate )
+			for ( int lEntryIndex = 0; lEntryIndex < lOrderedByStartDate.Count; lEntryIndex++ )
 			{
-				DateTime lEndDate = lEntry.EndDate ?? DateTime.Today;
-
-				int lAssignedLaneIndex = -1;
-
-				for ( int lLaneIndex = 0; lLaneIndex < lLaneEndDates.Count; lLaneIndex++ )
-				{
-					if ( lEntry.StartDate < lLaneEndDates[ lLaneIndex ] )
-					{
-						continue;
-					}
-
-					lAssignedLaneIndex = lLaneIndex;
-					lLaneEndDates[ lLaneIndex ] = lEndDate;
-					break;
-				}
-
-				if ( lAssignedLaneIndex < 0 )
-				{
-					lLaneEndDates.Add( lEndDate );
-					lAssignedLaneIndex = lLaneEndDates.Count - 1;
-				}
-
-				lEntry.SetLaneIndex( lAssignedLaneIndex );
+				ExperienceTimelineEntryViewModel lEntry = lOrderedByStartDate[ lEntryIndex ];
+				lEntry.SetLaneIndex( lEntryIndex );
 			}
 
 			List<ExperienceTimelineEntryViewModel> lOrderedForPalette = lValidEntries
@@ -198,10 +172,13 @@ namespace ResumeApp.ViewModels.Pages
 
 		private void ExecuteSelectExperience( object pParameter )
 		{
-			if ( pParameter is ExperienceTimelineEntryViewModel lEntry )
+			if ( !( pParameter is ExperienceTimelineEntryViewModel lEntry ) )
 			{
-				SelectedTimelineEntry = lEntry;
+				return;
 			}
+
+			SelectedTimelineEntry = lEntry;
+			SelectedDate = lEntry.StartDate;
 		}
 
 		private void ExecuteSelectDate( object pParameter )
@@ -350,6 +327,8 @@ namespace ResumeApp.ViewModels.Pages
 			List<ExperienceTimelineEntryViewModel> lOrdered = TimelineEntries
 				.Where( pItem => pItem != null )
 				.OrderBy( pItem => pItem.StartDate )
+				.ThenBy( pItem => pItem.CompanyText )
+				.ThenBy( pItem => pItem.RoleText )
 				.ToList();
 
 			ExperienceTimelineEntryViewModel lMatch = lOrdered
