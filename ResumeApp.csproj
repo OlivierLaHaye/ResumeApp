@@ -332,6 +332,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_1.png" />
+    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_10.png" />
+    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_2.png" />
+    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_3.png" />
+    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_4.png" />
+    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_5.png" />
+    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_6.png" />
+    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_7.png" />
+    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_8.png" />
+    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_9.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>REM Pre-build event in Project Properties → Build Events

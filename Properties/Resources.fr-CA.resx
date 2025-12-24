@@ -643,6 +643,9 @@
   <data name="Project3Context" xml:space="preserve">
     <value>Contexte: Logiciel personnel pour accélérer le workflow de retouche photo (import, renommage, étapes répétitives) sans réduire la qualité.</value>
   </data>
+  <data name="Project3Images" xml:space="preserve">
+    <value>Images: Resources/Projects/OLHphotographie/OLHphotographie_1.png;Resources/Projects/OLHphotographie/OLHphotographie_2.png;Resources/Projects/OLHphotographie/OLHphotographie_3.png;Resources/Projects/OLHphotographie/OLHphotographie_4.png;Resources/Projects/OLHphotographie/OLHphotographie_5.png;Resources/Projects/OLHphotographie/OLHphotographie_6.png;Resources/Projects/OLHphotographie/OLHphotographie_7.png;Resources/Projects/OLHphotographie/OLHphotographie_8.png;Resources/Projects/OLHphotographie/OLHphotographie_9.png;Resources/Projects/OLHphotographie/OLHphotographie_10.png</value>
+</data>
   <data name="Project3Impact" xml:space="preserve">
     <value>Impact: gains de productivité personnels grâce à la réduction des étapes manuelles répétitives et à une exécution plus rapide des tâches.</value>
   </data>

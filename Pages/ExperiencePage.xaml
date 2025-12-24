@@ -91,7 +91,6 @@
         <Border
             x:Name="mTimelineBorder"
             Grid.Row="1"
-            Margin="{StaticResource CommonTopBottomThickness}"
             Style="{StaticResource SubSectionCardBorderStyle}">
             <StackPanel x:Name="mTimelineStackPanel">
                 <Grid x:Name="mTimelineLayoutGrid" Margin="{StaticResource CommonThickness}">

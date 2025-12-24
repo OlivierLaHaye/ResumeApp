@@ -301,7 +301,6 @@
         <TabControl
             x:Name="mMainTabControl"
             Grid.Row="2"
-            Margin="{StaticResource LargeLeftRightThickness}"
             Style="{StaticResource MainWindowTabControlStyle}">
             <TabItem x:Name="mOverviewTabItem">
                 <TabItem.Header>
