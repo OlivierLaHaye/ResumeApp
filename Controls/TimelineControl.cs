@@ -1,7 +1,4 @@
-﻿// Copyright (C) Olivier La Haye
-// All rights reserved.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -9,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -124,7 +122,7 @@ namespace ResumeApp.Controls
 			public bool Equals( FormattedTextCacheKey pOther )
 			{
 				return string.Equals( Text, pOther.Text, StringComparison.Ordinal )
-				       && Math.Abs( FontSize - pOther.FontSize ) < 0.000001;
+					   && Math.Abs( FontSize - pOther.FontSize ) < 0.000001;
 			}
 
 			public override bool Equals( object pObject )
@@ -161,21 +159,14 @@ namespace ResumeApp.Controls
 			Decade
 		}
 
-		private enum TitleAnchor
-		{
-			Center,
-			Left,
-			Right
-		}
-
 		private const double MinimumZoomPixelsPerDay = 0.08;
 		private const double MaximumZoomPixelsPerDay = 48.0;
 		private const double WheelZoomFactorPerNotch = 1.12;
 
 		private const double DefaultPadding = 16.0;
 
-		private const double TimeFrameBarHeight = 10.0;
-		private const double TimeFrameLaneHeight = 18.0;
+		private const double TimeFrameBarHeight = 22.0;
+		private const double TimeFrameLaneHeight = 28.0;
 		private const double TimeFrameLaneGapPixels = 8.0;
 
 		private const double TickMajorHeight = 8.0;
@@ -190,11 +181,9 @@ namespace ResumeApp.Controls
 
 		private const double FitAnimationDurationMilliseconds = 240.0;
 
-		private const double TimeFrameTitleToBarGapPixels = 6.0;
-		private const double TimeFrameTitleRowStepPixels = 16.0;
-		private const double TimeFrameTitleCollisionPaddingPixels = 4.0;
-
-		private const double TimeFrameTitleHorizontalPaddingPixels = 2.0;
+		private const double TimeFrameTitleDotToTextGapPixels = 6.0;
+		private const double TimeFrameTitleInnerPaddingPixels = 8.0;
+		private const double TimeFrameTitleMinimumSpacingPixels = 10.0;
 
 		private const int ClickMaximumDurationMilliseconds = 320;
 
@@ -303,6 +292,10 @@ namespace ResumeApp.Controls
 		private FontStretch mTextCacheFontStretch;
 		private double mTextCachePixelsPerDip;
 		private Brush mTextCacheBrush;
+
+		private bool mHasUserInteracted;
+		private bool mHasAppliedInitialFit;
+		private bool mHasSuppressEnsureDateVisible;
 
 		public DateTime MinDate
 		{
@@ -587,7 +580,6 @@ namespace ResumeApp.Controls
 			lControl.UpdateRenderingSubscriptionIfNeeded();
 		}
 
-
 		private static void OnSelectedTimeFrameChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
 			if ( pDependencyObject is TimelineControl lControl )
@@ -646,10 +638,14 @@ namespace ResumeApp.Controls
 			}
 
 			lControl.ViewportStartDate = lControl.ClampViewportStartDate( lControl.ViewportStartDate, lControl.GetContentRect() );
-			lControl.EnsureDateVisible( lControl.SelectedDate, lControl.GetContentRect() );
+
+			if ( !lControl.mHasSuppressEnsureDateVisible )
+			{
+				lControl.EnsureDateVisible( lControl.SelectedDate, lControl.GetContentRect() );
+			}
+
 			lControl.UpdateRenderingSubscriptionIfNeeded();
 		}
-
 
 		private static double CoerceZoomValue( double pZoom )
 		{
@@ -688,31 +684,6 @@ namespace ResumeApp.Controls
 			{
 				lControl.UpdateRenderingSubscriptionIfNeeded();
 			}
-		}
-
-
-		private static double MeasureTextWidth(
-			string pText,
-			Typeface pTypeface,
-			double pFontSize,
-			Brush pBrush,
-			double pPixelsPerDip )
-		{
-			if ( string.IsNullOrEmpty( pText ) || pTypeface == null || pBrush == null )
-			{
-				return 0.0;
-			}
-
-			var lText = new FormattedText(
-				pText,
-				CultureInfo.CurrentCulture,
-				FlowDirection.LeftToRight,
-				pTypeface,
-				pFontSize,
-				pBrush,
-				pPixelsPerDip );
-
-			return lText.WidthIncludingTrailingWhitespace;
 		}
 
 		private static IEnumerable<DateTime> EnumerateMajorTicks( DateTime pStart, DateTime pEnd, TickGranularity pGranularity, int pStep )
@@ -886,101 +857,6 @@ namespace ResumeApp.Controls
 			}
 		}
 
-		private static List<List<VisibleTimeFrame>> BuildOverlapGroups( IEnumerable<VisibleTimeFrame> pFrames )
-		{
-			var lOrdered = pFrames
-				.OrderBy( pFrame => pFrame.StartX )
-				.ThenByDescending( pFrame => pFrame.EndX )
-				.ThenBy( pFrame => pFrame.Item?.Title ?? string.Empty, StringComparer.OrdinalIgnoreCase )
-				.ToList();
-
-			var lGroups = new List<List<VisibleTimeFrame>>();
-			var lCurrentGroup = new List<VisibleTimeFrame>();
-			var lGroupEndX = double.NegativeInfinity;
-
-			foreach ( var lFrame in lOrdered )
-			{
-				if ( lCurrentGroup.Count == 0 )
-				{
-					lCurrentGroup.Add( lFrame );
-					lGroupEndX = lFrame.EndX;
-					continue;
-				}
-
-				if ( lFrame.StartX <= lGroupEndX )
-				{
-					lCurrentGroup.Add( lFrame );
-					lGroupEndX = Math.Max( lGroupEndX, lFrame.EndX );
-					continue;
-				}
-
-				lGroups.Add( lCurrentGroup );
-				lCurrentGroup = new List<VisibleTimeFrame> { lFrame };
-				lGroupEndX = lFrame.EndX;
-			}
-
-			if ( lCurrentGroup.Count > 0 )
-			{
-				lGroups.Add( lCurrentGroup );
-			}
-
-			return lGroups;
-		}
-
-		private static VisibleTimeFrame ChooseLeftAnchoredFrame( IEnumerable<VisibleTimeFrame> pGroup )
-		{
-			var lOrdered = pGroup
-				.OrderBy( pFrame => pFrame.StartDate )
-				.ThenBy( pFrame => pFrame.EndDate )
-				.ThenBy( pFrame => pFrame.Item?.Title ?? string.Empty, StringComparer.OrdinalIgnoreCase );
-
-			return lOrdered.FirstOrDefault();
-		}
-
-		private static IEnumerable<VisibleTimeFrame> OrderFramesForTitlePlacement( IEnumerable<VisibleTimeFrame> pGroup, VisibleTimeFrame pLeftFrame )
-		{
-			var lOthers = pGroup
-				.Where( pFrame => pLeftFrame == null || !ReferenceEquals( pFrame.Item, pLeftFrame.Item ) )
-				.OrderBy( pFrame => pFrame.StartDate )
-				.ThenBy( pFrame => pFrame.EndDate )
-				.ThenBy( pFrame => pFrame.Item?.Title ?? string.Empty, StringComparer.OrdinalIgnoreCase )
-				.ToList();
-
-			return pLeftFrame == null ? lOthers : new[] { pLeftFrame }.Concat( lOthers );
-		}
-
-		private static TitleAnchor GetTitleAnchorForFrame( VisibleTimeFrame pFrame, VisibleTimeFrame pLeftFrame, int pGroupCount )
-		{
-			if ( pGroupCount <= 1 )
-			{
-				return TitleAnchor.Center;
-			}
-
-			return pLeftFrame != null && ReferenceEquals( pFrame.Item, pLeftFrame.Item ) ? TitleAnchor.Left : TitleAnchor.Right;
-		}
-
-		private static double ClampLabelLeft( double pLeft, double pContentLeft, double pContentRight, double pWidth )
-		{
-			if ( pWidth <= 0.0 )
-			{
-				return pLeft;
-			}
-
-			var lMaxLeft = pContentRight - pWidth;
-			if ( lMaxLeft < pContentLeft )
-			{
-				return pContentLeft;
-			}
-
-			if ( pLeft < pContentLeft )
-			{
-				return pContentLeft;
-			}
-
-			return pLeft > lMaxLeft ? lMaxLeft : pLeft;
-		}
-
-
 		protected override void OnRender( DrawingContext pDrawingContext )
 		{
 			base.OnRender( pDrawingContext );
@@ -1015,10 +891,11 @@ namespace ResumeApp.Controls
 			DrawFocusOutlineIfNeeded( pDrawingContext );
 		}
 
-
 		protected override void OnMouseWheel( MouseWheelEventArgs pEventArgs )
 		{
 			base.OnMouseWheel( pEventArgs );
+
+			mHasUserInteracted = true;
 
 			mIsFitAnimationActive = false;
 			mIsInertiaActive = false;
@@ -1052,12 +929,13 @@ namespace ResumeApp.Controls
 			pEventArgs.Handled = true;
 		}
 
-
 		protected override void OnMouseLeftButtonDown( MouseButtonEventArgs pEventArgs )
 		{
 			base.OnMouseLeftButtonDown( pEventArgs );
 
 			Focus();
+
+			mHasUserInteracted = true;
 
 			mIsFitAnimationActive = false;
 			mIsInertiaActive = false;
@@ -1083,7 +961,6 @@ namespace ResumeApp.Controls
 			pEventArgs.Handled = true;
 		}
 
-
 		protected override void OnMouseMove( MouseEventArgs pEventArgs )
 		{
 			base.OnMouseMove( pEventArgs );
@@ -1103,6 +980,8 @@ namespace ResumeApp.Controls
 				UpdateCursorAtPosition( lPosition );
 				return;
 			}
+
+			mHasUserInteracted = true;
 
 			mHasDragged = true;
 			mIsInertiaActive = false;
@@ -1187,6 +1066,8 @@ namespace ResumeApp.Controls
 		{
 			base.OnKeyDown( pEventArgs );
 
+			mHasUserInteracted = true;
+
 			var lContentRect = GetContentRect();
 			var lIsControlDown = ( Keyboard.Modifiers & ModifierKeys.Control ) == ModifierKeys.Control;
 
@@ -1227,12 +1108,59 @@ namespace ResumeApp.Controls
 		{
 			base.OnRenderSizeChanged( pSizeInfo );
 
+			EnsureInitialFitIfNeeded();
+
 			CoerceValue( sZoomLevelProperty );
 			CoerceValue( sViewportStartTicksProperty );
 
 			var lContentRect = GetContentRect();
 			ViewportStartDate = ClampViewportStartDate( ViewportStartDate, lContentRect );
 			EnsureDateVisible( SelectedDate, lContentRect );
+		}
+
+		private void EnsureInitialFitIfNeeded()
+		{
+			if ( mHasAppliedInitialFit || mHasUserInteracted )
+			{
+				return;
+			}
+
+			var lContentRect = GetContentRect();
+			if ( lContentRect.Width <= 1.0 )
+			{
+				return;
+			}
+
+			var lHasZoomBindingOrLocal = BindingOperations.IsDataBound( this, sZoomLevelProperty ) || ReadLocalValue( sZoomLevelProperty ) != DependencyProperty.UnsetValue;
+			var lHasViewportBindingOrLocal = BindingOperations.IsDataBound( this, sViewportStartTicksProperty ) || ReadLocalValue( sViewportStartTicksProperty ) != DependencyProperty.UnsetValue;
+
+			if ( lHasZoomBindingOrLocal || lHasViewportBindingOrLocal )
+			{
+				mHasAppliedInitialFit = true;
+				return;
+			}
+
+			var lStartDate = EffectiveMinDate;
+			var lEndDate = DateTime.Today;
+
+			var lRangeDays = Math.Max( 1.0, ( lEndDate - lStartDate ).TotalDays );
+			var lFitZoom = lContentRect.Width / lRangeDays;
+			var lTargetZoom = CoerceZoomValueByContent( lFitZoom, lContentRect );
+
+			var lTargetViewportStart = ClampViewportStartDate( lStartDate, lContentRect );
+
+			mHasSuppressEnsureDateVisible = true;
+			try
+			{
+				ZoomLevel = lTargetZoom;
+				ViewportStartDate = lTargetViewportStart;
+			}
+			finally
+			{
+				mHasSuppressEnsureDateVisible = false;
+			}
+
+			mHasAppliedInitialFit = true;
 		}
 
 		private List<TimeFrameTitleDrawInfo> LayoutTimeFrameTitles(
@@ -1249,46 +1177,45 @@ namespace ResumeApp.Controls
 				return new List<TimeFrameTitleDrawInfo>();
 			}
 
-			var lMinBarTop = pBarRectsByItem.Values.Select( pRect => pRect.Top ).DefaultIfEmpty( pContentRect.Top ).Min();
-
-			var lTitleAreaTop = pContentRect.Top;
-			var lTitleAreaBottom = Math.Max( lTitleAreaTop, lMinBarTop - TimeFrameTitleToBarGapPixels );
-			var lTitleAreaHeight = Math.Max( 0.0, lTitleAreaBottom - lTitleAreaTop );
-
-			if ( lTitleAreaHeight <= 0.0 )
-			{
-				return new List<TimeFrameTitleDrawInfo>();
-			}
-
 			var lCandidates = lVisibleFrames
+				.Where( pFrame => pBarRectsByItem.ContainsKey( pFrame.Item ) )
 				.Select( pFrame =>
 				{
+					var lBarRect = pBarRectsByItem[ pFrame.Item ];
 					var lTitle = pFrame.Item.Title ?? string.Empty;
-					var lText = CreateFormattedTextCached( lTitle, pTypeface, TimeFrameLabelFontSize, pTextBrush, pPixelsPerDip );
 
-					var lWidth = lText?.WidthIncludingTrailingWhitespace ?? 0.0;
+					var lMaxFontSize = Math.Max( 8.0, lBarRect.Height - 8.0 );
+					var lFontSize = Math.Min( TimeFrameLabelFontSize, lMaxFontSize );
+
+					var lText = CreateFormattedTextCached( lTitle, pTypeface, lFontSize, pTextBrush, pPixelsPerDip );
+					var lTextWidth = lText?.WidthIncludingTrailingWhitespace ?? 0.0;
+					var lTextHeight = lText?.Height ?? 0.0;
+
+					var lDotRadius = Math.Max( 3.0, Math.Min( 5.0, lBarRect.Height * 0.22 ) );
+					var lDotDiameter = lDotRadius * 2.0;
+
+					var lGroupWidth = lDotDiameter + TimeFrameTitleDotToTextGapPixels + lTextWidth;
+					var lGroupHeight = Math.Max( lTextHeight, lDotDiameter );
+
 					var lCenterX = pContentRect.Left + ( ( pFrame.StartX + pFrame.EndX ) * 0.5 );
-					var lLeftX = pContentRect.Left + pFrame.StartX;
-					var lRightX = pContentRect.Left + pFrame.EndX;
 
 					return new
 					{
-						Item = pFrame.Item,
+						pFrame.Item,
+						pFrame.LaneIndex,
 						Text = lText,
-						Width = lWidth,
-						Height = lText?.Height ?? 0.0,
+						TextWidth = lTextWidth,
+						TextHeight = lTextHeight,
+						BarRect = lBarRect,
+						GroupWidth = lGroupWidth,
+						GroupHeight = lGroupHeight,
 						CenterX = lCenterX,
-						LeftX = lLeftX,
-						RightX = lRightX,
-						StartDate = pFrame.StartDate,
-						EndDate = pFrame.EndDate,
 						Title = lTitle
 					};
 				} )
-				.Where( pCandidate => pCandidate.Text != null && pCandidate.Width > 0.0 && pCandidate.Height > 0.0 )
-				.OrderBy( pCandidate => pCandidate.CenterX )
-				.ThenBy( pCandidate => pCandidate.StartDate )
-				.ThenBy( pCandidate => pCandidate.EndDate )
+				.Where( pCandidate => pCandidate.Text != null && pCandidate.TextWidth > 0.0 && pCandidate.GroupWidth > 0.0 )
+				.OrderBy( pCandidate => pCandidate.LaneIndex )
+				.ThenBy( pCandidate => pCandidate.CenterX )
 				.ThenBy( pCandidate => pCandidate.Title, StringComparer.OrdinalIgnoreCase )
 				.ToList();
 
@@ -1297,179 +1224,102 @@ namespace ResumeApp.Controls
 				return new List<TimeFrameTitleDrawInfo>();
 			}
 
-			const double lMinSpacingPixels = 10.0;
-
-			var lMaxHeight = lCandidates.Select( pCandidate => pCandidate.Height ).DefaultIfEmpty( 0.0 ).Max();
-			var lRowStep = Math.Max( 1.0, lMaxHeight + lMinSpacingPixels );
-
-			var lMaxRowCount = Math.Max( 1, ( int )Math.Floor( ( lTitleAreaHeight + lMinSpacingPixels ) / lRowStep ) );
-
-			var lPlacedByRow = Enumerable.Range( 0, lMaxRowCount ).Select( pRowIndex => new List<Rect>() ).ToList();
+			var lPlacedByLane = new Dictionary<int, List<Rect>>();
 			var lResults = new List<TimeFrameTitleDrawInfo>( lCandidates.Count );
 
 			foreach ( var lCandidate in lCandidates )
 			{
-				var lPlaced = false;
-
-				for ( var lRowIndex = 0; lRowIndex < lMaxRowCount && !lPlaced; lRowIndex++ )
+				if ( !lPlacedByLane.TryGetValue( lCandidate.LaneIndex, out var lPlacedRects ) )
 				{
-					if ( TryPlaceTitleCandidate( lCandidate.Item, lCandidate.Text, lCandidate.Width, lCandidate.Height, lCandidate.CenterX, lTitleAreaTop, lTitleAreaBottom, lRowIndex, lRowStep, pContentRect, lPlacedByRow, TitleAnchor.Center, out var lPlacedRect ) )
-					{
-						lResults.Add( new TimeFrameTitleDrawInfo( lCandidate.Item, lCandidate.Text, lPlacedRect ) );
-						lPlaced = true;
-					}
+					lPlacedRects = new List<Rect>();
+					lPlacedByLane[ lCandidate.LaneIndex ] = lPlacedRects;
 				}
 
-				if ( lPlaced )
+				var lMinLeft = Math.Max( pContentRect.Left, lCandidate.BarRect.Left + TimeFrameTitleInnerPaddingPixels );
+				var lMaxLeft = Math.Min( pContentRect.Right - lCandidate.GroupWidth, lCandidate.BarRect.Right - TimeFrameTitleInnerPaddingPixels - lCandidate.GroupWidth );
+
+				if ( lMaxLeft < lMinLeft )
 				{
-					continue;
+					lMaxLeft = lMinLeft;
 				}
 
-				for ( var lRowIndex = 0; lRowIndex < lMaxRowCount && !lPlaced; lRowIndex++ )
-				{
-					if ( TryPlaceTitleCandidate( lCandidate.Item, lCandidate.Text, lCandidate.Width, lCandidate.Height, lCandidate.CenterX, lTitleAreaTop, lTitleAreaBottom, lRowIndex, lRowStep, pContentRect, lPlacedByRow, TitleAnchor.Left, out var lPlacedRect ) )
-					{
-						lResults.Add( new TimeFrameTitleDrawInfo( lCandidate.Item, lCandidate.Text, lPlacedRect ) );
-						lPlaced = true;
-					}
-				}
+				var lDesiredLeft = lCandidate.CenterX - ( lCandidate.GroupWidth * 0.5 );
+				var lPlacedLeft = PlaceLeftWithLaneSpacing( lDesiredLeft, lCandidate.GroupWidth, lMinLeft, lMaxLeft, lCandidate.CenterX, lPlacedRects );
 
-				if ( lPlaced )
-				{
-					continue;
-				}
+				var lGroupTop = lCandidate.BarRect.Top + Math.Max( 0.0, ( lCandidate.BarRect.Height - lCandidate.GroupHeight ) * 0.5 );
+				var lGroupRect = new Rect( lPlacedLeft, lGroupTop, lCandidate.GroupWidth, lCandidate.GroupHeight );
 
-				for ( var lRowIndex = 0; lRowIndex < lMaxRowCount && !lPlaced; lRowIndex++ )
-				{
-					if ( TryPlaceTitleCandidate( lCandidate.Item, lCandidate.Text, lCandidate.Width, lCandidate.Height, lCandidate.CenterX, lTitleAreaTop, lTitleAreaBottom, lRowIndex, lRowStep, pContentRect, lPlacedByRow, TitleAnchor.Right, out var lPlacedRect ) )
-					{
-						lResults.Add( new TimeFrameTitleDrawInfo( lCandidate.Item, lCandidate.Text, lPlacedRect ) );
-						lPlaced = true;
-					}
-				}
+				lPlacedRects.Add( lGroupRect );
+				lPlacedRects.Sort( ( pLeftRect, pRightRect ) => pLeftRect.Left.CompareTo( pRightRect.Left ) );
+
+				lResults.Add( new TimeFrameTitleDrawInfo( lCandidate.Item, lCandidate.Text, lGroupRect ) );
 			}
 
 			return lResults;
 		}
 
-		private bool TryPlaceTitleCandidate(
-	Models.TimelineTimeFrameItem pItem,
-	FormattedText pText,
-	double pTextWidth,
-	double pTextHeight,
-	double pCenterX,
-	double pTitleAreaTop,
-	double pTitleAreaBottom,
-	int pRowIndex,
-	double pRowStep,
-	Rect pContentRect,
-	IList<List<Rect>> pPlacedByRow,
-	TitleAnchor pAnchor,
-	out Rect pPlacedRect )
+		private static double PlaceLeftWithLaneSpacing(
+			double pDesiredLeft,
+			double pWidth,
+			double pMinLeft,
+			double pMaxLeft,
+			double pDesiredCenterX,
+			IReadOnlyList<Rect> pPlacedRects )
 		{
-			pPlacedRect = Rect.Empty;
-
-			if ( pItem == null || pText == null || pTextWidth <= 0.0 || pTextHeight <= 0.0 )
-			{
-				return false;
-			}
-
-			const double lMinSpacingPixels = 10.0;
-
-			var lRowTop = pTitleAreaBottom - pTextHeight - ( pRowIndex * pRowStep );
-			lRowTop = Math.Max( pTitleAreaTop, Math.Min( pTitleAreaBottom - pTextHeight, lRowTop ) );
-
-			var lDesiredLeft = pCenterX - ( pTextWidth * 0.5 );
-
-			switch ( pAnchor )
-			{
-				case TitleAnchor.Left:
-					{
-						lDesiredLeft = pCenterX - ( pTextWidth * 0.5 );
-						break;
-					}
-				case TitleAnchor.Right:
-					{
-						lDesiredLeft = pCenterX - ( pTextWidth * 0.5 );
-						break;
-					}
-				case TitleAnchor.Center:
-					{
-						lDesiredLeft = pCenterX - ( pTextWidth * 0.5 );
-						break;
-					}
-			}
-
-			var lContentLeft = pContentRect.Left;
-			var lContentRight = pContentRect.Right;
-
-			double lLeft;
-
-			if ( pAnchor == TitleAnchor.Left )
-			{
-				lLeft = ClampLabelLeft( pCenterX - ( pTextWidth * 0.5 ), lContentLeft, lContentRight, pTextWidth );
-			}
-			else if ( pAnchor == TitleAnchor.Right )
-			{
-				lLeft = ClampLabelLeft( pCenterX - ( pTextWidth * 0.5 ), lContentLeft, lContentRight, pTextWidth );
-			}
-			else
-			{
-				lLeft = ClampLabelLeft( lDesiredLeft, lContentLeft, lContentRight, pTextWidth );
-			}
-
-			var lAttemptRect = new Rect( lLeft, lRowTop, pTextWidth, pTextHeight );
-			var lRowRects = pPlacedByRow[ pRowIndex ];
-
-			if ( lRowRects.Count == 0 )
-			{
-				lRowRects.Add( lAttemptRect );
-				pPlacedRect = lAttemptRect;
-				return true;
-			}
+			var lClampedDesiredLeft = ClampToRange( pDesiredLeft, pMinLeft, pMaxLeft );
+			var lAttemptLeft = lClampedDesiredLeft;
 
 			for ( var lIterationCount = 0; lIterationCount < 6; lIterationCount++ )
 			{
-				var lConflicts = lRowRects
-					.Where( pExisting => ( lAttemptRect.Right + lMinSpacingPixels ) > pExisting.Left && ( pExisting.Right + lMinSpacingPixels ) > lAttemptRect.Left )
+				var lAttemptRect = new Rect( lAttemptLeft, 0.0, pWidth, 1.0 );
+
+				var lConflicts = pPlacedRects
+					.Where( pExisting => ( lAttemptRect.Right + TimeFrameTitleMinimumSpacingPixels ) > pExisting.Left && ( pExisting.Right + TimeFrameTitleMinimumSpacingPixels ) > lAttemptRect.Left )
 					.ToList();
 
 				if ( lConflicts.Count == 0 )
 				{
-					lRowRects.Add( lAttemptRect );
-					lRowRects.Sort( ( pLeftRect, pRightRect ) => pLeftRect.Left.CompareTo( pRightRect.Left ) );
-					pPlacedRect = lAttemptRect;
-					return true;
+					return lAttemptLeft;
 				}
 
-				var lShiftRightLeft = lConflicts.Max( pExisting => pExisting.Right + lMinSpacingPixels );
-				var lShiftLeftLeft = lConflicts.Min( pExisting => pExisting.Left - lMinSpacingPixels - pTextWidth );
+				var lShiftRightLeft = lConflicts.Max( pExisting => pExisting.Right + TimeFrameTitleMinimumSpacingPixels );
+				var lShiftLeftLeft = lConflicts.Min( pExisting => pExisting.Left - TimeFrameTitleMinimumSpacingPixels - pWidth );
 
-				var lRightCandidate = ClampLabelLeft( lShiftRightLeft, lContentLeft, lContentRight, pTextWidth );
-				var lLeftCandidate = ClampLabelLeft( lShiftLeftLeft, lContentLeft, lContentRight, pTextWidth );
+				var lRightCandidate = ClampToRange( lShiftRightLeft, pMinLeft, pMaxLeft );
+				var lLeftCandidate = ClampToRange( lShiftLeftLeft, pMinLeft, pMaxLeft );
 
-				var lRightDelta = Math.Abs( ( lRightCandidate + ( pTextWidth * 0.5 ) ) - pCenterX );
-				var lLeftDelta = Math.Abs( ( lLeftCandidate + ( pTextWidth * 0.5 ) ) - pCenterX );
+				var lRightDelta = Math.Abs( ( lRightCandidate + ( pWidth * 0.5 ) ) - pDesiredCenterX );
+				var lLeftDelta = Math.Abs( ( lLeftCandidate + ( pWidth * 0.5 ) ) - pDesiredCenterX );
 
-				var lHasRightRoom = lRightCandidate <= ( lContentRight - pTextWidth );
-				var lHasLeftRoom = lLeftCandidate >= lContentLeft;
+				var lHasRightRoom = lRightCandidate <= pMaxLeft + 0.000001;
+				var lHasLeftRoom = lLeftCandidate >= pMinLeft - 0.000001;
 
 				if ( lHasLeftRoom && ( !lHasRightRoom || lLeftDelta <= lRightDelta ) )
 				{
-					lAttemptRect = new Rect( lLeftCandidate, lRowTop, pTextWidth, pTextHeight );
+					lAttemptLeft = lLeftCandidate;
 					continue;
 				}
 
 				if ( lHasRightRoom )
 				{
-					lAttemptRect = new Rect( lRightCandidate, lRowTop, pTextWidth, pTextHeight );
+					lAttemptLeft = lRightCandidate;
 					continue;
 				}
 
-				return false;
+				return lAttemptLeft;
 			}
 
-			return false;
+			return lAttemptLeft;
+		}
+
+		private static double ClampToRange( double pValue, double pMin, double pMax )
+		{
+			if ( pValue < pMin )
+			{
+				return pMin;
+			}
+
+			return pValue > pMax ? pMax : pValue;
 		}
 
 		private void SetSelectedDateInternal( DateTime pDate )
@@ -1531,12 +1381,12 @@ namespace ResumeApp.Controls
 			var lCultureName = CultureInfo.CurrentCulture?.Name ?? string.Empty;
 
 			var lHasSameContext = ReferenceEquals( pBrush, mTextCacheBrush )
-			                      && Math.Abs( pPixelsPerDip - mTextCachePixelsPerDip ) < 0.000001
-			                      && Equals( FontFamily, mTextCacheFontFamily )
-			                      && FontStyle.Equals( mTextCacheFontStyle )
-			                      && FontWeight.Equals( mTextCacheFontWeight )
-			                      && FontStretch.Equals( mTextCacheFontStretch )
-			                      && string.Equals( lCultureName, mTextCacheCultureName, StringComparison.Ordinal );
+								  && Math.Abs( pPixelsPerDip - mTextCachePixelsPerDip ) < 0.000001
+								  && Equals( FontFamily, mTextCacheFontFamily )
+								  && FontStyle.Equals( mTextCacheFontStyle )
+								  && FontWeight.Equals( mTextCacheFontWeight )
+								  && FontStretch.Equals( mTextCacheFontStretch )
+								  && string.Equals( lCultureName, mTextCacheCultureName, StringComparison.Ordinal );
 
 			if ( lHasSameContext )
 			{
@@ -1565,9 +1415,10 @@ namespace ResumeApp.Controls
 			Cursor = pIsHand ? Cursors.Hand : Cursors.Arrow;
 		}
 
-
 		private void SetSelectedDateFromUserInteraction( DateTime pDate, Rect pContentRect )
 		{
+			mHasUserInteracted = true;
+
 			var lClamped = ClampDateToRange( pDate );
 
 			mIsInternalSelectedDateUpdate = true;
@@ -1608,9 +1459,9 @@ namespace ResumeApp.Controls
 		private void UpdateRenderingSubscriptionIfNeeded()
 		{
 			var lShouldSubscribe = mIsFitAnimationActive
-			                       || mIsInertiaActive
-			                       || ( mIsPointerDown && mHasDragged )
-			                       || mHasPendingPan;
+								   || mIsInertiaActive
+								   || ( mIsPointerDown && mHasDragged )
+								   || mHasPendingPan;
 
 			if ( lShouldSubscribe == mIsRenderingSubscribed )
 			{
@@ -1647,6 +1498,7 @@ namespace ResumeApp.Controls
 
 		private void OnLoaded( object pSender, RoutedEventArgs pEventArgs )
 		{
+			EnsureInitialFitIfNeeded();
 			UpdateRenderingSubscriptionIfNeeded();
 			InvalidateVisual();
 		}
@@ -1670,7 +1522,6 @@ namespace ResumeApp.Controls
 
 			UpdateRenderingSubscriptionIfNeeded();
 		}
-
 
 		private void UpdateAnimationFrameIfNeeded()
 		{
@@ -1741,40 +1592,6 @@ namespace ResumeApp.Controls
 			}
 
 			ViewportStartDate = ClampViewportStartDate( ViewportStartDate, lContentRect );
-		}
-
-		private void AnimateFitToRange( DateTime pStartDate, DateTime pEndDate )
-		{
-			var lContentRect = GetContentRect();
-
-			var lStart = ClampDateToRange( pStartDate );
-			var lEnd = ClampDateToRange( pEndDate );
-
-			if ( lEnd < lStart )
-			{
-				(lStart, lEnd) = (lEnd, lStart);
-			}
-
-			var lRangeDays = Math.Max( 1.0, ( lEnd - lStart ).TotalDays );
-			var lTargetZoom = lContentRect.Width / lRangeDays;
-
-			lTargetZoom = CoerceZoomValueByContent( lTargetZoom, lContentRect );
-
-			var lTargetViewportStart = ClampViewportStartDate( lStart, lContentRect );
-
-			mIsInertiaActive = false;
-			mHasPendingPan = false;
-
-			mIsFitAnimationActive = true;
-			mFitAnimationStartUtc = DateTime.UtcNow;
-
-			mFitStartViewportTicks = ViewportStartTicks;
-			mFitTargetViewportTicks = lTargetViewportStart.Ticks;
-
-			mFitStartZoom = ZoomLevel;
-			mFitTargetZoom = lTargetZoom;
-
-			UpdateRenderingSubscriptionIfNeeded();
 		}
 
 		private void StartInertiaIfPossible()
@@ -1856,43 +1673,53 @@ namespace ResumeApp.Controls
 			var lBaselineY = pContentRect.Bottom - 34.0;
 			var lTickLabelY = lBaselineY + 10.0;
 
+			var lLaneTopLimit = pContentRect.Top;
+			var lLaneBottomLimit = lBaselineY - 12.0;
+			var lAvailableLaneHeight = Math.Max( 0.0, lLaneBottomLimit - lLaneTopLimit );
+
 			var lTimeFrames = ( IEnumerable<Models.TimelineTimeFrameItem> )( TimeFrames ?? Enumerable.Empty<Models.TimelineTimeFrameItem>() );
 			var lVisibleTimeFrames = BuildVisibleTimeFrames( lTimeFrames, lEffectiveMinDate, lEffectiveMaxDate, lViewportStart, lViewportEnd, pContentRect );
 
 			var lLaneCount = lVisibleTimeFrames.Select( pFrame => pFrame.LaneIndex ).DefaultIfEmpty( -1 ).Max() + 1;
 			lLaneCount = Math.Max( 0, lLaneCount );
 
-			var lLaneAreaHeight = lLaneCount * TimeFrameLaneHeight;
-			var lLaneBottomLimit = lBaselineY - 12.0;
+			var lDesiredLaneHeight = TimeFrameLaneHeight;
+			var lCompressedLaneHeight = lLaneCount > 0 ? Math.Max( 1.0, lAvailableLaneHeight / lLaneCount ) : 0.0;
+			var lEffectiveLaneHeight = lLaneCount > 0 ? Math.Min( lDesiredLaneHeight, lCompressedLaneHeight ) : 0.0;
 
-			var lMaxTitleAreaHeight = lLaneBottomLimit - ( pContentRect.Top + TimeFrameTitleToBarGapPixels + lLaneAreaHeight );
-			var lTitleAreaHeight = Math.Max( 0.0, lMaxTitleAreaHeight );
+			var lLaneAreaHeight = lLaneCount * lEffectiveLaneHeight;
+			var lLaneTopOffset = lLaneTopLimit + Math.Max( 0.0, ( lAvailableLaneHeight - lLaneAreaHeight ) * 0.5 );
 
-			var lTimeFrameTopY = pContentRect.Top + lTitleAreaHeight + TimeFrameTitleToBarGapPixels;
+			var lEffectiveBarHeight = Math.Min( TimeFrameBarHeight, Math.Max( 2.0, lEffectiveLaneHeight - 6.0 ) );
 
 			var lBarRectsByItem = new Dictionary<Models.TimelineTimeFrameItem, Rect>();
 
 			foreach ( var lFrame in lVisibleTimeFrames )
 			{
-				var lBarY = lTimeFrameTopY + ( lFrame.LaneIndex * TimeFrameLaneHeight );
-				var lBarRect = new Rect( pContentRect.Left + lFrame.StartX, lBarY, Math.Max( 2.0, lFrame.EndX - lFrame.StartX ), TimeFrameBarHeight );
+				var lLaneTop = lLaneTopOffset + ( lFrame.LaneIndex * lEffectiveLaneHeight );
+				var lBarY = lLaneTop + ( ( lEffectiveLaneHeight - lEffectiveBarHeight ) * 0.5 );
+
+				var lBarRect = new Rect(
+					pContentRect.Left + lFrame.StartX,
+					lBarY,
+					Math.Max( 2.0, lFrame.EndX - lFrame.StartX ),
+					lEffectiveBarHeight );
 
 				var lFrameBrush = ResolveTimeFrameBrush( lFrame.Item ) ?? lAccentBrush;
-				var lBarRadius = new RadiusXy( 6.0, 6.0 );
+				var lBarCornerRadius = Math.Min( 10.0, lBarRect.Height * 0.5 );
+				var lBarRadius = new RadiusXy( lBarCornerRadius, lBarCornerRadius );
 
 				DrawRoundedRect( pDrawingContext, lBarRect, lFrameBrush, lBarRadius );
 				lBarRectsByItem[ lFrame.Item ] = lBarRect;
 
 				var lIsSelected = SelectedTimeFrame != null && ReferenceEquals( SelectedTimeFrame, lFrame.Item );
-				if ( !lIsSelected )
+				if ( lIsSelected )
 				{
-					continue;
-				}
-
-				var lPen = TryFindResource( "OnSurfaceCardStrokeOnDarkBrush" ) is Brush lStrokeBrush ? new Pen( lStrokeBrush, 1.0 ) : null;
-				if ( lPen != null )
-				{
-					pDrawingContext.DrawRoundedRectangle( null, lPen, lBarRect, 6.0, 6.0 );
+					var lPen = TryFindResource( "OnSurfaceCardStrokeOnDarkBrush" ) is Brush lStrokeBrush ? new Pen( lStrokeBrush, 1.0 ) : null;
+					if ( lPen != null )
+					{
+						pDrawingContext.DrawRoundedRectangle( null, lPen, lBarRect, lBarCornerRadius, lBarCornerRadius );
+					}
 				}
 			}
 
@@ -1901,11 +1728,42 @@ namespace ResumeApp.Controls
 
 			foreach ( var lTitleInfo in lTitleDrawInfos )
 			{
-				pDrawingContext.DrawText( lTitleInfo.Text, lTitleInfo.Rect.TopLeft );
-
 				if ( !lBarRectsByItem.TryGetValue( lTitleInfo.Item, out var lBarRect ) )
 				{
 					continue;
+				}
+
+				var lBarCornerRadius = Math.Min( 10.0, lBarRect.Height * 0.5 );
+				var lClipRect = new Rect(
+					lBarRect.Left + 1.0,
+					lBarRect.Top + 1.0,
+					Math.Max( 0.0, lBarRect.Width - 2.0 ),
+					Math.Max( 0.0, lBarRect.Height - 2.0 ) );
+
+				if ( lClipRect.Width <= 0.0 || lClipRect.Height <= 0.0 )
+				{
+					continue;
+				}
+
+				var lDotRadius = Math.Max( 3.0, Math.Min( 5.0, lBarRect.Height * 0.22 ) );
+				var lDotCenterX = lTitleInfo.Rect.Left + lDotRadius;
+				var lDotCenterY = lBarRect.Top + ( lBarRect.Height * 0.5 );
+
+				var lTextLeft = lTitleInfo.Rect.Left + ( lDotRadius * 2.0 ) + TimeFrameTitleDotToTextGapPixels;
+				var lTextTop = lBarRect.Top + Math.Max( 0.0, ( lBarRect.Height - lTitleInfo.Text.Height ) * 0.5 );
+
+				pDrawingContext.PushClip( new RectangleGeometry( lClipRect, lBarCornerRadius, lBarCornerRadius ) );
+				try
+				{
+					if ( lForegroundBrush != null )
+					{
+						pDrawingContext.DrawEllipse( lForegroundBrush, null, new Point( lDotCenterX, lDotCenterY ), lDotRadius, lDotRadius );
+						pDrawingContext.DrawText( lTitleInfo.Text, new Point( lTextLeft, lTextTop ) );
+					}
+				}
+				finally
+				{
+					pDrawingContext.Pop();
 				}
 
 				var lHitRect = Rect.Union( lBarRect, lTitleInfo.Rect );
@@ -1942,7 +1800,6 @@ namespace ResumeApp.Controls
 				lPixelsPerDip );
 		}
 
-
 		private void DrawFocusOutlineIfNeeded( DrawingContext pDrawingContext )
 		{
 			if ( !IsKeyboardFocusWithin )
@@ -1971,25 +1828,25 @@ namespace ResumeApp.Controls
 		{
 			var lSchedules = new[]
 			{
-		new TickLabelSchedule( TickGranularity.Days, 1 ),
-		new TickLabelSchedule( TickGranularity.Days, 2 ),
-		new TickLabelSchedule( TickGranularity.Days, 7 ),
-		new TickLabelSchedule( TickGranularity.Days, 14 ),
+				new TickLabelSchedule( TickGranularity.Days, 1 ),
+				new TickLabelSchedule( TickGranularity.Days, 2 ),
+				new TickLabelSchedule( TickGranularity.Days, 7 ),
+				new TickLabelSchedule( TickGranularity.Days, 14 ),
 
-		new TickLabelSchedule( TickGranularity.Weeks, 1 ),
-		new TickLabelSchedule( TickGranularity.Weeks, 2 ),
-		new TickLabelSchedule( TickGranularity.Weeks, 4 ),
+				new TickLabelSchedule( TickGranularity.Weeks, 1 ),
+				new TickLabelSchedule( TickGranularity.Weeks, 2 ),
+				new TickLabelSchedule( TickGranularity.Weeks, 4 ),
 
-		new TickLabelSchedule( TickGranularity.Months, 1 ),
-		new TickLabelSchedule( TickGranularity.Months, 2 ),
-		new TickLabelSchedule( TickGranularity.Months, 4 ),
-		new TickLabelSchedule( TickGranularity.Months, 6 ),
+				new TickLabelSchedule( TickGranularity.Months, 1 ),
+				new TickLabelSchedule( TickGranularity.Months, 2 ),
+				new TickLabelSchedule( TickGranularity.Months, 4 ),
+				new TickLabelSchedule( TickGranularity.Months, 6 ),
 
-		new TickLabelSchedule( TickGranularity.Years, 1 ),
-		new TickLabelSchedule( TickGranularity.Years, 2 ),
-		new TickLabelSchedule( TickGranularity.Years, 5 ),
-		new TickLabelSchedule( TickGranularity.Years, 10 )
-	};
+				new TickLabelSchedule( TickGranularity.Years, 1 ),
+				new TickLabelSchedule( TickGranularity.Years, 2 ),
+				new TickLabelSchedule( TickGranularity.Years, 5 ),
+				new TickLabelSchedule( TickGranularity.Years, 10 )
+			};
 
 			foreach ( var lSchedule in lSchedules )
 			{
@@ -2028,7 +1885,6 @@ namespace ResumeApp.Controls
 
 			return lSchedules.Last();
 		}
-
 
 		private void DrawTicksAndLabels(
 			DrawingContext pDrawingContext,
@@ -2084,7 +1940,6 @@ namespace ResumeApp.Controls
 					new Point( pContentRect.Left + lX, pBaselineY - TickMinorHeight ) );
 			}
 		}
-
 
 		private void DrawSelectedIndicator(
 			DrawingContext pDrawingContext,
