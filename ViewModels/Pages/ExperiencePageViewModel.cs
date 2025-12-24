@@ -18,53 +18,49 @@ namespace ResumeApp.ViewModels.Pages
 	{
 		private bool mIsSelectionSynchronizationActive;
 
-		private DateTime mTimelineMinDate;
-
-		private DateTime mSelectedDate;
-
-		private TimelineTimeFrameItem mSelectedTimeFrame;
-
-		private ExperienceTimelineEntryViewModel mSelectedTimelineEntry;
-
-		private ICommand mSelectExperienceCommand;
-
-		private ICommand mSelectDateCommand;
-
 		public ObservableCollection<ExperienceTimelineEntryViewModel> TimelineEntries { get; }
 
 		public ObservableCollection<TimelineTimeFrameItem> ExperienceTimeFrames { get; }
 
+		public string TimelineControlInteractionsHelpText => ResourcesService[ "TimelineControlInteractionsHelpText" ];
+
+		private DateTime mTimelineMinDate;
 		public DateTime TimelineMinDate
 		{
 			get => mTimelineMinDate;
 			private set => SetProperty( ref mTimelineMinDate, value );
 		}
 
+		private DateTime mSelectedDate;
 		public DateTime SelectedDate
 		{
 			get => mSelectedDate;
 			set => SetSelectedDate( value );
 		}
 
+		private TimelineTimeFrameItem mSelectedTimeFrame;
 		public TimelineTimeFrameItem SelectedTimeFrame
 		{
 			get => mSelectedTimeFrame;
 			set => SetSelectedTimeFrame( value );
 		}
 
+		private ExperienceTimelineEntryViewModel mSelectedTimelineEntry;
 		public ExperienceTimelineEntryViewModel SelectedTimelineEntry
 		{
 			get => mSelectedTimelineEntry;
 			set => SetSelectedTimelineEntry( value );
 		}
 
+		private ICommand mSelectExperienceCommand;
 		public ICommand SelectExperienceCommand =>
-									mSelectExperienceCommand ??
-									( mSelectExperienceCommand = new ParameterRelayCommand( ExecuteSelectExperience ) );
+											mSelectExperienceCommand ??
+											( mSelectExperienceCommand = new ParameterRelayCommand( ExecuteSelectExperience ) );
 
+		private ICommand mSelectDateCommand;
 		public ICommand SelectDateCommand =>
-									mSelectDateCommand ??
-									( mSelectDateCommand = new ParameterRelayCommand( ExecuteSelectDate ) );
+											mSelectDateCommand ??
+											( mSelectDateCommand = new ParameterRelayCommand( ExecuteSelectDate ) );
 
 		public ExperiencePageViewModel( ResourcesService pResourcesService, ThemeService pThemeService )
 			: base( pResourcesService, pThemeService )
@@ -74,6 +70,7 @@ namespace ResumeApp.ViewModels.Pages
 
 			ResourcesService.PropertyChanged += ( pSender, pArgs ) =>
 			{
+				RaisePropertyChanged( nameof( TimelineControlInteractionsHelpText ) );
 				RebuildEntries();
 			};
 

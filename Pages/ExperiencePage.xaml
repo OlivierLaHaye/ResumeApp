@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:behaviors="clr-namespace:ResumeApp.Behaviors"
     xmlns:controls="clr-namespace:ResumeApp.Controls"
-    xmlns:converters="clr-namespace:ResumeApp.Converters"
     x:Name="mExperiencePageRoot"
     SnapsToDevicePixels="True"
     UseLayoutRounding="True">
@@ -78,15 +77,24 @@
             Grid.Row="1"
             Margin="{StaticResource CommonTopBottomThickness}"
             Style="{StaticResource SubSectionCardBorderStyle}">
-            <Grid x:Name="mTimelineLayoutGrid" Margin="{StaticResource CommonThickness}">
-                <controls:TimelineControl
-                    x:Name="mExperienceTimelineControl"
-                    Focusable="True"
-                    MinDate="{Binding TimelineMinDate}"
-                    SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedTimeFrame="{Binding SelectedTimeFrame, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TimeFrames="{Binding ExperienceTimeFrames}" />
-            </Grid>
+            <StackPanel>
+                <Grid x:Name="mTimelineLayoutGrid" Margin="{StaticResource CommonThickness}">
+                    <controls:TimelineControl
+                        x:Name="mExperienceTimelineControl"
+                        Focusable="True"
+                        MinDate="{Binding TimelineMinDate}"
+                        SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        SelectedTimeFrame="{Binding SelectedTimeFrame, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        TimeFrames="{Binding ExperienceTimeFrames}" />
+                </Grid>
+                <Grid x:Name="mTimelineHelpLayoutGrid" Margin="{StaticResource CommonThickness}">
+                    <TextBlock
+                        x:Name="mTimelineHelpTextBlock"
+                        FontSize="{StaticResource SmallFontSize}"
+                        Opacity="{StaticResource LowOpacity}"
+                        Text="{Binding TimelineControlInteractionsHelpText}" />
+                </Grid>
+            </StackPanel>
         </Border>
 
         <ScrollViewer

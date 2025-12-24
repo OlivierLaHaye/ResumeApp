@@ -808,6 +808,9 @@
   <data name="TabVisualCraftTitle" xml:space="preserve">
     <value>Savoir-faire visuel</value>
   </data>
+  <data name="TimelineControlInteractionsHelpText" xml:space="preserve">
+    <value>Cliquez sur la timeline (ou appuyez sur Tab pour lui donner le focus), utilisez la molette pour zoomer, glissez pour déplacer avec inertie, cliquez sur une barre ou n'importe où sur la timeline pour sélectionner une date, utilisez les flèches gauche/droite pour avancer (Ctrl pour un pas plus grand), et appuyez sur Home pour le début ou End pour aujourd'hui.</value>
+</data>
   <data name="ValueFullRemoteOnly" xml:space="preserve">
     <value>100% à distance</value>
   </data>

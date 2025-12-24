@@ -808,6 +808,9 @@
   <data name="TabVisualCraftTitle" xml:space="preserve">
     <value>Visual craft</value>
   </data>
+  <data name="TimelineControlInteractionsHelpText" xml:space="preserve">
+    <value>Click the timeline (or press Tab to focus), use the mouse wheel to zoom, drag to pan with inertia, click a bar or anywhere on the timeline to select a date, use Left/Right arrows to step (hold Ctrl for larger steps), and press Home for the start or End for today.</value>
+</data>
   <data name="ValueFullRemoteOnly" xml:space="preserve">
     <value>Fully remote</value>
   </data>
