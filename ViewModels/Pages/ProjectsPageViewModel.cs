@@ -18,6 +18,19 @@ namespace ResumeApp.ViewModels.Pages
 			{
 				new ProjectCardViewModel(
 					pResourcesService: ResourcesService,
+					pTitleResourceKey: "Project3Title",
+					pContextResourceKey: "Project3Context",
+					pConstraintsResourceKey: "Project3Constraints",
+					pWhatIBuiltItemResourceKeys: new[]
+					{
+						"Project3Bullet1",
+						"Project3Bullet2"
+					},
+					pImpactResourceKey: "Project3Impact",
+					pTechResourceKey: "Project3Tech" ),
+
+				new ProjectCardViewModel(
+					pResourcesService: ResourcesService,
 					pTitleResourceKey: "Project1Title",
 					pContextResourceKey: "Project1Context",
 					pConstraintsResourceKey: "Project1Constraints",
@@ -39,20 +52,7 @@ namespace ResumeApp.ViewModels.Pages
 						"Project2Bullet1"
 					},
 					pImpactResourceKey: "Project2Impact",
-					pTechResourceKey: "Project2Tech" ),
-
-				new ProjectCardViewModel(
-					pResourcesService: ResourcesService,
-					pTitleResourceKey: "Project3Title",
-					pContextResourceKey: "Project3Context",
-					pConstraintsResourceKey: "Project3Constraints",
-					pWhatIBuiltItemResourceKeys: new[]
-					{
-						"Project3Bullet1",
-						"Project3Bullet2"
-					},
-					pImpactResourceKey: "Project3Impact",
-					pTechResourceKey: "Project3Tech" )
+					pTechResourceKey: "Project2Tech" )
 			} );
 
 			ResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;

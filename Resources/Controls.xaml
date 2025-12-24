@@ -4745,14 +4745,7 @@
         x:Key="RestartAsAdminButtonStyle"
         BasedOn="{StaticResource CaptionButtonStyle}"
         TargetType="Button">
-        <Setter Property="Background">
-            <Setter.Value>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                    <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                </LinearGradientBrush>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -4818,14 +4811,7 @@
         x:Key="RestartButtonStyle"
         BasedOn="{StaticResource CaptionButtonStyle}"
         TargetType="Button">
-        <Setter Property="Background">
-            <Setter.Value>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                    <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                </LinearGradientBrush>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -4961,38 +4947,24 @@
         x:Key="MinimizeButtonStyle"
         BasedOn="{StaticResource CaptionButtonStyle}"
         TargetType="Button">
-        <Setter Property="Background">
-            <Setter.Value>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                    <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                </LinearGradientBrush>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Grid
+                    <Border
                         x:Name="LayoutRoot"
                         Width="45"
-                        Margin="0">
-                        <Grid.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                                <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                            </LinearGradientBrush>
-                        </Grid.Background>
+                        Margin="0"
+                        Background="{DynamicResource CommonGrayBrush}"
+                        CornerRadius="0,0,0,15">
                         <Grid Height="30">
                             <Viewbox Margin="14" Stretch="Uniform">
                                 <Grid>
-                                    <Grid.Resources>
-                                        <Style BasedOn="{StaticResource CustomButtonPathStyleBasedOnHoverAndBackground}" TargetType="Path" />
-                                    </Grid.Resources>
-                                    <Path Data="F1 M 0.000,0.000 L 400.000,0.000 L 400.000,99.414 L 0.000,99.414 L 0.000,0.000 Z" />
+                                    <Path Fill="{DynamicResource CommonWhiteBrush}" Data="F1 M 0.000,0.000 L 400.000,0.000 L 400.000,99.414 L 0.000,99.414 L 0.000,0.000 Z" />
                                 </Grid>
                             </Viewbox>
                         </Grid>
-                    </Grid>
+                    </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
@@ -5031,34 +5003,19 @@
         x:Key="MaximizeButtonStyle"
         BasedOn="{StaticResource CaptionButtonStyle}"
         TargetType="Button">
-        <Setter Property="Background">
-            <Setter.Value>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                    <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                </LinearGradientBrush>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Grid
                         x:Name="LayoutRoot"
                         Width="45"
-                        Margin="0">
-                        <Grid.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                                <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                            </LinearGradientBrush>
-                        </Grid.Background>
+                        Margin="0"
+                        Background="{DynamicResource CommonGrayBrush}">
                         <Grid Height="30">
-                            <Viewbox Margin="10" Stretch="Uniform">
+                            <Viewbox Margin="11" Stretch="Uniform">
                                 <Grid>
-                                    <Grid.Resources>
-                                        <Style BasedOn="{StaticResource CustomButtonPathStyleBasedOnHoverAndBackground}" TargetType="Path" />
-                                    </Grid.Resources>
-                                    <Path Data="F1 M 100.000,100.000 L 300.586,100.000 L 300.586,300.586 L 100.000,300.586 L 100.000,100.000 Z M 0.000,0.000 L 0.000,400.586 L 400.586,400.586 L 400.586,0.000 L 0.000,0.000 Z" />
+                                    <Path Fill="{DynamicResource CommonWhiteBrush}" Data="F1 M 100.000,100.000 L 300.586,100.000 L 300.586,300.586 L 100.000,300.586 L 100.000,100.000 Z M 0.000,0.000 L 0.000,400.586 L 400.586,400.586 L 400.586,0.000 L 0.000,0.000 Z" />
                                 </Grid>
                             </Viewbox>
                         </Grid>
@@ -5101,34 +5058,19 @@
         x:Key="RestoreButtonStyle"
         BasedOn="{StaticResource CaptionButtonStyle}"
         TargetType="Button">
-        <Setter Property="Background">
-            <Setter.Value>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                    <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                </LinearGradientBrush>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Grid
                         x:Name="LayoutRoot"
                         Width="45"
-                        Margin="0">
-                        <Grid.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                                <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                            </LinearGradientBrush>
-                        </Grid.Background>
+                        Margin="0"
+                        Background="{DynamicResource CommonGrayBrush}">
                         <Grid Height="30">
                             <Viewbox Margin="11" Stretch="Uniform">
                                 <Grid>
-                                    <Grid.Resources>
-                                        <Style BasedOn="{StaticResource CustomButtonPathStyleBasedOnHoverAndBackground}" TargetType="Path" />
-                                    </Grid.Resources>
-                                    <Path Data="F1 M 100.000,100.000 L 200.586,100.000 L 200.586,200.586 L 100.000,200.586 L 100.000,100.000 Z M 0.000,0.000 L 0.000,300.586 L 300.586,300.586 L 300.586,0.000 L 0.000,0.000 Z" />
+                                    <Path Fill="{DynamicResource CommonWhiteBrush}" Data="F1 M 100.000,100.000 L 200.586,100.000 L 200.586,200.586 L 100.000,200.586 L 100.000,100.000 Z M 0.000,0.000 L 0.000,300.586 L 300.586,300.586 L 300.586,0.000 L 0.000,0.000 Z" />
                                 </Grid>
                             </Viewbox>
                         </Grid>
@@ -5171,38 +5113,24 @@
         x:Key="CloseButtonStyle"
         BasedOn="{StaticResource CaptionButtonStyle}"
         TargetType="Button">
-        <Setter Property="Background">
-            <Setter.Value>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                    <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                </LinearGradientBrush>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Grid
+                    <Border
                         x:Name="LayoutRoot"
                         Width="45"
-                        Margin="0">
-                        <Grid.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                                <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                            </LinearGradientBrush>
-                        </Grid.Background>
+                        Margin="0"
+                        Background="{DynamicResource CommonGrayBrush}"
+                        CornerRadius="0,0,15,0">
                         <Grid Height="30">
-                            <Viewbox Margin="10" Stretch="Uniform">
+                            <Viewbox Margin="11" Stretch="Uniform">
                                 <Grid>
-                                    <Grid.Resources>
-                                        <Style BasedOn="{StaticResource CustomButtonPathStyleBasedOnHoverAndBackground}" TargetType="Path" />
-                                    </Grid.Resources>
-                                    <Path Data="F1 M 0.176,0.000 L 50.176,0.000 L 51.738,0.000 C 64.434,0.586 77.324,6.445 86.113,15.625 L 200.176,129.688 L 315.801,15.625 C 329.082,4.102 338.066,0.391 350.176,0.000 L 400.176,0.000 L 400.176,50.000 C 400.176,64.258 398.418,77.539 387.676,87.500 L 273.613,201.562 L 386.113,314.062 C 395.488,323.438 400.176,336.719 400.176,350.000 L 400.176,400.000 L 350.176,400.000 C 336.895,400.000 323.613,395.312 314.238,385.938 L 200.176,271.875 L 86.113,385.938 C 76.738,395.312 63.457,400.000 50.176,400.000 L 0.176,400.000 L 0.176,350.000 C 0.176,336.719 4.863,323.438 14.238,314.062 L 128.301,201.562 L 14.238,87.500 C 3.691,77.734 -0.996,64.062 0.176,50.000 L 0.176,0.000 Z" />
+                                    <Path Fill="{DynamicResource CommonWhiteBrush}" Data="F1 M 0.176,0.000 L 50.176,0.000 L 51.738,0.000 C 64.434,0.586 77.324,6.445 86.113,15.625 L 200.176,129.688 L 315.801,15.625 C 329.082,4.102 338.066,0.391 350.176,0.000 L 400.176,0.000 L 400.176,50.000 C 400.176,64.258 398.418,77.539 387.676,87.500 L 273.613,201.562 L 386.113,314.062 C 395.488,323.438 400.176,336.719 400.176,350.000 L 400.176,400.000 L 350.176,400.000 C 336.895,400.000 323.613,395.312 314.238,385.938 L 200.176,271.875 L 86.113,385.938 C 76.738,395.312 63.457,400.000 50.176,400.000 L 0.176,400.000 L 0.176,350.000 C 0.176,336.719 4.863,323.438 14.238,314.062 L 128.301,201.562 L 14.238,87.500 C 3.691,77.734 -0.996,64.062 0.176,50.000 L 0.176,0.000 Z" />
                                 </Grid>
                             </Viewbox>
                         </Grid>
-                    </Grid>
+                    </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Cursor" Value="{StaticResource HandCursor}" />

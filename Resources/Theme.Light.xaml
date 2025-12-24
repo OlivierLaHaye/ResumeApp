@@ -20,12 +20,12 @@
     <Color x:Key="CommonPinkStrongColor">#BE185D</Color>
     <Color x:Key="CommonRedStrongColor">#BE123C</Color>
 
-    <Color x:Key="CommonBlackColor">#0C0C0C</Color>
-    <Color x:Key="CommonDarkerGrayColor">#141414</Color>
-    <Color x:Key="CommonDarkGrayColor">#1C1C1C</Color>
-    <Color x:Key="CommonGrayColor">#262626</Color>
-    <Color x:Key="CommonLightGrayColor">#A6A6A6</Color>
-    <Color x:Key="CommonWhiteColor">#F2F2F2</Color>
+    <Color x:Key="CommonBlackColor">#F2F2F2</Color>
+    <Color x:Key="CommonDarkerGrayColor">#FAFAFA</Color>
+    <Color x:Key="CommonDarkGrayColor">#E6E6E6</Color>
+    <Color x:Key="CommonGrayColor">#D5D5D5</Color>
+    <Color x:Key="CommonLightGrayColor">#4D4D4D</Color>
+    <Color x:Key="CommonWhiteColor">#121212</Color>
 
     <SolidColorBrush x:Key="CommonBlackBrush" Color="{DynamicResource CommonBlackColor}" />
     <SolidColorBrush x:Key="CommonDarkerGrayBrush" Color="{DynamicResource CommonDarkerGrayColor}" />

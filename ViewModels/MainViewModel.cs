@@ -1,6 +1,3 @@
-// Copyright (C) Olivier La Haye
-// All rights reserved.
-
 using ResumeApp.Infrastructure;
 using ResumeApp.Services;
 using ResumeApp.ViewModels.Pages;
@@ -32,6 +29,13 @@ namespace ResumeApp.ViewModels
 		public bool IsFrenchLanguageActive => SelectedLanguage == AppLanguage.FrenchCanada;
 
 		public string ActiveLanguageDisplayName => ResourcesService.ActiveLanguageDisplayName;
+
+		private bool mIsTopBarCollapsed;
+		public bool IsTopBarCollapsed
+		{
+			get => mIsTopBarCollapsed;
+			set => SetProperty( ref mIsTopBarCollapsed, value );
+		}
 
 		private AppLanguage mSelectedLanguage;
 		public AppLanguage SelectedLanguage
@@ -72,6 +76,8 @@ namespace ResumeApp.ViewModels
 			mSelectedLanguage = pResourcesService.ActiveCulture.Name.StartsWith( "fr", StringComparison.OrdinalIgnoreCase )
 				? AppLanguage.FrenchCanada
 				: AppLanguage.EnglishCanada;
+
+			mIsTopBarCollapsed = false;
 
 			pResourcesService.PropertyChanged += ( pSender, pEventArgs ) =>
 			{
