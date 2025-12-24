@@ -637,6 +637,9 @@
   <data name="Project3Context" xml:space="preserve">
     <value>Context: Personal software to speed up photo editing workflow (import, renaming, repetitive steps) without sacrificing quality.</value>
   </data>
+  <data name="Project3Images" xml:space="preserve">
+    <value>Images: Resources/Projects/Peel.OS/Peel.OS_1.png;Resources/Projects/Peel.OS/Peel.OS_2.png;Resources/Projects/Peel.OS/Peel.OS_3.png;Resources/Projects/Peel.OS/Peel.OS_4.png;Resources/Projects/Peel.OS/Peel.OS_5.png;Resources/Projects/Peel.OS/Peel.OS_6.png;Resources/Projects/Peel.OS/Peel.OS_7.png</value>
+</data>
   <data name="Project3Impact" xml:space="preserve">
     <value>Impact: personal productivity gains by reducing repetitive manual steps and speeding up real editing sessions.</value>
   </data>

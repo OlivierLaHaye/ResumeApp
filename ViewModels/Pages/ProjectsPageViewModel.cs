@@ -1,9 +1,7 @@
-// Copyright (C) Olivier La Haye
-// All rights reserved.
+// ViewModels/Pages/ProjectsPageViewModel.cs
 
 using ResumeApp.Services;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 
 namespace ResumeApp.ViewModels.Pages
 {
@@ -27,7 +25,8 @@ namespace ResumeApp.ViewModels.Pages
 						"Project3Bullet2"
 					},
 					pImpactResourceKey: "Project3Impact",
-					pTechResourceKey: "Project3Tech" ),
+					pTechResourceKey: "Project3Tech",
+					pImagesResourceKey: "Project3Images" ),
 
 				new ProjectCardViewModel(
 					pResourcesService: ResourcesService,
@@ -40,7 +39,8 @@ namespace ResumeApp.ViewModels.Pages
 						"Project1Bullet2"
 					},
 					pImpactResourceKey: "Project1Impact",
-					pTechResourceKey: "Project1Tech" ),
+					pTechResourceKey: "Project1Tech",
+					pImagesResourceKey: "Project1Images" ),
 
 				new ProjectCardViewModel(
 					pResourcesService: ResourcesService,
@@ -52,18 +52,9 @@ namespace ResumeApp.ViewModels.Pages
 						"Project2Bullet1"
 					},
 					pImpactResourceKey: "Project2Impact",
-					pTechResourceKey: "Project2Tech" )
+					pTechResourceKey: "Project2Tech",
+					pImagesResourceKey: "Project2Images" )
 			} );
-
-			ResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
-		}
-
-		private void OnResourcesServicePropertyChanged( object pSender, PropertyChangedEventArgs pArgs )
-		{
-			foreach ( ProjectCardViewModel lProject in Projects )
-			{
-				lProject.RefreshFromResources();
-			}
 		}
 	}
 }

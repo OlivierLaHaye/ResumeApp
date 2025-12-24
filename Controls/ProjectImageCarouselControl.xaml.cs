@@ -1,4 +1,5 @@
-﻿// Controls/ProjectImageCarouselControl.xaml.cs
+﻿// Copyright (C) Olivier La Haye
+// All rights reserved.
 
 using System;
 using System.Collections.ObjectModel;
@@ -11,7 +12,7 @@ using System.Windows.Media.Animation;
 
 namespace ResumeApp.Controls
 {
-	public sealed partial class ProjectImageCarouselControl : UserControl
+	public sealed partial class ProjectImageCarouselControl
 	{
 		public static readonly DependencyProperty sImagesProperty =
 			DependencyProperty.Register(
@@ -64,6 +65,47 @@ namespace ResumeApp.Controls
 			Unloaded += OnControlUnloaded;
 		}
 
+		private static void OnImagesPropertyChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
+		{
+			if ( pDependencyObject is ProjectImageCarouselControl lControl )
+			{
+				lControl.OnImagesChanged( pArgs.OldValue as ObservableCollection<ImageSource>, pArgs.NewValue as ObservableCollection<ImageSource> );
+			}
+		}
+
+		private static void OnSelectedIndexPropertyChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
+		{
+			if ( pDependencyObject is ProjectImageCarouselControl lControl )
+			{
+				lControl.OnSelectedIndexChanged();
+			}
+		}
+
+		private static void OnPlaceholderTextPropertyChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
+		{
+			if ( pDependencyObject is ProjectImageCarouselControl lControl )
+			{
+				lControl.UpdatePlaceholderVisuals();
+			}
+		}
+
+		private static int GetWrappedIndex( int pTargetIndex, int pImagesCount )
+		{
+			if ( pImagesCount <= 0 )
+			{
+				return -1;
+			}
+
+			int lModulo = pTargetIndex % pImagesCount;
+
+			if ( lModulo < 0 )
+			{
+				lModulo += pImagesCount;
+			}
+
+			return lModulo;
+		}
+
 		private void OnControlLoaded( object pSender, RoutedEventArgs pArgs )
 		{
 			AttachImages( Images );
@@ -77,14 +119,6 @@ namespace ResumeApp.Controls
 			AttachImages( null );
 		}
 
-		private static void OnImagesPropertyChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
-		{
-			if ( pDependencyObject is ProjectImageCarouselControl lControl )
-			{
-				lControl.OnImagesChanged( pArgs.OldValue as ObservableCollection<ImageSource>, pArgs.NewValue as ObservableCollection<ImageSource> );
-			}
-		}
-
 		private void OnImagesChanged( ObservableCollection<ImageSource> pOldImages, ObservableCollection<ImageSource> pNewImages )
 		{
 			AttachImages( pNewImages );
@@ -92,26 +126,10 @@ namespace ResumeApp.Controls
 			UpdateVisuals( pShouldAnimate: false );
 		}
 
-		private static void OnSelectedIndexPropertyChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
-		{
-			if ( pDependencyObject is ProjectImageCarouselControl lControl )
-			{
-				lControl.OnSelectedIndexChanged();
-			}
-		}
-
 		private void OnSelectedIndexChanged()
 		{
 			EnsureSelectedIndexIsValid();
 			UpdateVisuals( pShouldAnimate: true );
-		}
-
-		private static void OnPlaceholderTextPropertyChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
-		{
-			if ( pDependencyObject is ProjectImageCarouselControl lControl )
-			{
-				lControl.UpdatePlaceholderVisuals();
-			}
 		}
 
 		private void UpdatePlaceholderVisuals()
@@ -226,13 +244,22 @@ namespace ResumeApp.Controls
 		private void UpdateNavigationEnabledState()
 		{
 			int lImagesCount = GetImagesCount();
+			bool lHasMultipleImages = lImagesCount > 1;
 
-			bool lCanGoPrevious = lImagesCount > 1 && SelectedIndex > 0;
-			bool lCanGoNext = lImagesCount > 1 && SelectedIndex >= 0 && SelectedIndex < lImagesCount - 1;
+			if ( mPreviousButton != null )
+			{
+				mPreviousButton.IsEnabled = lHasMultipleImages;
+			}
 
-			mPreviousButton.IsEnabled = lCanGoPrevious;
-			mNextButton.IsEnabled = lCanGoNext;
-			mDotsListBox.IsEnabled = lImagesCount > 1;
+			if ( mNextButton != null )
+			{
+				mNextButton.IsEnabled = lHasMultipleImages;
+			}
+
+			if ( mDotsListBox != null )
+			{
+				mDotsListBox.IsEnabled = lHasMultipleImages;
+			}
 		}
 
 		private void AnimateImageFadeIn()
@@ -260,14 +287,14 @@ namespace ResumeApp.Controls
 				return;
 			}
 
-			int lClampedIndex = Math.Max( 0, Math.Min( pTargetIndex, lImagesCount - 1 ) );
+			int lWrappedIndex = GetWrappedIndex( pTargetIndex, lImagesCount );
 
-			if ( lClampedIndex == SelectedIndex )
+			if ( lWrappedIndex == SelectedIndex )
 			{
 				return;
 			}
 
-			SelectedIndex = lClampedIndex;
+			SelectedIndex = lWrappedIndex;
 		}
 
 		private void NavigatePrevious() => TryNavigateToIndex( SelectedIndex - 1 );
@@ -293,44 +320,55 @@ namespace ResumeApp.Controls
 				return;
 			}
 
-			if ( pArgs.Key == Key.Left )
+			switch ( pArgs.Key )
 			{
-				NavigatePrevious();
-				pArgs.Handled = true;
-				return;
-			}
-
-			if ( pArgs.Key == Key.Right )
-			{
-				NavigateNext();
-				pArgs.Handled = true;
+				case Key.Left:
+					{
+						NavigatePrevious();
+						pArgs.Handled = true;
+						return;
+					}
+				case Key.Right:
+					{
+						NavigateNext();
+						pArgs.Handled = true;
+						break;
+					}
 			}
 		}
 
 		private void OnRootPreviewMouseWheel( object pSender, MouseWheelEventArgs pArgs )
+		{
+			pArgs.Handled = false;
+		}
+
+		private void OnRootPreviewMouseLeftButtonDown( object pSender, MouseButtonEventArgs pArgs )
+		{
+			mProjectImageCarouselControlRoot.Focus();
+		}
+
+		private void OnDotPreviewMouseLeftButtonDown( object pSender, MouseButtonEventArgs pArgs )
 		{
 			if ( !HasMultipleImages() )
 			{
 				return;
 			}
 
-			if ( pArgs.Delta > 0 )
+			if ( !( pSender is ListBoxItem lDotListBoxItem ) )
 			{
-				NavigatePrevious();
-				pArgs.Handled = true;
 				return;
 			}
 
-			if ( pArgs.Delta < 0 )
-			{
-				NavigateNext();
-				pArgs.Handled = true;
-			}
-		}
+			int lClickedIndex = mDotsListBox.ItemContainerGenerator.IndexFromContainer( lDotListBoxItem );
 
-		private void OnRootPreviewMouseLeftButtonDown( object pSender, MouseButtonEventArgs pArgs )
-		{
+			if ( lClickedIndex < 0 )
+			{
+				return;
+			}
+
 			mProjectImageCarouselControlRoot.Focus();
+			TryNavigateToIndex( lClickedIndex );
+			pArgs.Handled = true;
 		}
 
 		private void OnMediaRootGridSizeChanged( object pSender, SizeChangedEventArgs pArgs )

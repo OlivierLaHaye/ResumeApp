@@ -18,14 +18,10 @@
             <Setter Property="Height" Value="38" />
             <Setter Property="Padding" Value="0" />
             <Setter Property="Background" Value="{DynamicResource CommonBlackBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource CommonGrayBrush}" />
             <Setter Property="BorderThickness" Value="{StaticResource ExtraSmallThickness}" />
-            <Setter Property="FontSize" Value="20" />
-            <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Opacity" Value="0.35" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
@@ -67,6 +63,8 @@
             <Setter Property="Height" Value="10" />
             <Setter Property="Margin" Value="4,4,4,4" />
             <Setter Property="Focusable" Value="False" />
+            <Setter Property="Cursor" Value="Hand" />
+            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="OnDotPreviewMouseLeftButtonDown" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ListBoxItem}">
@@ -75,15 +73,78 @@
                             Background="{DynamicResource CommonWhiteBrush}"
                             CornerRadius="999"
                             Opacity="0.35"
-                            SnapsToDevicePixels="True" />
+                            RenderTransformOrigin="0.5,0.5"
+                            SnapsToDevicePixels="True">
+                            <Border.RenderTransform>
+                                <ScaleTransform x:Name="mDotScaleTransform" ScaleX="1" ScaleY="1" />
+                            </Border.RenderTransform>
+                        </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="mDotScaleTransform"
+                                                Storyboard.TargetProperty="ScaleX"
+                                                To="1.35"
+                                                Duration="0:0:0.12">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="mDotScaleTransform"
+                                                Storyboard.TargetProperty="ScaleY"
+                                                To="1.35"
+                                                Duration="0:0:0.12">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="mDotScaleTransform"
+                                                Storyboard.TargetProperty="ScaleX"
+                                                To="1"
+                                                Duration="0:0:0.16">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="mDotScaleTransform"
+                                                Storyboard.TargetProperty="ScaleY"
+                                                To="1"
+                                                Duration="0:0:0.16">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
                                 <Setter TargetName="mDotBorder" Property="Opacity" Value="0.7" />
                             </Trigger>
+
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="mDotBorder" Property="Background" Value="{DynamicResource CommonBrush}" />
                                 <Setter TargetName="mDotBorder" Property="Opacity" Value="0.9" />
                             </Trigger>
+
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsSelected" Value="True" />
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="mDotBorder" Property="Opacity" Value="1" />
+                            </MultiTrigger>
+
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="mDotBorder" Property="Opacity" Value="0.15" />
                             </Trigger>
@@ -105,12 +166,12 @@
     <Grid x:Name="mCarouselLayoutRoot">
         <Border
             x:Name="mMediaCardBorder"
-            Height="180"
-            Background="{DynamicResource CommonGrayBrush}"
-            BorderBrush="{DynamicResource CommonGrayBrush}"
-            BorderThickness="{StaticResource ExtraSmallThickness}"
+            Height="360"
             CornerRadius="{StaticResource ExtraSmallCornerRadius}"
             SnapsToDevicePixels="True">
+            <Border.Background>
+                <SolidColorBrush Opacity="0.5" Color="{DynamicResource CommonGrayColor}" />
+            </Border.Background>
             <Grid
                 x:Name="mMediaRootGrid"
                 ClipToBounds="True"
@@ -121,7 +182,7 @@
                     x:Name="mCurrentImageImage"
                     Opacity="0"
                     RenderOptions.BitmapScalingMode="HighQuality"
-                    Stretch="UniformToFill" />
+                    Stretch="Uniform" />
 
                 <Grid x:Name="mPlaceholderGrid" Visibility="Collapsed">
                     <StackPanel
@@ -175,8 +236,18 @@
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         Click="OnPreviousButtonClick"
-                        Content="‹"
-                        Style="{StaticResource NavigationButtonStyle}" />
+                        Style="{StaticResource NavigationButtonStyle}">
+                        <Path
+                            Width="15"
+                            Fill="{DynamicResource CommonWhiteBrush}"
+                            Data="M17.920015,8.074995 H11.690015 H6.079985 C5.119985,8.074995 4.639985,9.234995 5.319985,9.915005 L10.500015,15.095005 C11.330015,15.925005 12.680015,15.925005 13.510015,15.095005 L15.480015,13.125005 L18.690015,9.915005 C19.360015,9.234995 18.880015,8.074995 17.920015,8.074995 Z"
+                            RenderTransformOrigin="0.5,0.5"
+                            Stretch="Uniform">
+                            <Path.RenderTransform>
+                                <RotateTransform Angle="90" />
+                            </Path.RenderTransform>
+                        </Path>
+                    </Button>
 
                     <Button
                         x:Name="mNextButton"
@@ -185,8 +256,18 @@
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         Click="OnNextButtonClick"
-                        Content="›"
-                        Style="{StaticResource NavigationButtonStyle}" />
+                        Style="{StaticResource NavigationButtonStyle}">
+                        <Path
+                            Width="15"
+                            Fill="{DynamicResource CommonWhiteBrush}"
+                            Data="M17.920015,8.074995 H11.690015 H6.079985 C5.119985,8.074995 4.639985,9.234995 5.319985,9.915005 L10.500015,15.095005 C11.330015,15.925005 12.680015,15.925005 13.510015,15.095005 L15.480015,13.125005 L18.690015,9.915005 C19.360015,9.234995 18.880015,8.074995 17.920015,8.074995 Z"
+                            RenderTransformOrigin="0.5,0.5"
+                            Stretch="Uniform">
+                            <Path.RenderTransform>
+                                <RotateTransform Angle="270" />
+                            </Path.RenderTransform>
+                        </Path>
+                    </Button>
 
                     <Border
                         x:Name="mDotsBackgroundBorder"
@@ -196,7 +277,7 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Bottom"
                         Background="{DynamicResource CommonBlackBrush}"
-                        CornerRadius="999"
+                        CornerRadius="{StaticResource CommonCornerRadius}"
                         Opacity="0.25"
                         SnapsToDevicePixels="True">
                         <ListBox
