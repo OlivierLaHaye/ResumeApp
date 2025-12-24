@@ -336,7 +336,7 @@ namespace ResumeApp.Controls
 		public DateTime ViewportStartDate
 		{
 			get => new DateTime( Math.Max( 0L, ( long )ViewportStartTicks ) );
-			set => ViewportStartTicks = value.Ticks;
+			set => SetCurrentValue( sViewportStartTicksProperty, ( double )value.Ticks );
 		}
 
 		private DateTime EffectiveMinDate => GetEffectiveMinDate();
@@ -531,9 +531,12 @@ namespace ResumeApp.Controls
 
 			lControl.CoerceValue( sZoomLevelProperty );
 			lControl.CoerceValue( sViewportStartTicksProperty );
+			lControl.CoerceValue( sSelectedDateProperty );
 
-			lControl.ViewportStartDate = lControl.ClampViewportStartDate( lControl.ViewportStartDate, lControl.GetContentRect() );
-			lControl.SelectedDate = lControl.ClampDateToRange( lControl.SelectedDate );
+			var lContentRect = lControl.GetContentRect();
+			lControl.SetViewportStartDateCurrent( lControl.ClampViewportStartDate( lControl.ViewportStartDate, lContentRect ) );
+
+			lControl.EnsureInitialFitIfNeeded();
 			lControl.InvalidateVisual();
 		}
 
@@ -607,11 +610,12 @@ namespace ResumeApp.Controls
 
 			lControl.CoerceValue( sZoomLevelProperty );
 			lControl.CoerceValue( sViewportStartTicksProperty );
+			lControl.CoerceValue( sSelectedDateProperty );
 
-			lControl.MinDate = lControl.MinDate;
-			lControl.SelectedDate = lControl.SelectedDate;
-			lControl.ViewportStartDate = lControl.ClampViewportStartDate( lControl.ViewportStartDate, lControl.GetContentRect() );
+			var lContentRect = lControl.GetContentRect();
+			lControl.SetViewportStartDateCurrent( lControl.ClampViewportStartDate( lControl.ViewportStartDate, lContentRect ) );
 
+			lControl.EnsureInitialFitIfNeeded();
 			lControl.InvalidateVisual();
 		}
 
@@ -637,11 +641,12 @@ namespace ResumeApp.Controls
 				return;
 			}
 
-			lControl.ViewportStartDate = lControl.ClampViewportStartDate( lControl.ViewportStartDate, lControl.GetContentRect() );
+			var lContentRect = lControl.GetContentRect();
+			lControl.SetViewportStartDateCurrent( lControl.ClampViewportStartDate( lControl.ViewportStartDate, lContentRect ) );
 
 			if ( !lControl.mHasSuppressEnsureDateVisible )
 			{
-				lControl.EnsureDateVisible( lControl.SelectedDate, lControl.GetContentRect() );
+				lControl.EnsureDateVisible( lControl.SelectedDate, lContentRect );
 			}
 
 			lControl.UpdateRenderingSubscriptionIfNeeded();
@@ -895,7 +900,7 @@ namespace ResumeApp.Controls
 		{
 			base.OnMouseWheel( pEventArgs );
 
-			mHasUserInteracted = true;
+			MarkUserInteracted();
 
 			mIsFitAnimationActive = false;
 			mIsInertiaActive = false;
@@ -920,8 +925,8 @@ namespace ResumeApp.Controls
 			var lAnchorOffsetPixels = lPosition.X - lContentRect.Left;
 			var lNewViewportStart = lAnchorDate.AddDays( -( lAnchorOffsetPixels / Math.Max( MinimumZoomPixelsPerDay, lTargetZoom ) ) );
 
-			ZoomLevel = lTargetZoom;
-			ViewportStartDate = ClampViewportStartDate( lNewViewportStart, lContentRect );
+			SetZoomLevelCurrent( lTargetZoom );
+			SetViewportStartDateCurrent( ClampViewportStartDate( lNewViewportStart, lContentRect ) );
 
 			UpdateCursorAtPosition( lPosition );
 			UpdateRenderingSubscriptionIfNeeded();
@@ -935,7 +940,7 @@ namespace ResumeApp.Controls
 
 			Focus();
 
-			mHasUserInteracted = true;
+			MarkUserInteracted();
 
 			mIsFitAnimationActive = false;
 			mIsInertiaActive = false;
@@ -981,7 +986,7 @@ namespace ResumeApp.Controls
 				return;
 			}
 
-			mHasUserInteracted = true;
+			MarkUserInteracted();
 
 			mHasDragged = true;
 			mIsInertiaActive = false;
@@ -1023,7 +1028,7 @@ namespace ResumeApp.Controls
 
 				if ( mPointerDownTimeFrameItem != null && lHitOnUp != null && ReferenceEquals( mPointerDownTimeFrameItem, lHitOnUp ) )
 				{
-					SelectedTimeFrame = mPointerDownTimeFrameItem;
+					SetSelectedTimeFrameCurrent( mPointerDownTimeFrameItem );
 					SetSelectedDateFromUserInteraction( mPointerDownTimeFrameItem.StartDate, lContentRect );
 
 					UpdateCursorAtPosition( lPosition );
@@ -1066,7 +1071,7 @@ namespace ResumeApp.Controls
 		{
 			base.OnKeyDown( pEventArgs );
 
-			mHasUserInteracted = true;
+			MarkUserInteracted();
 
 			var lContentRect = GetContentRect();
 			var lIsControlDown = ( Keyboard.Modifiers & ModifierKeys.Control ) == ModifierKeys.Control;
@@ -1075,14 +1080,14 @@ namespace ResumeApp.Controls
 			{
 				case Key.Home:
 					{
-						SelectedDate = ClampDateToRange( EffectiveMinDate );
+						SetSelectedDateCurrent( ClampDateToRange( EffectiveMinDate ) );
 						EnsureDateVisible( SelectedDate, lContentRect );
 						pEventArgs.Handled = true;
 						return;
 					}
 				case Key.End:
 					{
-						SelectedDate = ClampDateToRange( DateTime.Today );
+						SetSelectedDateCurrent( ClampDateToRange( DateTime.Today ) );
 						EnsureDateVisible( SelectedDate, lContentRect );
 						pEventArgs.Handled = true;
 						return;
@@ -1098,7 +1103,7 @@ namespace ResumeApp.Controls
 			var lStep = GetKeyboardStep( ZoomLevel, lIsControlDown );
 			var lNewDate = AddStep( SelectedDate, lStep, lDirection );
 
-			SelectedDate = ClampDateToRange( lNewDate );
+			SetSelectedDateCurrent( ClampDateToRange( lNewDate ) );
 			EnsureDateVisible( SelectedDate, lContentRect );
 
 			pEventArgs.Handled = true;
@@ -1114,8 +1119,44 @@ namespace ResumeApp.Controls
 			CoerceValue( sViewportStartTicksProperty );
 
 			var lContentRect = GetContentRect();
-			ViewportStartDate = ClampViewportStartDate( ViewportStartDate, lContentRect );
+			SetViewportStartDateCurrent( ClampViewportStartDate( ViewportStartDate, lContentRect ) );
 			EnsureDateVisible( SelectedDate, lContentRect );
+		}
+
+		private void MarkUserInteracted()
+		{
+			if ( mHasUserInteracted )
+			{
+				return;
+			}
+
+			mHasUserInteracted = true;
+
+			if ( !mHasAppliedInitialFit )
+			{
+				mHasAppliedInitialFit = true;
+			}
+		}
+
+		private bool HasNonBindingLocalValue( DependencyProperty pDependencyProperty )
+		{
+			if ( BindingOperations.IsDataBound( this, pDependencyProperty ) )
+			{
+				return false;
+			}
+
+			return ReadLocalValue( pDependencyProperty ) != DependencyProperty.UnsetValue;
+		}
+
+		private bool HasFitInputsAvailable()
+		{
+			if ( MinDate != DateTime.MinValue )
+			{
+				return true;
+			}
+
+			var lTimeFrames = TimeFrames;
+			return lTimeFrames != null && lTimeFrames.Count > 0;
 		}
 
 		private void EnsureInitialFitIfNeeded()
@@ -1126,15 +1167,17 @@ namespace ResumeApp.Controls
 			}
 
 			var lContentRect = GetContentRect();
-			if ( lContentRect.Width <= 1.0 )
+			if ( lContentRect.Width <= 1.0 || lContentRect.Height <= 1.0 )
 			{
 				return;
 			}
 
-			var lHasZoomBindingOrLocal = BindingOperations.IsDataBound( this, sZoomLevelProperty ) || ReadLocalValue( sZoomLevelProperty ) != DependencyProperty.UnsetValue;
-			var lHasViewportBindingOrLocal = BindingOperations.IsDataBound( this, sViewportStartTicksProperty ) || ReadLocalValue( sViewportStartTicksProperty ) != DependencyProperty.UnsetValue;
+			if ( !HasFitInputsAvailable() )
+			{
+				return;
+			}
 
-			if ( lHasZoomBindingOrLocal || lHasViewportBindingOrLocal )
+			if ( HasNonBindingLocalValue( sZoomLevelProperty ) || HasNonBindingLocalValue( sViewportStartTicksProperty ) )
 			{
 				mHasAppliedInitialFit = true;
 				return;
@@ -1152,8 +1195,8 @@ namespace ResumeApp.Controls
 			mHasSuppressEnsureDateVisible = true;
 			try
 			{
-				ZoomLevel = lTargetZoom;
-				ViewportStartDate = lTargetViewportStart;
+				SetZoomLevelCurrent( lTargetZoom );
+				SetViewportStartDateCurrent( lTargetViewportStart );
 			}
 			finally
 			{
@@ -1161,6 +1204,31 @@ namespace ResumeApp.Controls
 			}
 
 			mHasAppliedInitialFit = true;
+		}
+
+		private void SetZoomLevelCurrent( double pZoomLevel )
+		{
+			SetCurrentValue( sZoomLevelProperty, pZoomLevel );
+		}
+
+		private void SetViewportStartTicksCurrent( double pViewportStartTicks )
+		{
+			SetCurrentValue( sViewportStartTicksProperty, pViewportStartTicks );
+		}
+
+		private void SetViewportStartDateCurrent( DateTime pViewportStartDate )
+		{
+			SetCurrentValue( sViewportStartTicksProperty, ( double )pViewportStartDate.Ticks );
+		}
+
+		private void SetSelectedDateCurrent( DateTime pSelectedDate )
+		{
+			SetCurrentValue( sSelectedDateProperty, pSelectedDate );
+		}
+
+		private void SetSelectedTimeFrameCurrent( Models.TimelineTimeFrameItem pSelectedTimeFrame )
+		{
+			SetCurrentValue( sSelectedTimeFrameProperty, pSelectedTimeFrame );
 		}
 
 		private List<TimeFrameTitleDrawInfo> LayoutTimeFrameTitles(
@@ -1327,7 +1395,7 @@ namespace ResumeApp.Controls
 			mIsInternalSelectedDateUpdate = true;
 			try
 			{
-				SelectedDate = pDate;
+				SetSelectedDateCurrent( pDate );
 			}
 			finally
 			{
@@ -1417,14 +1485,14 @@ namespace ResumeApp.Controls
 
 		private void SetSelectedDateFromUserInteraction( DateTime pDate, Rect pContentRect )
 		{
-			mHasUserInteracted = true;
+			MarkUserInteracted();
 
 			var lClamped = ClampDateToRange( pDate );
 
 			mIsInternalSelectedDateUpdate = true;
 			try
 			{
-				SelectedDate = lClamped;
+				SetSelectedDateCurrent( lClamped );
 			}
 			finally
 			{
@@ -1448,7 +1516,7 @@ namespace ResumeApp.Controls
 			var lDeltaDays = lDeltaPixels / Math.Max( MinimumZoomPixelsPerDay, lZoom );
 			var lDeltaTicks = lDeltaDays * TimeSpan.TicksPerDay;
 
-			ViewportStartTicks = mViewportStartTicksAtPointerDown - lDeltaTicks;
+			SetViewportStartTicksCurrent( mViewportStartTicksAtPointerDown - lDeltaTicks );
 
 			var lSampleTimestampUtc = mPendingPanTimestampUtc == default ? DateTime.UtcNow : mPendingPanTimestampUtc;
 			AddPanSample( lSampleTimestampUtc, mPendingPanPointerX );
@@ -1558,11 +1626,11 @@ namespace ResumeApp.Controls
 			var lNewViewportTicks = Lerp( mFitStartViewportTicks, mFitTargetViewportTicks, lEased );
 			var lNewZoom = Lerp( mFitStartZoom, mFitTargetZoom, lEased );
 
-			ZoomLevel = CoerceZoomValueByContent( lNewZoom, lContentRect );
+			SetZoomLevelCurrent( CoerceZoomValueByContent( lNewZoom, lContentRect ) );
 
 			var lCandidateStart = new DateTime( Math.Max( 0L, ( long )lNewViewportTicks ) );
 			var lClampedStart = ClampViewportStartDate( lCandidateStart, lContentRect );
-			ViewportStartTicks = lClampedStart.Ticks;
+			SetViewportStartTicksCurrent( ( double )lClampedStart.Ticks );
 
 			if ( !( lProgress >= 1.0 ) )
 			{
@@ -1570,7 +1638,7 @@ namespace ResumeApp.Controls
 			}
 
 			mIsFitAnimationActive = false;
-			ViewportStartDate = ClampViewportStartDate( ViewportStartDate, lContentRect );
+			SetViewportStartDateCurrent( ClampViewportStartDate( ViewportStartDate, lContentRect ) );
 		}
 
 		private void UpdateInertia( double pDeltaSeconds )
@@ -1580,7 +1648,7 @@ namespace ResumeApp.Controls
 			var lDeltaTicks = mInertiaVelocityTicksPerSecond * pDeltaSeconds;
 			var lNewViewportTicks = ViewportStartTicks - lDeltaTicks;
 
-			ViewportStartTicks = lNewViewportTicks;
+			SetViewportStartTicksCurrent( lNewViewportTicks );
 
 			var lFriction = Math.Pow( 0.12, pDeltaSeconds );
 			mInertiaVelocityTicksPerSecond *= lFriction;
@@ -1591,7 +1659,7 @@ namespace ResumeApp.Controls
 				mIsInertiaActive = false;
 			}
 
-			ViewportStartDate = ClampViewportStartDate( ViewportStartDate, lContentRect );
+			SetViewportStartDateCurrent( ClampViewportStartDate( ViewportStartDate, lContentRect ) );
 		}
 
 		private void StartInertiaIfPossible()
@@ -2077,7 +2145,7 @@ namespace ResumeApp.Controls
 			}
 
 			var lCenteredStart = lDate.AddDays( -( lVisibleDays * 0.5 ) );
-			ViewportStartDate = ClampViewportStartDate( lCenteredStart, pContentRect );
+			SetViewportStartDateCurrent( ClampViewportStartDate( lCenteredStart, pContentRect ) );
 		}
 
 		private DateTime PixelToDate( double pPixelX, Rect pContentRect )
@@ -2194,8 +2262,9 @@ namespace ResumeApp.Controls
 		{
 			CoerceValue( sZoomLevelProperty );
 			CoerceValue( sViewportStartTicksProperty );
+			CoerceValue( sSelectedDateProperty );
 
-			MinDate = MinDate;
+			EnsureInitialFitIfNeeded();
 			InvalidateVisual();
 		}
 	}
