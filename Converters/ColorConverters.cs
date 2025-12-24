@@ -77,18 +77,6 @@ namespace ResumeApp.Converters
 	[ValueConversion( typeof( int ), typeof( Brush ) )]
 	public sealed class PaletteIndexToBrushConverter : IValueConverter
 	{
-		private static readonly string[] sBrushKeys =
-		{
-			"CommonBlueBrush",
-			"CommonGreenBrush",
-			"CommonYellowBrush",
-			"CommonRedBrush",
-			"CommonPurpleBrush",
-			"CommonOrangeBrush",
-			"CommonCyanBrush",
-			"CommonPinkBrush"
-		};
-
 		public object Convert( object pValue, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
 			int lPaletteIndex = 0;
@@ -107,13 +95,13 @@ namespace ResumeApp.Converters
 					}
 			}
 
-			if ( sBrushKeys == null || sBrushKeys.Length == 0 )
+			if ( ColorHelper.sAccentBrushKeys == null || ColorHelper.sAccentBrushKeys.Length == 0 )
 			{
 				return TryFindBrushOrNull( "CommonBlueBrush" ) ?? Brushes.Transparent;
 			}
 
 			int lNormalizedIndex = lPaletteIndex < 0 ? 0 : lPaletteIndex;
-			string lBrushKey = sBrushKeys[ lNormalizedIndex % sBrushKeys.Length ];
+			string lBrushKey = ColorHelper.sAccentBrushKeys[ lNormalizedIndex % ColorHelper.sAccentBrushKeys.Length ];
 
 			return TryFindBrushOrNull( lBrushKey )
 			       ?? TryFindBrushOrNull( "CommonBlueBrush" )

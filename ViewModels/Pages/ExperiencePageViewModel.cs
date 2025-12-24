@@ -1,6 +1,7 @@
 // Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using ResumeApp.Helpers;
 using ResumeApp.Infrastructure;
 using ResumeApp.Models;
 using ResumeApp.Services;
@@ -15,58 +16,52 @@ namespace ResumeApp.ViewModels.Pages
 {
 	public sealed class ExperiencePageViewModel : ViewModelBase
 	{
-		private static readonly string[] sAccentBrushKeys =
-		{
-			"CommonBlueBrush",
-			"CommonGreenBrush",
-			"CommonYellowBrush",
-			"CommonRedBrush",
-			"CommonPurpleBrush",
-			"CommonOrangeBrush",
-			"CommonCyanBrush",
-			"CommonPinkBrush"
-		};
-
 		private bool mIsSelectionSynchronizationActive;
+
+		private DateTime mTimelineMinDate;
+
+		private DateTime mSelectedDate;
+
+		private TimelineTimeFrameItem mSelectedTimeFrame;
+
+		private ExperienceTimelineEntryViewModel mSelectedTimelineEntry;
+
+		private ICommand mSelectExperienceCommand;
+
+		private ICommand mSelectDateCommand;
 
 		public ObservableCollection<ExperienceTimelineEntryViewModel> TimelineEntries { get; }
 
 		public ObservableCollection<TimelineTimeFrameItem> ExperienceTimeFrames { get; }
 
-		private DateTime mTimelineMinDate;
 		public DateTime TimelineMinDate
 		{
 			get => mTimelineMinDate;
 			private set => SetProperty( ref mTimelineMinDate, value );
 		}
 
-		private DateTime mSelectedDate;
 		public DateTime SelectedDate
 		{
 			get => mSelectedDate;
 			set => SetSelectedDate( value );
 		}
 
-		private TimelineTimeFrameItem mSelectedTimeFrame;
 		public TimelineTimeFrameItem SelectedTimeFrame
 		{
 			get => mSelectedTimeFrame;
 			set => SetSelectedTimeFrame( value );
 		}
 
-		private ExperienceTimelineEntryViewModel mSelectedTimelineEntry;
 		public ExperienceTimelineEntryViewModel SelectedTimelineEntry
 		{
 			get => mSelectedTimelineEntry;
 			set => SetSelectedTimelineEntry( value );
 		}
 
-		private ICommand mSelectExperienceCommand;
 		public ICommand SelectExperienceCommand =>
 									mSelectExperienceCommand ??
 									( mSelectExperienceCommand = new ParameterRelayCommand( ExecuteSelectExperience ) );
 
-		private ICommand mSelectDateCommand;
 		public ICommand SelectDateCommand =>
 									mSelectDateCommand ??
 									( mSelectDateCommand = new ParameterRelayCommand( ExecuteSelectDate ) );
@@ -129,13 +124,13 @@ namespace ResumeApp.ViewModels.Pages
 
 		private static string GetAccentKeyForPaletteIndex( int pPaletteIndex )
 		{
-			if ( sAccentBrushKeys == null || sAccentBrushKeys.Length == 0 )
+			if ( ColorHelper.sAccentBrushKeys == null || ColorHelper.sAccentBrushKeys.Length == 0 )
 			{
 				return "CommonBlueBrush";
 			}
 
 			int lNormalizedIndex = pPaletteIndex < 0 ? 0 : pPaletteIndex;
-			return sAccentBrushKeys[ lNormalizedIndex % sAccentBrushKeys.Length ];
+			return ColorHelper.sAccentBrushKeys[ lNormalizedIndex % ColorHelper.sAccentBrushKeys.Length ];
 		}
 
 		private static void AssignLanes( ICollection<ExperienceTimelineEntryViewModel> pEntries )

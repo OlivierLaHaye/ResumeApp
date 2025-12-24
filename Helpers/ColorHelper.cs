@@ -14,6 +14,17 @@ namespace ResumeApp.Helpers
 {
 	public static class ColorHelper
 	{
+		public static readonly string[] sAccentBrushKeys =
+		{
+			"CommonBlueStrongBrush",
+			"CommonGreenStrongBrush",
+			"CommonYellowStrongBrush",
+			"CommonRedStrongBrush",
+			"CommonPurpleStrongBrush",
+			"CommonOrangeStrongBrush",
+			"CommonCyanStrongBrush",
+			"CommonPinkStrongBrush"
+		};
 		public class CmykColor
 		{
 			public double C { get; set; }

@@ -5,14 +5,27 @@
     <Color x:Key="CommonBlueColor">#047af7</Color>
     <Color x:Key="CommonGreenColor">#04D182</Color>
     <Color x:Key="CommonYellowColor">#f7e004</Color>
+    <Color x:Key="CommonPurpleColor">#8B5CF6</Color>
+    <Color x:Key="CommonOrangeColor">#F97316</Color>
+    <Color x:Key="CommonCyanColor">#06B6D4</Color>
+    <Color x:Key="CommonPinkColor">#EC4899</Color>
     <Color x:Key="CommonRedColor">#f70452</Color>
 
-    <Color x:Key="CommonBlackColor">#F2F2F2</Color>
-    <Color x:Key="CommonDarkerGrayColor">#FAFAFA</Color>
-    <Color x:Key="CommonDarkGrayColor">#E6E6E6</Color>
-    <Color x:Key="CommonGrayColor">#D5D5D5</Color>
-    <Color x:Key="CommonLightGrayColor">#4D4D4D</Color>
-    <Color x:Key="CommonWhiteColor">#121212</Color>
+    <Color x:Key="CommonBlueStrongColor">#0057D6</Color>
+    <Color x:Key="CommonGreenStrongColor">#067A4C</Color>
+    <Color x:Key="CommonYellowStrongColor">#8A6A00</Color>
+    <Color x:Key="CommonPurpleStrongColor">#6D28D9</Color>
+    <Color x:Key="CommonOrangeStrongColor">#C2410C</Color>
+    <Color x:Key="CommonCyanStrongColor">#0E7490</Color>
+    <Color x:Key="CommonPinkStrongColor">#BE185D</Color>
+    <Color x:Key="CommonRedStrongColor">#BE123C</Color>
+
+    <Color x:Key="CommonBlackColor">#0C0C0C</Color>
+    <Color x:Key="CommonDarkerGrayColor">#141414</Color>
+    <Color x:Key="CommonDarkGrayColor">#1C1C1C</Color>
+    <Color x:Key="CommonGrayColor">#262626</Color>
+    <Color x:Key="CommonLightGrayColor">#A6A6A6</Color>
+    <Color x:Key="CommonWhiteColor">#F2F2F2</Color>
 
     <SolidColorBrush x:Key="CommonBlackBrush" Color="{DynamicResource CommonBlackColor}" />
     <SolidColorBrush x:Key="CommonDarkerGrayBrush" Color="{DynamicResource CommonDarkerGrayColor}" />
@@ -26,6 +39,19 @@
     <SolidColorBrush x:Key="CommonGreenBrush" Color="{DynamicResource CommonGreenColor}" />
     <SolidColorBrush x:Key="CommonYellowBrush" Color="{DynamicResource CommonYellowColor}" />
     <SolidColorBrush x:Key="CommonRedBrush" Color="{DynamicResource CommonRedColor}" />
+    <SolidColorBrush x:Key="CommonPurpleBrush" Color="{DynamicResource CommonPurpleColor}" />
+    <SolidColorBrush x:Key="CommonOrangeBrush" Color="{DynamicResource CommonOrangeColor}" />
+    <SolidColorBrush x:Key="CommonCyanBrush" Color="{DynamicResource CommonCyanColor}" />
+    <SolidColorBrush x:Key="CommonPinkBrush" Color="{DynamicResource CommonPinkColor}" />
+
+    <SolidColorBrush x:Key="CommonBlueStrongBrush" Color="{StaticResource CommonBlueStrongColor}" />
+    <SolidColorBrush x:Key="CommonGreenStrongBrush" Color="{StaticResource CommonGreenStrongColor}" />
+    <SolidColorBrush x:Key="CommonYellowStrongBrush" Color="{StaticResource CommonYellowStrongColor}" />
+    <SolidColorBrush x:Key="CommonPurpleStrongBrush" Color="{StaticResource CommonPurpleStrongColor}" />
+    <SolidColorBrush x:Key="CommonOrangeStrongBrush" Color="{StaticResource CommonOrangeStrongColor}" />
+    <SolidColorBrush x:Key="CommonCyanStrongBrush" Color="{StaticResource CommonCyanStrongColor}" />
+    <SolidColorBrush x:Key="CommonPinkStrongBrush" Color="{StaticResource CommonPinkStrongColor}" />
+    <SolidColorBrush x:Key="CommonRedStrongBrush" Color="{StaticResource CommonRedStrongColor}" />
 
     <SolidColorBrush
         x:Key="OnSurfaceDividerOnDarkBrush"
