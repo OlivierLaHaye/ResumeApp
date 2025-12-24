@@ -300,41 +300,43 @@ namespace ResumeApp.Controls
 		private bool mHasUserInteracted;
 		private bool mHasAppliedInitialFit;
 		private bool mHasSuppressEnsureDateVisible;
+		private bool mHasSuppressSelectedTimeFrameToSelectedDateSync;
+		private int mSelectedTimeFrameToSelectedDateSyncSuppressionVersion;
 
 		public DateTime MinDate
 		{
 			get => ( DateTime )GetValue( sMinDateProperty );
-			set => SetValue( sMinDateProperty, value );
+			set => SetCurrentValue( sMinDateProperty, value );
 		}
 
 		public DateTime SelectedDate
 		{
 			get => ( DateTime )GetValue( sSelectedDateProperty );
-			set => SetValue( sSelectedDateProperty, value );
+			set => SetCurrentValue( sSelectedDateProperty, value );
 		}
 
 		public TimelineTimeFrameItem SelectedTimeFrame
 		{
 			get => ( TimelineTimeFrameItem )GetValue( sSelectedTimeFrameProperty );
-			set => SetValue( sSelectedTimeFrameProperty, value );
+			set => SetCurrentValue( sSelectedTimeFrameProperty, value );
 		}
 
 		public ObservableCollection<TimelineTimeFrameItem> TimeFrames
 		{
 			get => ( ObservableCollection<TimelineTimeFrameItem> )GetValue( sTimeFramesProperty );
-			set => SetValue( sTimeFramesProperty, value );
+			set => SetCurrentValue( sTimeFramesProperty, value );
 		}
 
 		public double ZoomLevel
 		{
 			get => ( double )GetValue( sZoomLevelProperty );
-			set => SetValue( sZoomLevelProperty, value );
+			set => SetCurrentValue( sZoomLevelProperty, value );
 		}
 
 		public double ViewportStartTicks
 		{
 			get => ( double )GetValue( sViewportStartTicksProperty );
-			set => SetValue( sViewportStartTicksProperty, value );
+			set => SetCurrentValue( sViewportStartTicksProperty, value );
 		}
 
 		public DateTime ViewportStartDate
@@ -590,10 +592,31 @@ namespace ResumeApp.Controls
 
 		private static void OnSelectedTimeFrameChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
-			if ( pDependencyObject is TimelineControl lControl )
+			if ( !( pDependencyObject is TimelineControl lControl ) )
 			{
-				lControl.InvalidateVisual();
+				return;
 			}
+
+			lControl.InvalidateVisual();
+
+			if ( lControl.mHasSuppressSelectedTimeFrameToSelectedDateSync )
+			{
+				return;
+			}
+
+			if ( !( pEventArgs.NewValue is TimelineTimeFrameItem lNewTimeFrame ) )
+			{
+				return;
+			}
+
+			var lTargetDate = lNewTimeFrame.StartDate.Date;
+
+			if ( lControl.SelectedDate.Date == lTargetDate )
+			{
+				return;
+			}
+
+			lControl.SetSelectedDateCurrentValue( lTargetDate );
 		}
 
 		private static void OnTimeFramesChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
@@ -1458,6 +1481,19 @@ namespace ResumeApp.Controls
 
 			var lClamped = ClampDateToRange( pDate );
 
+			mHasSuppressSelectedTimeFrameToSelectedDateSync = true;
+			var lSuppressionVersion = ++mSelectedTimeFrameToSelectedDateSyncSuppressionVersion;
+
+			Dispatcher.BeginInvoke( new Action( () =>
+			{
+				if ( lSuppressionVersion != mSelectedTimeFrameToSelectedDateSyncSuppressionVersion )
+				{
+					return;
+				}
+
+				mHasSuppressSelectedTimeFrameToSelectedDateSync = false;
+			} ) );
+
 			mIsInternalSelectedDateUpdate = true;
 			try
 			{
@@ -1468,6 +1504,7 @@ namespace ResumeApp.Controls
 				mIsInternalSelectedDateUpdate = false;
 			}
 
+			UpdateBindingSourceIfNeeded( sSelectedDateProperty );
 			EnsureDateVisible( lClamped, pContentRect );
 		}
 
