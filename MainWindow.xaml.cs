@@ -1,28 +1,177 @@
-// ResumeApp.MainWindow.xaml.cs
+// Copyright (C) Olivier La Haye
+// All rights reserved.
+
 using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Shell;
 
 namespace ResumeApp
 {
 	public partial class MainWindow
 	{
+		[StructLayout( LayoutKind.Sequential )]
+		private struct Point
+		{
+			public int x;
+			public int y;
+		}
+
+		[StructLayout( LayoutKind.Sequential )]
+		private struct MinMaxInfo
+		{
+			public readonly Point ptReserved;
+			public Point ptMaxSize;
+			public Point ptMaxPosition;
+			public readonly Point ptMinTrackSize;
+			public readonly Point ptMaxTrackSize;
+		}
+
+		[StructLayout( LayoutKind.Sequential, CharSet = CharSet.Auto )]
+		private struct MonitorInfo
+		{
+			public int cbSize;
+			public readonly Rect rcMonitor;
+			public readonly Rect rcWork;
+			public readonly int dwFlags;
+		}
+
+		[StructLayout( LayoutKind.Sequential )]
+		private struct Rect
+		{
+			public readonly int left;
+			public readonly int top;
+			public readonly int right;
+			public readonly int bottom;
+		}
+
 		private const double TitleBarHeight = 48.0;
 		private const double NormalCornerRadius = 80.0;
+		private const double InitialNormalSizeRatio = 0.95;
 
 		private const int WmGetMinMaxInfo = 0x0024;
 		private const int MonitorDefaultToNearest = 2;
 
 		private WindowChrome mWindowChrome;
 		private HwndSource mHwndSource;
+		private bool mHasAppliedInitialNormalBounds;
 
 		public MainWindow()
 		{
 			InitializeComponent();
+			WindowStartupLocation = WindowStartupLocation.Manual;
+
 			StateChanged += OnWindowStateChanged;
 			Closed += OnWindowClosed;
+			Loaded += OnMainWindowLoaded;
+		}
+
+		private static Matrix GetTransformFromDeviceOrIdentity( IntPtr pWindowHandle )
+		{
+			HwndSource lHwndSource = HwndSource.FromHwnd( pWindowHandle );
+
+			CompositionTarget lCompositionTarget = lHwndSource?.CompositionTarget;
+			return lCompositionTarget?.TransformFromDevice ?? Matrix.Identity;
+		}
+
+		private static System.Windows.Rect ConvertRectFromPixelsToDip( Rect pRectPixels, Matrix pTransformFromDevice )
+		{
+			System.Windows.Point lTopLeftDip = pTransformFromDevice.Transform( new System.Windows.Point( pRectPixels.left, pRectPixels.top ) );
+			System.Windows.Point lBottomRightDip = pTransformFromDevice.Transform( new System.Windows.Point( pRectPixels.right, pRectPixels.bottom ) );
+
+			return new System.Windows.Rect( lTopLeftDip, lBottomRightDip );
+		}
+
+		private static IntPtr GetTargetMonitorHandle( IntPtr pWindowHandle )
+		{
+			bool lHasCursorPos = GetCursorPos( out var lCursorPoint );
+			if ( !lHasCursorPos )
+			{
+				return MonitorFromWindow( pWindowHandle, MonitorDefaultToNearest );
+			}
+
+			IntPtr lMonitorFromCursor = MonitorFromPoint( lCursorPoint, MonitorDefaultToNearest );
+
+			return lMonitorFromCursor != IntPtr.Zero ? lMonitorFromCursor : MonitorFromWindow( pWindowHandle, MonitorDefaultToNearest );
+		}
+
+		private static bool TryGetWorkAreaRectPixels( IntPtr pMonitorHandle, out Rect pWorkAreaRectPixels )
+		{
+			pWorkAreaRectPixels = default;
+
+			MonitorInfo lMonitorInfo = new MonitorInfo
+			{
+				cbSize = Marshal.SizeOf( typeof( MonitorInfo ) )
+			};
+
+			bool lHasMonitorInfo = GetMonitorInfo( pMonitorHandle, ref lMonitorInfo );
+			if ( !lHasMonitorInfo )
+			{
+				return false;
+			}
+
+			pWorkAreaRectPixels = lMonitorInfo.rcWork;
+			return true;
+		}
+
+		private static void ApplyWorkingAreaMaximizeBounds( IntPtr pHwnd, IntPtr pLParam )
+		{
+			MinMaxInfo lMinMaxInfo = ( MinMaxInfo )Marshal.PtrToStructure( pLParam, typeof( MinMaxInfo ) );
+
+			IntPtr lMonitorHandle = MonitorFromWindow( pHwnd, MonitorDefaultToNearest );
+			if ( lMonitorHandle == IntPtr.Zero )
+			{
+				return;
+			}
+
+			MonitorInfo lMonitorInfo = new MonitorInfo
+			{
+				cbSize = Marshal.SizeOf( typeof( MonitorInfo ) )
+			};
+
+			bool lHasMonitorInfo = GetMonitorInfo( lMonitorHandle, ref lMonitorInfo );
+			if ( !lHasMonitorInfo )
+			{
+				return;
+			}
+
+			Rect lWorkAreaRect = lMonitorInfo.rcWork;
+			Rect lMonitorRect = lMonitorInfo.rcMonitor;
+
+			lMinMaxInfo.ptMaxPosition.x = lWorkAreaRect.left - lMonitorRect.left;
+			lMinMaxInfo.ptMaxPosition.y = lWorkAreaRect.top - lMonitorRect.top;
+
+			lMinMaxInfo.ptMaxSize.x = lWorkAreaRect.right - lWorkAreaRect.left;
+			lMinMaxInfo.ptMaxSize.y = lWorkAreaRect.bottom - lWorkAreaRect.top;
+
+			Marshal.StructureToPtr( lMinMaxInfo, pLParam, true );
+		}
+
+		[DllImport( "user32.dll" )]
+		private static extern IntPtr MonitorFromWindow( IntPtr pHwnd, int pFlags );
+
+		[DllImport( "user32.dll" )]
+		private static extern IntPtr MonitorFromPoint( Point pPoint, int pFlags );
+
+		[DllImport( "user32.dll" )]
+		private static extern bool GetCursorPos( out Point pPoint );
+
+		[DllImport( "user32.dll", CharSet = CharSet.Auto )]
+		private static extern bool GetMonitorInfo( IntPtr pMonitorHandle, ref MonitorInfo pMonitorInfo );
+
+		private static IntPtr WindowProc( IntPtr pHwnd, int pMessage, IntPtr pWParam, IntPtr pLParam, ref bool pIsHandled )
+		{
+			if ( pMessage != WmGetMinMaxInfo )
+			{
+				return IntPtr.Zero;
+			}
+
+			ApplyWorkingAreaMaximizeBounds( pHwnd, pLParam );
+			pIsHandled = true;
+
+			return IntPtr.Zero;
 		}
 
 		protected override void OnSourceInitialized( EventArgs pEventArgs )
@@ -53,12 +202,71 @@ namespace ResumeApp
 			IntPtr lWindowHandle = new WindowInteropHelper( this ).Handle;
 
 			mHwndSource = HwndSource.FromHwnd( lWindowHandle );
-			if ( mHwndSource == null )
+
+			mHwndSource?.AddHook( WindowProc );
+		}
+
+		private void OnMainWindowLoaded( object pSender, RoutedEventArgs pEventArgs )
+		{
+			ApplyInitialNormalBoundsIfNeeded();
+		}
+
+		private void ApplyInitialNormalBoundsIfNeeded()
+		{
+			if ( mHasAppliedInitialNormalBounds )
 			{
 				return;
 			}
 
-			mHwndSource.AddHook( WindowProc );
+			if ( WindowState != WindowState.Normal )
+			{
+				return;
+			}
+
+			IntPtr lWindowHandle = new WindowInteropHelper( this ).Handle;
+			if ( lWindowHandle == IntPtr.Zero )
+			{
+				return;
+			}
+
+			Matrix lTransformFromDevice = GetTransformFromDeviceOrIdentity( lWindowHandle );
+
+			IntPtr lMonitorHandle = GetTargetMonitorHandle( lWindowHandle );
+			if ( lMonitorHandle == IntPtr.Zero )
+			{
+				return;
+			}
+
+			bool lHasWorkArea = TryGetWorkAreaRectPixels( lMonitorHandle, out var lWorkAreaRectPixels );
+			if ( !lHasWorkArea )
+			{
+				return;
+			}
+
+			System.Windows.Rect lWorkAreaRectDip = ConvertRectFromPixelsToDip( lWorkAreaRectPixels, lTransformFromDevice );
+			if ( lWorkAreaRectDip.Width <= 0.0 || lWorkAreaRectDip.Height <= 0.0 )
+			{
+				return;
+			}
+
+			double lTargetWidth = Math.Floor( lWorkAreaRectDip.Width * InitialNormalSizeRatio );
+			double lTargetHeight = Math.Floor( lWorkAreaRectDip.Height * InitialNormalSizeRatio );
+
+			lTargetWidth = Math.Min( lTargetWidth, lWorkAreaRectDip.Width );
+			lTargetHeight = Math.Min( lTargetHeight, lWorkAreaRectDip.Height );
+
+			if ( lTargetWidth <= 0.0 || lTargetHeight <= 0.0 )
+			{
+				return;
+			}
+
+			Width = lTargetWidth;
+			Height = lTargetHeight;
+
+			Left = lWorkAreaRectDip.Left + ( lWorkAreaRectDip.Width - lTargetWidth ) / 2.0;
+			Top = lWorkAreaRectDip.Top + ( lWorkAreaRectDip.Height - lTargetHeight ) / 2.0;
+
+			mHasAppliedInitialNormalBounds = true;
 		}
 
 		private void OnWindowClosed( object pSender, EventArgs pEventArgs )
@@ -89,50 +297,6 @@ namespace ResumeApp
 				: new CornerRadius( NormalCornerRadius );
 		}
 
-		private IntPtr WindowProc( IntPtr pHwnd, int pMessage, IntPtr pWParam, IntPtr pLParam, ref bool pIsHandled )
-		{
-			if ( pMessage == WmGetMinMaxInfo )
-			{
-				ApplyWorkingAreaMaximizeBounds( pHwnd, pLParam );
-				pIsHandled = true;
-			}
-
-			return IntPtr.Zero;
-		}
-
-		private static void ApplyWorkingAreaMaximizeBounds( IntPtr pHwnd, IntPtr pLParam )
-		{
-			MINMAXINFO lMinMaxInfo = ( MINMAXINFO )Marshal.PtrToStructure( pLParam, typeof( MINMAXINFO ) );
-
-			IntPtr lMonitorHandle = MonitorFromWindow( pHwnd, MonitorDefaultToNearest );
-			if ( lMonitorHandle == IntPtr.Zero )
-			{
-				return;
-			}
-
-			MONITORINFO lMonitorInfo = new MONITORINFO
-			{
-				cbSize = Marshal.SizeOf( typeof( MONITORINFO ) )
-			};
-
-			bool lHasMonitorInfo = GetMonitorInfo( lMonitorHandle, ref lMonitorInfo );
-			if ( !lHasMonitorInfo )
-			{
-				return;
-			}
-
-			RECT lWorkAreaRect = lMonitorInfo.rcWork;
-			RECT lMonitorRect = lMonitorInfo.rcMonitor;
-
-			lMinMaxInfo.ptMaxPosition.x = lWorkAreaRect.left - lMonitorRect.left;
-			lMinMaxInfo.ptMaxPosition.y = lWorkAreaRect.top - lMonitorRect.top;
-
-			lMinMaxInfo.ptMaxSize.x = lWorkAreaRect.right - lWorkAreaRect.left;
-			lMinMaxInfo.ptMaxSize.y = lWorkAreaRect.bottom - lWorkAreaRect.top;
-
-			Marshal.StructureToPtr( lMinMaxInfo, pLParam, true );
-		}
-
 		private void OnMinimizeWindowButtonClick( object pSender, RoutedEventArgs pEventArgs )
 		{
 			WindowState = WindowState.Minimized;
@@ -148,47 +312,6 @@ namespace ResumeApp
 		private void OnCloseWindowButtonClick( object pSender, RoutedEventArgs pEventArgs )
 		{
 			Close();
-		}
-
-		[DllImport( "user32.dll" )]
-		private static extern IntPtr MonitorFromWindow( IntPtr pHwnd, int pFlags );
-
-		[DllImport( "user32.dll", CharSet = CharSet.Auto )]
-		private static extern bool GetMonitorInfo( IntPtr pMonitorHandle, ref MONITORINFO pMonitorInfo );
-
-		[StructLayout( LayoutKind.Sequential )]
-		private struct POINT
-		{
-			public int x;
-			public int y;
-		}
-
-		[StructLayout( LayoutKind.Sequential )]
-		private struct MINMAXINFO
-		{
-			public POINT ptReserved;
-			public POINT ptMaxSize;
-			public POINT ptMaxPosition;
-			public POINT ptMinTrackSize;
-			public POINT ptMaxTrackSize;
-		}
-
-		[StructLayout( LayoutKind.Sequential, CharSet = CharSet.Auto )]
-		private struct MONITORINFO
-		{
-			public int cbSize;
-			public RECT rcMonitor;
-			public RECT rcWork;
-			public int dwFlags;
-		}
-
-		[StructLayout( LayoutKind.Sequential )]
-		private struct RECT
-		{
-			public int left;
-			public int top;
-			public int right;
-			public int bottom;
 		}
 	}
 }

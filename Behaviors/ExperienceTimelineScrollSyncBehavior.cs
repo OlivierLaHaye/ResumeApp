@@ -254,10 +254,7 @@ namespace ResumeApp.Behaviors
 			pScrollViewer.Loaded -= OnScrollViewerLoaded;
 			pScrollViewer.ScrollChanged -= OnScrollChanged;
 
-			if ( pState.DebounceTimer != null )
-			{
-				pState.DebounceTimer.Stop();
-			}
+			pState.DebounceTimer?.Stop();
 		}
 
 		private static void QueueInitialSync( ScrollViewer pScrollViewer, ExperienceTimelineScrollSyncState pState )

@@ -8,21 +8,21 @@
     <Grid x:Name="mThemeCheckBoxLayoutGrid" Margin="{StaticResource SmallThickness}">
         <CheckBox
             x:Name="mCheckBoxThemeButton"
-            Command="{Binding CheckBoxThemeCommand, ElementName=mThemeCheckBoxControlRoot}"
+            Command="{Binding sCheckBoxThemeCommand, ElementName=mThemeCheckBoxControlRoot}"
             Style="{StaticResource TextCheckBoxStyle}">
             <StackPanel x:Name="mCheckBoxThemeStackPanel">
                 <TextBlock
                     x:Name="mCheckBoxThemeLabelTextBlock"
                     Margin="{StaticResource SmallThickness}"
                     HorizontalAlignment="Center"
-                    Text="{Binding LabelText, ElementName=mThemeCheckBoxControlRoot}" />
+                    Text="{Binding sLabelText, ElementName=mThemeCheckBoxControlRoot}" />
                 <TextBlock x:Name="mCheckBoxThemeStateTextBlock" HorizontalAlignment="Center">
                     <TextBlock.Style>
                         <Style BasedOn="{StaticResource SmallTextBlock}" TargetType="{x:Type TextBlock}">
-                            <Setter Property="Text" Value="{Binding LightModeText, ElementName=mThemeCheckBoxControlRoot}" />
+                            <Setter Property="Text" Value="{Binding sLightModeText, ElementName=mThemeCheckBoxControlRoot}" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsDarkThemeActive, ElementName=mThemeCheckBoxControlRoot}" Value="True">
-                                    <Setter Property="Text" Value="{Binding DarkModeText, ElementName=mThemeCheckBoxControlRoot}" />
+                                <DataTrigger Binding="{Binding sIsDarkThemeActive, ElementName=mThemeCheckBoxControlRoot}" Value="True">
+                                    <Setter Property="Text" Value="{Binding sDarkModeText, ElementName=mThemeCheckBoxControlRoot}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

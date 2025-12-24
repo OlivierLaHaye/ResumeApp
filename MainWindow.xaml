@@ -14,7 +14,7 @@
     ResizeMode="CanResize"
     SnapsToDevicePixels="True"
     UseLayoutRounding="True"
-    WindowStartupLocation="CenterScreen"
+    WindowStartupLocation="Manual"
     WindowStyle="None">
 
     <Window.Resources>
@@ -171,10 +171,10 @@
 
                         <controls:ThemeCheckBox
                             x:Name="mThemeToggleControl"
-                            CheckBoxThemeCommand="{Binding CheckBoxThemeCommand}"
-                            IsDarkThemeActive="{Binding IsDarkThemeActive}"
-                            LabelResourceKey="ButtonToggleTheme"
-                            ResourcesService="{Binding ResourcesService}" />
+                            sCheckBoxThemeCommand="{Binding CheckBoxThemeCommand}"
+                            sIsDarkThemeActive="{Binding IsDarkThemeActive}"
+                            sLabelResourceKey="ButtonToggleTheme"
+                            sResourcesService="{Binding ResourcesService}" />
 
                         <controls:LanguageCheckBoxControl
                             x:Name="mLanguageToggleControl"
