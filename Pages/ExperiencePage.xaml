@@ -1,3 +1,4 @@
+<!--  Pages/ExperiencePage.xaml  -->
 <UserControl
     x:Class="ResumeApp.Pages.ExperiencePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -13,6 +14,21 @@
             <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
             <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
             <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+
+        <Style
+            x:Key="MonoBodyTextBlockStyle"
+            BasedOn="{StaticResource {x:Type TextBlock}}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}" />
+            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
+        </Style>
+
+        <Style x:Key="ChipBorderStyle" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="{DynamicResource CommonGrayBrush}" />
+            <Setter Property="CornerRadius" Value="{StaticResource ExtraSmallCornerRadius}" />
+            <Setter Property="Margin" Value="{StaticResource ExtraSmallThickness}" />
         </Style>
 
         <Style x:Key="ExperienceCardFocusVisualStyle" TargetType="{x:Type Control}">
@@ -77,7 +93,7 @@
             Grid.Row="1"
             Margin="{StaticResource CommonTopBottomThickness}"
             Style="{StaticResource SubSectionCardBorderStyle}">
-            <StackPanel>
+            <StackPanel x:Name="mTimelineStackPanel">
                 <Grid x:Name="mTimelineLayoutGrid" Margin="{StaticResource CommonThickness}">
                     <controls:TimelineControl
                         x:Name="mExperienceTimelineControl"
@@ -241,26 +257,40 @@
                                                 </ItemsControl.ItemTemplate>
                                             </ItemsControl>
 
-                                            <DockPanel
-                                                x:Name="mTechDockPanel"
+                                            <StackPanel
+                                                x:Name="mTechStackPanel"
                                                 Grid.Row="4"
                                                 Margin="{StaticResource SmallThickness}"
-                                                LastChildFill="True">
+                                                Orientation="Vertical">
                                                 <TextBlock
                                                     x:Name="mTechLabelTextBlock"
-                                                    DockPanel.Dock="Left"
                                                     FontFamily="{StaticResource MonoFontFamily}"
                                                     FontSize="{StaticResource SmallFontSize}"
                                                     Opacity="{StaticResource CommonOpacity}"
                                                     Text="{Binding DataContext.ResourcesService[LabelTech], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
-                                                <TextBlock
-                                                    x:Name="mTechValueTextBlock"
-                                                    Margin="{StaticResource SmallLeftRightThickness}"
-                                                    FontFamily="{StaticResource MonoFontFamily}"
-                                                    FontSize="{StaticResource SmallFontSize}"
-                                                    Opacity="{StaticResource CommonOpacity}"
-                                                    Text="{Binding TechText}" />
-                                            </DockPanel>
+
+                                                <ItemsControl
+                                                    x:Name="mTechChipsItemsControl"
+                                                    Margin="{StaticResource ExtraSmallThickness}"
+                                                    ItemsSource="{Binding TechItems}">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <WrapPanel x:Name="mTechWrapPanel" />
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border x:Name="mTechChipBorder" Style="{StaticResource ChipBorderStyle}">
+                                                                <TextBlock
+                                                                    x:Name="mTechChipTextBlock"
+                                                                    Margin="{StaticResource SmallThickness}"
+                                                                    Style="{StaticResource MonoBodyTextBlockStyle}"
+                                                                    Text="{Binding}" />
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
                                 </Grid>

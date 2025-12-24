@@ -54,13 +54,13 @@ namespace ResumeApp.ViewModels.Pages
 
 		private ICommand mSelectExperienceCommand;
 		public ICommand SelectExperienceCommand =>
-											mSelectExperienceCommand ??
-											( mSelectExperienceCommand = new ParameterRelayCommand( ExecuteSelectExperience ) );
+			mSelectExperienceCommand ??
+			( mSelectExperienceCommand = new ParameterRelayCommand( ExecuteSelectExperience ) );
 
 		private ICommand mSelectDateCommand;
 		public ICommand SelectDateCommand =>
-											mSelectDateCommand ??
-											( mSelectDateCommand = new ParameterRelayCommand( ExecuteSelectDate ) );
+			mSelectDateCommand ??
+			( mSelectDateCommand = new ParameterRelayCommand( ExecuteSelectDate ) );
 
 		public ExperiencePageViewModel( ResourcesService pResourcesService, ThemeService pThemeService )
 			: base( pResourcesService, pThemeService )
@@ -332,7 +332,12 @@ namespace ResumeApp.ViewModels.Pages
 				return TimelineMinDate;
 			}
 
-			return pDate > lToday ? lToday : pDate;
+			if ( pDate > lToday )
+			{
+				return lToday;
+			}
+
+			return pDate;
 		}
 
 		private ExperienceTimelineEntryViewModel FindEntryClosestAtOrBefore( DateTime pDate )

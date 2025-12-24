@@ -4,7 +4,9 @@
 using ResumeApp.Infrastructure;
 using ResumeApp.Services;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 
 namespace ResumeApp.ViewModels.Pages
@@ -18,6 +20,8 @@ namespace ResumeApp.ViewModels.Pages
 		public string LocationText { get; }
 		public string ScopeText { get; }
 		public string TechText { get; }
+
+		public ObservableCollection<string> TechItems { get; }
 
 		public DateTime StartDate { get; }
 		public DateTime? EndDate { get; }
@@ -68,6 +72,8 @@ namespace ResumeApp.ViewModels.Pages
 			ScopeText = pScopeText ?? string.Empty;
 			TechText = pTechText ?? string.Empty;
 
+			TechItems = new ObservableCollection<string>( SplitTechTextToItems( TechText ) );
+
 			StartDate = pStartDate;
 			EndDate = pEndDate;
 
@@ -77,6 +83,31 @@ namespace ResumeApp.ViewModels.Pages
 			SetLaneIndex( 0 );
 			SetPaletteIndex( 0 );
 			MarkerGlyph = ResolveMarkerGlyph( 0 );
+		}
+
+		private static IEnumerable<string> SplitTechTextToItems( string pTechText )
+		{
+			if ( string.IsNullOrWhiteSpace( pTechText ) )
+			{
+				return Enumerable.Empty<string>();
+			}
+
+			string lNormalizedText = pTechText
+				.Replace( " / ", "," )
+				.Replace( "•", "," )
+				.Replace( "·", "," )
+				.Replace( "|", "," )
+				.Replace( ";", "," );
+
+			string[] lParts = lNormalizedText.Split(
+				new[] { ',', '\r', '\n', '\t' },
+				StringSplitOptions.RemoveEmptyEntries );
+
+			return lParts
+				.Select( pPart => ( pPart ?? string.Empty ).Trim() )
+				.Where( pItem => !string.IsNullOrWhiteSpace( pItem ) )
+				.Distinct( StringComparer.OrdinalIgnoreCase )
+				.ToList();
 		}
 
 		private static double GetDoubleResourceOrDefault( string pKey, double pDefault )
@@ -114,7 +145,7 @@ namespace ResumeApp.ViewModels.Pages
 
 			PaletteIndex = lNormalizedPaletteIndex;
 		}
-		
+
 		private void UpdateDateRangeText()
 		{
 			string lStartText = StartDate.ToString( "yyyy-MM", mResourcesService.ActiveCulture );
