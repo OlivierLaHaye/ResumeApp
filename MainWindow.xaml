@@ -135,33 +135,60 @@
                     Right="{StaticResource LargeThicknessValue}" />
             </Border.Margin>
 
-            <Grid x:Name="mTopBarRootGrid">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+            <Grid x:Name="mTopBarRootGrid" VerticalAlignment="Center">
+
+                <Image
+                    Height="32"
+                    Margin="{StaticResource CommonThickness}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    RenderOptions.BitmapScalingMode="HighQuality"
+                    Source="pack://application:,,,/ResumeApp;component/Resources/ResumeApp.png"
+                    Stretch="Uniform"
+                    Visibility="{Binding IsTopBarCollapsed, Mode=OneWay, Converter={StaticResource BoolToCollapseConverter}}" />
 
                 <Grid
                     x:Name="mTopBarLayoutGrid"
                     Margin="{StaticResource SmallThickness}"
+                    VerticalAlignment="Center"
                     Visibility="{Binding IsTopBarCollapsed, Mode=OneWay, Converter={StaticResource InverseBoolToCollapseConverter}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel x:Name="mTitleStackPanel" Orientation="Vertical">
-                        <TextBlock
-                            x:Name="mAppTitleTextBlock"
-                            FontSize="{StaticResource LargeFontSize}"
-                            FontWeight="SemiBold"
-                            Text="{Binding ResourcesService[AppTitle], Mode=OneWay}" />
-                        <TextBlock
-                            x:Name="mAppSubtitleTextBlock"
-                            FontSize="{StaticResource SmallFontSize}"
-                            Opacity="{StaticResource LowOpacity}"
-                            Text="{Binding ResourcesService[AppSubtitle], Mode=OneWay}" />
-                    </StackPanel>
+                    <Grid x:Name="mTitleWithIconGrid" VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Image
+                            x:Name="mAppIconImage"
+                            Height="160"
+                            Margin="{StaticResource LargeThickness}"
+                            VerticalAlignment="Center"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Source="pack://application:,,,/ResumeApp;component/Resources/ResumeApp.png"
+                            Stretch="Uniform" />
+
+                        <StackPanel
+                            x:Name="mTitleStackPanel"
+                            Grid.Column="1"
+                            Margin="{StaticResource LargeTopBottomThickness}"
+                            Orientation="Vertical">
+                            <TextBlock
+                                x:Name="mAppTitleTextBlock"
+                                FontSize="{StaticResource LargeFontSize}"
+                                FontWeight="SemiBold"
+                                Text="{Binding ResourcesService[AppTitle], Mode=OneWay}" />
+                            <TextBlock
+                                x:Name="mAppSubtitleTextBlock"
+                                FontSize="{StaticResource SmallFontSize}"
+                                Opacity="{StaticResource LowOpacity}"
+                                Text="{Binding ResourcesService[AppSubtitle], Mode=OneWay}" />
+                        </StackPanel>
+                    </Grid>
 
                     <StackPanel
                         x:Name="mTopBarActionsStackPanel"
@@ -187,9 +214,8 @@
 
                 <ToggleButton
                     x:Name="mTopBarCollapseToggleButton"
-                    Grid.Row="1"
+                    Grid.Row="0"
                     HorizontalAlignment="Center"
-                    VerticalAlignment="Bottom"
                     IsChecked="{Binding IsTopBarCollapsed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <ToggleButton.Style>
                         <Style TargetType="{x:Type ToggleButton}">
@@ -210,8 +236,8 @@
                                             Background="{TemplateBinding Background}">
                                             <Viewbox
                                                 x:Name="mTopBarCollapseIconViewBox"
-                                                Width="18"
-                                                Height="18"
+                                                Width="20"
+                                                Height="20"
                                                 Stretch="Uniform">
                                                 <Grid x:Name="mTopBarCollapseIconGrid">
                                                     <Path
