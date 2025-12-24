@@ -180,11 +180,13 @@
                                                     <TextBlock
                                                         x:Name="mWhatIBuiltBulletTextBlock"
                                                         Margin="{StaticResource SmallLeftRightThickness}"
+                                                        VerticalAlignment="Center"
                                                         DockPanel.Dock="Left"
                                                         Opacity="{StaticResource CommonOpacity}"
                                                         Text="{Binding DataContext.ResourcesService[GlyphBullet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                                                     <TextBlock
                                                         x:Name="mWhatIBuiltTextBlock"
+                                                        VerticalAlignment="Center"
                                                         Style="{StaticResource BodyTextBlockStyle}"
                                                         Text="{Binding DisplayText}" />
                                                 </DockPanel>

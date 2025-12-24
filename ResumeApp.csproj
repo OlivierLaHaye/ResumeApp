@@ -138,6 +138,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Windows\ProjectImageViewerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
@@ -257,6 +261,9 @@
     <Compile Include="ViewModels\ViewModelBase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Windows\ProjectImageViewerWindow.xaml.cs">
+      <DependentUpon>ProjectImageViewerWindow.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.fr-CA.resx">
@@ -308,6 +315,23 @@
     </Resource>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\Projects\Creaform.OS\Creaform.OS_1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Creaform.OS\Creaform.OS_2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Creaform.OS\Creaform.OS_3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Creaform.OS\Creaform.OS_4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Creaform.OS\Creaform.OS_5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>REM Pre-build event in Project Properties → Build Events

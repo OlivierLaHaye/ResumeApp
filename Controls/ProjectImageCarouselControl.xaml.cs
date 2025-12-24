@@ -1,11 +1,11 @@
-﻿// Copyright (C) Olivier La Haye
-// All rights reserved.
-
+﻿// Controls/ProjectImageCarouselControl.xaml.cs
+using ResumeApp.Windows;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -35,9 +35,17 @@ namespace ResumeApp.Controls
 				typeof( ProjectImageCarouselControl ),
 				new PropertyMetadata( string.Empty, OnPlaceholderTextPropertyChanged ) );
 
+		public static readonly DependencyProperty sIsFullscreenProperty =
+			DependencyProperty.Register(
+				nameof( IsFullscreen ),
+				typeof( bool ),
+				typeof( ProjectImageCarouselControl ),
+				new PropertyMetadata( false, OnIsFullscreenPropertyChanged ) );
+
 		private static readonly Duration sFadeDuration = new Duration( TimeSpan.FromMilliseconds( 180 ) );
 
 		private ObservableCollection<ImageSource> mObservedImages;
+		private ProjectImageViewerWindow mProjectImageViewerWindow;
 
 		public ObservableCollection<ImageSource> Images
 		{
@@ -57,6 +65,12 @@ namespace ResumeApp.Controls
 			set => SetValue( sPlaceholderTextProperty, value );
 		}
 
+		public bool IsFullscreen
+		{
+			get => ( bool )GetValue( sIsFullscreenProperty );
+			set => SetValue( sIsFullscreenProperty, value );
+		}
+
 		public ProjectImageCarouselControl()
 		{
 			InitializeComponent();
@@ -69,7 +83,10 @@ namespace ResumeApp.Controls
 		{
 			if ( pDependencyObject is ProjectImageCarouselControl lControl )
 			{
-				lControl.OnImagesChanged( pArgs.OldValue as ObservableCollection<ImageSource>, pArgs.NewValue as ObservableCollection<ImageSource> );
+				ObservableCollection<ImageSource> lOldImages = pArgs.OldValue is ObservableCollection<ImageSource> lOldCollection ? lOldCollection : null;
+				ObservableCollection<ImageSource> lNewImages = pArgs.NewValue is ObservableCollection<ImageSource> lNewCollection ? lNewCollection : null;
+
+				lControl.OnImagesChanged( lOldImages, lNewImages );
 			}
 		}
 
@@ -86,6 +103,14 @@ namespace ResumeApp.Controls
 			if ( pDependencyObject is ProjectImageCarouselControl lControl )
 			{
 				lControl.UpdatePlaceholderVisuals();
+			}
+		}
+
+		private static void OnIsFullscreenPropertyChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
+		{
+			if ( pDependencyObject is ProjectImageCarouselControl lControl )
+			{
+				lControl.OnIsFullscreenChanged();
 			}
 		}
 
@@ -132,12 +157,20 @@ namespace ResumeApp.Controls
 			UpdateVisuals( pShouldAnimate: true );
 		}
 
+		private void OnIsFullscreenChanged()
+		{
+			UpdateVisuals( pShouldAnimate: false );
+			UpdateMediaClip();
+		}
+
 		private void UpdatePlaceholderVisuals()
 		{
-			if ( mPlaceholderTextBlock != null )
+			if ( mPlaceholderTextBlock == null )
 			{
-				mPlaceholderTextBlock.Text = PlaceholderText ?? string.Empty;
+				return;
 			}
+
+			mPlaceholderTextBlock.Text = PlaceholderText ?? string.Empty;
 		}
 
 		private void AttachImages( ObservableCollection<ImageSource> pImages )
@@ -159,6 +192,21 @@ namespace ResumeApp.Controls
 		{
 			EnsureSelectedIndexIsValid();
 			UpdateVisuals( pShouldAnimate: false );
+
+			if ( mProjectImageViewerWindow == null )
+			{
+				return;
+			}
+
+			if ( HasImages() )
+			{
+				return;
+			}
+
+			if ( mProjectImageViewerWindow.IsVisible )
+			{
+				mProjectImageViewerWindow.Close();
+			}
 		}
 
 		private int GetImagesCount() => Images?.Count ?? 0;
@@ -221,10 +269,12 @@ namespace ResumeApp.Controls
 			mNavigationOverlayGrid.Visibility = lHasMultipleImages ? Visibility.Visible : Visibility.Collapsed;
 
 			UpdateNavigationEnabledState();
+			UpdateExpandButtonVisibility( lHasImages );
 
 			if ( !lHasImages )
 			{
 				mCurrentImageImage.Source = null;
+				mCurrentImageImage.Opacity = 0;
 				return;
 			}
 
@@ -241,10 +291,20 @@ namespace ResumeApp.Controls
 			AnimateImageFadeIn();
 		}
 
+		private void UpdateExpandButtonVisibility( bool pHasImages )
+		{
+			if ( mExpandButton == null )
+			{
+				return;
+			}
+
+			bool lIsExpandAllowed = pHasImages && !IsFullscreen;
+			mExpandButton.Visibility = lIsExpandAllowed ? Visibility.Visible : Visibility.Collapsed;
+		}
+
 		private void UpdateNavigationEnabledState()
 		{
-			int lImagesCount = GetImagesCount();
-			bool lHasMultipleImages = lImagesCount > 1;
+			bool lHasMultipleImages = HasMultipleImages();
 
 			if ( mPreviousButton != null )
 			{
@@ -313,6 +373,72 @@ namespace ResumeApp.Controls
 			NavigateNext();
 		}
 
+		private void OnExpandButtonClick( object pSender, RoutedEventArgs pArgs )
+		{
+			OpenOrActivateExpandedWindow();
+		}
+
+		private void OpenOrActivateExpandedWindow()
+		{
+			if ( IsFullscreen )
+			{
+				return;
+			}
+
+			if ( !HasImages() )
+			{
+				return;
+			}
+
+			if ( mProjectImageViewerWindow != null && mProjectImageViewerWindow.IsVisible )
+			{
+				mProjectImageViewerWindow.Activate();
+				return;
+			}
+
+			var lViewerWindow = new ProjectImageViewerWindow();
+
+			var lOwnerWindow = Window.GetWindow( this );
+			if ( lOwnerWindow != null )
+			{
+				lViewerWindow.Owner = lOwnerWindow;
+			}
+
+			var lImagesBinding = new Binding
+			{
+				Source = this,
+				Path = new PropertyPath( nameof( Images ) ),
+				Mode = BindingMode.OneWay
+			};
+
+			var lSelectedIndexBinding = new Binding
+			{
+				Source = this,
+				Path = new PropertyPath( nameof( SelectedIndex ) ),
+				Mode = BindingMode.TwoWay,
+				UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+			};
+
+			BindingOperations.SetBinding( lViewerWindow, ProjectImageViewerWindow.sImagesProperty, lImagesBinding );
+			BindingOperations.SetBinding( lViewerWindow, ProjectImageViewerWindow.sSelectedIndexProperty, lSelectedIndexBinding );
+
+			lViewerWindow.Closed += OnProjectImageViewerWindowClosed;
+
+			mProjectImageViewerWindow = lViewerWindow;
+
+			lViewerWindow.Show();
+			lViewerWindow.Activate();
+		}
+
+		private void OnProjectImageViewerWindowClosed( object pSender, EventArgs pArgs )
+		{
+			if ( pSender is ProjectImageViewerWindow lViewerWindow && ReferenceEquals( mProjectImageViewerWindow, lViewerWindow ) )
+			{
+				mProjectImageViewerWindow.Closed -= OnProjectImageViewerWindowClosed;
+				mProjectImageViewerWindow = null;
+			}
+		}
+
 		private void OnRootPreviewKeyDown( object pSender, KeyEventArgs pArgs )
 		{
 			if ( !HasMultipleImages() )
@@ -339,6 +465,12 @@ namespace ResumeApp.Controls
 
 		private void OnRootPreviewMouseWheel( object pSender, MouseWheelEventArgs pArgs )
 		{
+			if ( IsFullscreen )
+			{
+				pArgs.Handled = true;
+				return;
+			}
+
 			pArgs.Handled = false;
 		}
 
