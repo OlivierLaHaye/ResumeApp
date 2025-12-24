@@ -15,85 +15,104 @@
     WindowStartupLocation="Manual"
     WindowStyle="None">
 
-    <Grid x:Name="mProjectImageViewerWindowLayoutRootGrid">
-        <controls:ProjectImageCarouselControl
-            x:Name="mFullscreenProjectImageCarouselControl"
-            Images="{Binding Images, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-            IsFullscreen="True"
-            PlaceholderText=""
-            SelectedIndex="{Binding SelectedIndex, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+    <Border
+        x:Name="mWindowFrameBorder"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True">
+        <Border.Style>
+            <Style TargetType="{x:Type Border}">
+                <Setter Property="BorderBrush" Value="{DynamicResource CommonLightGrayBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="40" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
+                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="CornerRadius" Value="0" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
 
-        <Grid
-            x:Name="mCustomTitleBarRootGrid"
-            Height="48"
-            VerticalAlignment="Top"
-            Panel.ZIndex="10"
-            Background="Transparent">
+        <Grid x:Name="mProjectImageViewerWindowLayoutRootGrid">
+            <controls:ProjectImageCarouselControl
+                x:Name="mFullscreenProjectImageCarouselControl"
+                Images="{Binding Images, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                IsFullscreen="True"
+                PlaceholderText=""
+                SelectedIndex="{Binding SelectedIndex, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <Border x:Name="mCustomTitleBarDragSurfaceBorder" Background="Transparent" />
-
-            <Border
-                x:Name="mCaptionButtonsCapsuleBorder"
-                HorizontalAlignment="Center"
+            <Grid
+                x:Name="mCustomTitleBarRootGrid"
+                Height="48"
                 VerticalAlignment="Top"
-                WindowChrome.IsHitTestVisibleInChrome="True">
+                Panel.ZIndex="10"
+                Background="Transparent">
 
-                <Grid x:Name="mCaptionButtonsGrid">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="45" />
-                        <ColumnDefinition Width="45" />
-                        <ColumnDefinition Width="45" />
-                    </Grid.ColumnDefinitions>
+                <Border x:Name="mCustomTitleBarDragSurfaceBorder" Background="Transparent" />
 
-                    <Button
-                        x:Name="mMinimizeWindowButton"
-                        Grid.Column="0"
-                        Click="OnMinimizeWindowButtonClick"
-                        Style="{StaticResource MinimizeButtonStyle}"
-                        WindowChrome.IsHitTestVisibleInChrome="True" />
+                <Border
+                    x:Name="mCaptionButtonsCapsuleBorder"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    WindowChrome.IsHitTestVisibleInChrome="True">
 
-                    <Grid x:Name="mMaximizeRestoreButtonsGrid" Grid.Column="1">
-                        <Button
-                            x:Name="mMaximizeWindowButton"
-                            Click="OnMaximizeRestoreWindowButtonClick"
-                            WindowChrome.IsHitTestVisibleInChrome="True">
-                            <Button.Style>
-                                <Style BasedOn="{StaticResource MaximizeButtonStyle}" TargetType="{x:Type Button}">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
+                    <Grid x:Name="mCaptionButtonsGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="45" />
+                            <ColumnDefinition Width="45" />
+                            <ColumnDefinition Width="45" />
+                        </Grid.ColumnDefinitions>
 
                         <Button
-                            x:Name="mRestoreWindowButton"
-                            Click="OnMaximizeRestoreWindowButtonClick"
-                            WindowChrome.IsHitTestVisibleInChrome="True">
-                            <Button.Style>
-                                <Style BasedOn="{StaticResource RestoreButtonStyle}" TargetType="{x:Type Button}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
+                            x:Name="mMinimizeWindowButton"
+                            Grid.Column="0"
+                            Click="OnMinimizeWindowButtonClick"
+                            Style="{StaticResource MinimizeButtonStyle}"
+                            WindowChrome.IsHitTestVisibleInChrome="True" />
+
+                        <Grid x:Name="mMaximizeRestoreButtonsGrid" Grid.Column="1">
+                            <Button
+                                x:Name="mMaximizeWindowButton"
+                                Click="OnMaximizeRestoreWindowButtonClick"
+                                WindowChrome.IsHitTestVisibleInChrome="True">
+                                <Button.Style>
+                                    <Style BasedOn="{StaticResource MaximizeButtonStyle}" TargetType="{x:Type Button}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+
+                            <Button
+                                x:Name="mRestoreWindowButton"
+                                Click="OnMaximizeRestoreWindowButtonClick"
+                                WindowChrome.IsHitTestVisibleInChrome="True">
+                                <Button.Style>
+                                    <Style BasedOn="{StaticResource RestoreButtonStyle}" TargetType="{x:Type Button}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </Grid>
+
+                        <Button
+                            x:Name="mCloseWindowButton"
+                            Grid.Column="2"
+                            Click="OnCloseWindowButtonClick"
+                            Style="{StaticResource CloseButtonStyle}"
+                            WindowChrome.IsHitTestVisibleInChrome="True" />
                     </Grid>
-
-                    <Button
-                        x:Name="mCloseWindowButton"
-                        Grid.Column="2"
-                        Click="OnCloseWindowButtonClick"
-                        Style="{StaticResource CloseButtonStyle}"
-                        WindowChrome.IsHitTestVisibleInChrome="True" />
-                </Grid>
-            </Border>
+                </Border>
+            </Grid>
         </Grid>
-    </Grid>
+    </Border>
 </Window>
