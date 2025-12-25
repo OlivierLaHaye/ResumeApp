@@ -10,7 +10,6 @@
     AllowsTransparency="False"
     Background="{DynamicResource CommonBlackBrush}"
     BorderThickness="0"
-    Foreground="{DynamicResource CommonWhiteBrush}"
     ResizeMode="CanResize"
     SnapsToDevicePixels="True"
     UseLayoutRounding="True"
@@ -43,20 +42,13 @@
         </Style>
     </Window.Resources>
 
-    <Border x:Name="mWindowFrameBorder" SnapsToDevicePixels="True" UseLayoutRounding="True">
-        <Border.Style>
-            <Style TargetType="{x:Type Border}">
-                <Setter Property="BorderBrush" Value="{DynamicResource CommonLightGrayBrush}" />
-                <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="CornerRadius" Value="40" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
-                        <Setter Property="BorderThickness" Value="0" />
-                        <Setter Property="CornerRadius" Value="0" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Border.Style>
+    <Border
+        x:Name="mWindowFrameBorder"
+        BorderBrush="{DynamicResource CommonLightGrayBrush}"
+        BorderThickness="2"
+        CornerRadius="40"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True">
 
         <Grid x:Name="mMainWindowLayoutRoot">
             <Grid.RowDefinitions>

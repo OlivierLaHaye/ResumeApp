@@ -1,7 +1,4 @@
-﻿// Copyright (C) Olivier La Haye
-// All rights reserved.
-
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -114,7 +111,7 @@ namespace ResumeApp.Windows
 
 		private static IntPtr GetTargetMonitorHandle( IntPtr pWindowHandle )
 		{
-			bool lHasCursorPos = GetCursorPos( out var lCursorPoint );
+			bool lHasCursorPos = GetCursorPos( out Point lCursorPoint );
 			if ( !lHasCursorPos )
 			{
 				return MonitorFromWindow( pWindowHandle, MonitorDefaultToNearest );
@@ -265,7 +262,7 @@ namespace ResumeApp.Windows
 				return;
 			}
 
-			bool lHasWorkArea = TryGetWorkAreaRectPixels( lMonitorHandle, out var lWorkAreaRectPixels );
+			bool lHasWorkArea = TryGetWorkAreaRectPixels( lMonitorHandle, out Rect lWorkAreaRectPixels );
 			if ( !lHasWorkArea )
 			{
 				return;

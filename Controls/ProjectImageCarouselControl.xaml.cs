@@ -1,55 +1,67 @@
-﻿// Controls/ProjectImageCarouselControl.xaml.cs
+﻿// Copyright (C) Olivier La Haye
+// All rights reserved.
+
 using ResumeApp.Windows;
 using System;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 
 namespace ResumeApp.Controls
 {
-	public sealed partial class ProjectImageCarouselControl
+	public partial class ProjectImageCarouselControl : UserControl
 	{
 		public static readonly DependencyProperty sImagesProperty =
 			DependencyProperty.Register(
 				nameof( Images ),
-				typeof( ObservableCollection<ImageSource> ),
+				typeof( IList ),
 				typeof( ProjectImageCarouselControl ),
-				new PropertyMetadata( null, OnImagesPropertyChanged ) );
+				new FrameworkPropertyMetadata( null, OnImagesChanged ) );
 
 		public static readonly DependencyProperty sSelectedIndexProperty =
 			DependencyProperty.Register(
 				nameof( SelectedIndex ),
 				typeof( int ),
 				typeof( ProjectImageCarouselControl ),
-				new FrameworkPropertyMetadata( -1, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedIndexPropertyChanged ) );
+				new FrameworkPropertyMetadata( 0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedIndexChanged ) );
 
 		public static readonly DependencyProperty sPlaceholderTextProperty =
 			DependencyProperty.Register(
 				nameof( PlaceholderText ),
 				typeof( string ),
 				typeof( ProjectImageCarouselControl ),
-				new PropertyMetadata( string.Empty, OnPlaceholderTextPropertyChanged ) );
+				new FrameworkPropertyMetadata( string.Empty ) );
 
 		public static readonly DependencyProperty sIsFullscreenProperty =
 			DependencyProperty.Register(
 				nameof( IsFullscreen ),
 				typeof( bool ),
 				typeof( ProjectImageCarouselControl ),
-				new PropertyMetadata( false, OnIsFullscreenPropertyChanged ) );
+				new FrameworkPropertyMetadata( false, OnIsFullscreenChanged ) );
 
-		private static readonly Duration sFadeDuration = new Duration( TimeSpan.FromMilliseconds( 180 ) );
+		private static readonly Dictionary<string, ImageSource> sCachedImageSourcesByUri = new Dictionary<string, ImageSource>( StringComparer.OrdinalIgnoreCase );
 
-		private ObservableCollection<ImageSource> mObservedImages;
-		private ProjectImageViewerWindow mProjectImageViewerWindow;
+		private static readonly TimeSpan sTransitionDuration = TimeSpan.FromMilliseconds( 240 );
 
-		public ObservableCollection<ImageSource> Images
+		private readonly IEasingFunction mCarouselEasingFunction;
+
+		private bool mIsUpdatingSelectedIndexInternally;
+
+		private bool mIsDragInProgress;
+		private bool mHasNavigatedDuringDrag;
+		private Point mDragStartPosition;
+		private double mDragThresholdPixels;
+
+		public IList Images
 		{
-			get => ( ObservableCollection<ImageSource> )GetValue( sImagesProperty );
+			get => ( IList )GetValue( sImagesProperty );
 			set => SetValue( sImagesProperty, value );
 		}
 
@@ -73,462 +85,633 @@ namespace ResumeApp.Controls
 
 		public ProjectImageCarouselControl()
 		{
+			mCarouselEasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
 			InitializeComponent();
-
 			Loaded += OnControlLoaded;
-			Unloaded += OnControlUnloaded;
 		}
 
-		private static void OnImagesPropertyChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
+		private static void OnImagesChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
 			if ( pDependencyObject is ProjectImageCarouselControl lControl )
 			{
-				ObservableCollection<ImageSource> lOldImages = pArgs.OldValue is ObservableCollection<ImageSource> lOldCollection ? lOldCollection : null;
-				ObservableCollection<ImageSource> lNewImages = pArgs.NewValue is ObservableCollection<ImageSource> lNewCollection ? lNewCollection : null;
-
-				lControl.OnImagesChanged( lOldImages, lNewImages );
+				lControl.EnsureSelectedIndexIsValid();
+				lControl.UpdateAllVisuals( false );
 			}
 		}
 
-		private static void OnSelectedIndexPropertyChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
+		private static void OnSelectedIndexChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
 			if ( pDependencyObject is ProjectImageCarouselControl lControl )
 			{
-				lControl.OnSelectedIndexChanged();
+				if ( lControl.mIsUpdatingSelectedIndexInternally )
+				{
+					return;
+				}
+
+				lControl.EnsureSelectedIndexIsValid();
+				lControl.UpdateAllVisuals( true );
 			}
 		}
 
-		private static void OnPlaceholderTextPropertyChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
+		private static void OnIsFullscreenChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
 			if ( pDependencyObject is ProjectImageCarouselControl lControl )
 			{
-				lControl.UpdatePlaceholderVisuals();
+				lControl.UpdateAllVisuals( false );
 			}
 		}
 
-		private static void OnIsFullscreenPropertyChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
+		private static int WrapIndex( int pIndex, int pCount )
 		{
-			if ( pDependencyObject is ProjectImageCarouselControl lControl )
-			{
-				lControl.OnIsFullscreenChanged();
-			}
-		}
-
-		private static int GetWrappedIndex( int pTargetIndex, int pImagesCount )
-		{
-			if ( pImagesCount <= 0 )
+			if ( pCount <= 0 )
 			{
 				return -1;
 			}
 
-			int lModulo = pTargetIndex % pImagesCount;
-
-			if ( lModulo < 0 )
+			int lWrappedIndex = pIndex % pCount;
+			if ( lWrappedIndex < 0 )
 			{
-				lModulo += pImagesCount;
+				lWrappedIndex += pCount;
 			}
 
-			return lModulo;
+			return lWrappedIndex;
 		}
 
-		private void OnControlLoaded( object pSender, RoutedEventArgs pArgs )
+		private static ImageSource ConvertToImageSource( object pItem )
 		{
-			AttachImages( Images );
-			EnsureSelectedIndexIsValid();
-			UpdateVisuals( pShouldAnimate: false );
-			UpdateMediaClip();
-		}
-
-		private void OnControlUnloaded( object pSender, RoutedEventArgs pArgs )
-		{
-			AttachImages( null );
-		}
-
-		private void OnImagesChanged( ObservableCollection<ImageSource> pOldImages, ObservableCollection<ImageSource> pNewImages )
-		{
-			AttachImages( pNewImages );
-			EnsureSelectedIndexIsValid();
-			UpdateVisuals( pShouldAnimate: false );
-		}
-
-		private void OnSelectedIndexChanged()
-		{
-			EnsureSelectedIndexIsValid();
-			UpdateVisuals( pShouldAnimate: true );
-		}
-
-		private void OnIsFullscreenChanged()
-		{
-			UpdateVisuals( pShouldAnimate: false );
-			UpdateMediaClip();
-		}
-
-		private void UpdatePlaceholderVisuals()
-		{
-			if ( mPlaceholderTextBlock == null )
+			switch ( pItem )
 			{
-				return;
+				case null:
+					{
+						return null;
+					}
+				case ImageSource lAlreadyImageSource:
+					{
+						return lAlreadyImageSource;
+					}
 			}
 
-			mPlaceholderTextBlock.Text = PlaceholderText ?? string.Empty;
+			var lUriText = pItem as string;
+			if ( string.IsNullOrWhiteSpace( lUriText ) )
+			{
+				return null;
+			}
+
+			if ( sCachedImageSourcesByUri.TryGetValue( lUriText, out ImageSource lCachedImageSource ) )
+			{
+				return lCachedImageSource;
+			}
+
+			try
+			{
+				var lBitmapImage = new BitmapImage();
+				lBitmapImage.BeginInit();
+				lBitmapImage.UriSource = new Uri( lUriText, UriKind.RelativeOrAbsolute );
+				lBitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+				lBitmapImage.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+				lBitmapImage.EndInit();
+				lBitmapImage.Freeze();
+
+				sCachedImageSourcesByUri[ lUriText ] = lBitmapImage;
+				return lBitmapImage;
+			}
+			catch ( Exception )
+			{
+				// ignored
+			}
+
+			return null;
 		}
 
-		private void AttachImages( ObservableCollection<ImageSource> pImages )
+		private static bool IsDescendantOf( DependencyObject pElement, DependencyObject pPotentialAncestor )
 		{
-			if ( mObservedImages != null )
+			if ( pElement == null || pPotentialAncestor == null )
 			{
-				mObservedImages.CollectionChanged -= OnImagesCollectionChanged;
+				return false;
 			}
 
-			mObservedImages = pImages;
-
-			if ( mObservedImages != null )
+			DependencyObject lCurrentElement = pElement;
+			while ( lCurrentElement != null )
 			{
-				mObservedImages.CollectionChanged += OnImagesCollectionChanged;
+				if ( ReferenceEquals( lCurrentElement, pPotentialAncestor ) )
+				{
+					return true;
+				}
+
+				lCurrentElement = VisualTreeHelper.GetParent( lCurrentElement );
 			}
+
+			return false;
 		}
 
-		private void OnImagesCollectionChanged( object pSender, NotifyCollectionChangedEventArgs pArgs )
+		private static T FindAncestor<T>( DependencyObject pElement ) where T : DependencyObject
 		{
-			EnsureSelectedIndexIsValid();
-			UpdateVisuals( pShouldAnimate: false );
-
-			if ( mProjectImageViewerWindow == null )
+			DependencyObject lCurrentElement = pElement;
+			while ( lCurrentElement != null )
 			{
-				return;
+				if ( lCurrentElement is T lTypedElement )
+				{
+					return lTypedElement;
+				}
+
+				lCurrentElement = VisualTreeHelper.GetParent( lCurrentElement );
 			}
 
-			if ( HasImages() )
-			{
-				return;
-			}
-
-			if ( mProjectImageViewerWindow.IsVisible )
-			{
-				mProjectImageViewerWindow.Close();
-			}
+			return null;
 		}
 
-		private int GetImagesCount() => Images?.Count ?? 0;
-
-		private bool HasImages() => GetImagesCount() > 0;
-
-		private bool HasMultipleImages() => GetImagesCount() > 1;
+		private void OnControlLoaded( object pSender, RoutedEventArgs pEventArgs )
+		{
+			UpdateAllVisuals( false );
+		}
 
 		private void EnsureSelectedIndexIsValid()
 		{
-			int lImagesCount = GetImagesCount();
-
-			if ( lImagesCount <= 0 )
+			int lImageCount = GetImageCount();
+			if ( lImageCount <= 0 )
 			{
-				if ( SelectedIndex != -1 )
-				{
-					SelectedIndex = -1;
-				}
-
 				return;
 			}
 
-			if ( SelectedIndex < 0 || SelectedIndex >= lImagesCount )
+			if ( SelectedIndex >= 0 && SelectedIndex < lImageCount )
+			{
+				return;
+			}
+
+			mIsUpdatingSelectedIndexInternally = true;
+			try
 			{
 				SelectedIndex = 0;
 			}
+			finally
+			{
+				mIsUpdatingSelectedIndexInternally = false;
+			}
 		}
 
-		private ImageSource TryGetSelectedImageSource()
+		private int GetImageCount()
 		{
-			if ( Images == null )
-			{
-				return null;
-			}
-
-			int lImagesCount = Images.Count;
-
-			if ( lImagesCount <= 0 )
-			{
-				return null;
-			}
-
-			if ( SelectedIndex < 0 || SelectedIndex >= lImagesCount )
-			{
-				return null;
-			}
-
-			return Images[ SelectedIndex ];
+			var lImages = Images;
+			return lImages?.Count ?? 0;
 		}
 
-		private void UpdateVisuals( bool pShouldAnimate )
+		private void UpdateAllVisuals( bool pIsAnimated )
 		{
-			ImageSource lSelectedImageSource = TryGetSelectedImageSource();
+			int lImageCount = GetImageCount();
+			bool lHasAnyImage = lImageCount > 0;
+			bool lHasMultipleImages = lImageCount > 1;
 
-			bool lHasImages = lSelectedImageSource != null && HasImages();
-			bool lHasMultipleImages = lHasImages && HasMultipleImages();
+			mPlaceholderGrid.Visibility = lHasAnyImage ? Visibility.Collapsed : Visibility.Visible;
 
-			mPlaceholderGrid.Visibility = lHasImages ? Visibility.Collapsed : Visibility.Visible;
-			mCurrentImageImage.Visibility = lHasImages ? Visibility.Visible : Visibility.Collapsed;
 			mNavigationOverlayGrid.Visibility = lHasMultipleImages ? Visibility.Visible : Visibility.Collapsed;
 
-			UpdateNavigationEnabledState();
-			UpdateExpandButtonVisibility( lHasImages );
+			mPreviousButton.IsEnabled = lHasMultipleImages;
+			mNextButton.IsEnabled = lHasMultipleImages;
 
-			if ( !lHasImages )
+			mExpandButton.Visibility = ( lHasAnyImage && !IsFullscreen ) ? Visibility.Visible : Visibility.Collapsed;
+
+			UpdateCarouselVisualState( pIsAnimated );
+		}
+
+		private void UpdateCarouselVisualState( bool pIsAnimated )
+		{
+			int lImageCount = GetImageCount();
+			if ( lImageCount <= 0 )
 			{
-				mCurrentImageImage.Source = null;
-				mCurrentImageImage.Opacity = 0;
+				SetSlotCollapsed( mCurrentImageImage );
+				SetSlotCollapsed( mLeftStep1Image );
+				SetSlotCollapsed( mRightStep1Image );
+				SetSlotCollapsed( mLeftStep2Image );
+				SetSlotCollapsed( mRightStep2Image );
+				SetSlotCollapsed( mLeftStep3Image );
+				SetSlotCollapsed( mRightStep3Image );
 				return;
 			}
 
-			bool lIsSameSource = ReferenceEquals( mCurrentImageImage.Source, lSelectedImageSource );
-
-			mCurrentImageImage.Source = lSelectedImageSource;
-
-			if ( !pShouldAnimate || lIsSameSource )
+			double lContainerWidth = mMediaRootGrid.ActualWidth;
+			if ( lContainerWidth <= 1 )
 			{
-				mCurrentImageImage.Opacity = 1;
+				lContainerWidth = mMediaCardBorder.ActualWidth;
+			}
+
+			if ( lContainerWidth <= 1 )
+			{
+				lContainerWidth = 1000;
+			}
+
+			int lMaxStep = Math.Min( 3, lImageCount - 1 );
+
+			SetSlotState( mCurrentImageImage, GetImageSourceAtWrappedIndex( 0 ), 0, 0, lContainerWidth, pIsAnimated, 16 );
+
+			SetSlotState( mLeftStep1Image, lMaxStep >= 1 ? GetImageSourceAtWrappedIndex( -1 ) : null, 1, -1, lContainerWidth, pIsAnimated, 15 );
+			SetSlotState( mRightStep1Image, lMaxStep >= 1 ? GetImageSourceAtWrappedIndex( 1 ) : null, 1, 1, lContainerWidth, pIsAnimated, 15 );
+
+			SetSlotState( mLeftStep2Image, lMaxStep >= 2 ? GetImageSourceAtWrappedIndex( -2 ) : null, 2, -1, lContainerWidth, pIsAnimated, 14 );
+			SetSlotState( mRightStep2Image, lMaxStep >= 2 ? GetImageSourceAtWrappedIndex( 2 ) : null, 2, 1, lContainerWidth, pIsAnimated, 14 );
+
+			SetSlotState( mLeftStep3Image, lMaxStep >= 3 ? GetImageSourceAtWrappedIndex( -3 ) : null, 3, -1, lContainerWidth, pIsAnimated, 13 );
+			SetSlotState( mRightStep3Image, lMaxStep >= 3 ? GetImageSourceAtWrappedIndex( 3 ) : null, 3, 1, lContainerWidth, pIsAnimated, 13 );
+		}
+
+		private ImageSource GetImageSourceAtWrappedIndex( int pOffsetFromSelected )
+		{
+			int lImageCount = GetImageCount();
+			if ( lImageCount <= 0 )
+			{
+				return null;
+			}
+
+			int lWrappedIndex = WrapIndex( SelectedIndex + pOffsetFromSelected, lImageCount );
+			if ( lWrappedIndex < 0 )
+			{
+				return null;
+			}
+
+			object lItem = Images[ lWrappedIndex ];
+			return ConvertToImageSource( lItem );
+		}
+
+		private void SetSlotCollapsed( Image pImage )
+		{
+			if ( pImage == null )
+			{
 				return;
 			}
 
-			AnimateImageFadeIn();
-		}
+			pImage.Source = null;
+			pImage.Visibility = Visibility.Collapsed;
+			pImage.Opacity = 0;
+			Panel.SetZIndex( pImage, 0 );
 
-		private void UpdateExpandButtonVisibility( bool pHasImages )
-		{
-			if ( mExpandButton == null )
+			var lTransforms = GetSlotTransforms( pImage );
+			if ( lTransforms == null )
 			{
 				return;
 			}
 
-			bool lIsExpandAllowed = pHasImages && !IsFullscreen;
-			mExpandButton.Visibility = lIsExpandAllowed ? Visibility.Visible : Visibility.Collapsed;
+			StopAndSet( lTransforms.Item1, ScaleTransform.ScaleXProperty, 1 );
+			StopAndSet( lTransforms.Item1, ScaleTransform.ScaleYProperty, 1 );
+			StopAndSet( lTransforms.Item2, TranslateTransform.XProperty, 0 );
 		}
 
-		private void UpdateNavigationEnabledState()
+		private void SetSlotState( Image pImage, ImageSource pImageSource, int pStep, int pDirection, double pContainerWidth, bool pIsAnimated, int pZIndex )
 		{
-			bool lHasMultipleImages = HasMultipleImages();
-
-			if ( mPreviousButton != null )
+			if ( pImage == null )
 			{
-				mPreviousButton.IsEnabled = lHasMultipleImages;
+				return;
 			}
 
-			if ( mNextButton != null )
+			if ( pImageSource == null )
 			{
-				mNextButton.IsEnabled = lHasMultipleImages;
+				SetSlotCollapsed( pImage );
+				return;
 			}
 
-			if ( mDotsListBox != null )
+			pImage.Source = pImageSource;
+			pImage.Visibility = Visibility.Visible;
+			Panel.SetZIndex( pImage, pZIndex );
+
+			double lTargetScale = pStep <= 0 ? 1.0 : Math.Exp( -pStep * 0.32 );
+			double lTargetOpacity = pStep <= 0 ? 1.0 : Math.Exp( -pStep * 0.55 );
+
+			double lOffsetX = pStep <= 0
+				? 0.0
+				: pContainerWidth * 0.18 * ( Math.Exp( pStep * 0.50 ) - 1.0 );
+
+			double lTargetTranslateX = pDirection < 0 ? -lOffsetX : ( pDirection > 0 ? lOffsetX : 0.0 );
+
+			var lTransforms = GetSlotTransforms( pImage );
+			if ( lTransforms == null )
 			{
-				mDotsListBox.IsEnabled = lHasMultipleImages;
+				return;
 			}
+
+			ApplyDouble( lTransforms.Item1, ScaleTransform.ScaleXProperty, lTargetScale, pIsAnimated );
+			ApplyDouble( lTransforms.Item1, ScaleTransform.ScaleYProperty, lTargetScale, pIsAnimated );
+			ApplyDouble( lTransforms.Item2, TranslateTransform.XProperty, lTargetTranslateX, pIsAnimated );
+			ApplyDouble( pImage, UIElement.OpacityProperty, lTargetOpacity, pIsAnimated );
 		}
 
-		private void AnimateImageFadeIn()
+		private Tuple<ScaleTransform, TranslateTransform> GetSlotTransforms( Image pImage )
 		{
-			mCurrentImageImage.BeginAnimation( OpacityProperty, null );
-			mCurrentImageImage.Opacity = 0;
-
-			var lFadeAnimation = new DoubleAnimation
+			if ( !( pImage.RenderTransform is TransformGroup lTransformGroup ) )
 			{
-				From = 0,
-				To = 1,
-				Duration = sFadeDuration,
-				EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+				return null;
+			}
+
+			var lScaleTransform = lTransformGroup.Children.OfType<ScaleTransform>().FirstOrDefault();
+			var lTranslateTransform = lTransformGroup.Children.OfType<TranslateTransform>().FirstOrDefault();
+
+			if ( lScaleTransform == null || lTranslateTransform == null )
+			{
+				return null;
+			}
+
+			return Tuple.Create( lScaleTransform, lTranslateTransform );
+		}
+
+		private void ApplyDouble( DependencyObject pTarget, DependencyProperty pProperty, double pToValue, bool pIsAnimated )
+		{
+			if ( pTarget == null )
+			{
+				return;
+			}
+
+			if ( !pIsAnimated )
+			{
+				StopAndSet( pTarget, pProperty, pToValue );
+				return;
+			}
+
+			var lAnimatable = pTarget as Animatable;
+			if ( lAnimatable == null )
+			{
+				return;
+			}
+
+			var lDoubleAnimation = new DoubleAnimation
+			{
+				To = pToValue,
+				Duration = new Duration( sTransitionDuration ),
+				EasingFunction = mCarouselEasingFunction
 			};
 
-			mCurrentImageImage.BeginAnimation( OpacityProperty, lFadeAnimation );
+			lAnimatable.BeginAnimation( pProperty, lDoubleAnimation );
 		}
 
-		private void TryNavigateToIndex( int pTargetIndex )
+		private void StopAndSet( DependencyObject pTarget, DependencyProperty pProperty, double pValue )
 		{
-			int lImagesCount = GetImagesCount();
+			if ( pTarget is Animatable lAnimatable )
+			{
+				lAnimatable.BeginAnimation( pProperty, null );
+			}
 
-			if ( lImagesCount <= 0 )
+			pTarget.SetValue( pProperty, pValue );
+		}
+
+		private void NavigatePrevious()
+		{
+			int lImageCount = GetImageCount();
+			if ( lImageCount <= 1 )
 			{
 				return;
 			}
 
-			int lWrappedIndex = GetWrappedIndex( pTargetIndex, lImagesCount );
+			SelectedIndex = WrapIndex( SelectedIndex - 1, lImageCount );
+		}
 
-			if ( lWrappedIndex == SelectedIndex )
+		private void NavigateNext()
+		{
+			int lImageCount = GetImageCount();
+			if ( lImageCount <= 1 )
 			{
 				return;
 			}
 
-			SelectedIndex = lWrappedIndex;
+			SelectedIndex = WrapIndex( SelectedIndex + 1, lImageCount );
 		}
 
-		private void NavigatePrevious() => TryNavigateToIndex( SelectedIndex - 1 );
-
-		private void NavigateNext() => TryNavigateToIndex( SelectedIndex + 1 );
-
-		private void OnPreviousButtonClick( object pSender, RoutedEventArgs pArgs )
+		private void OnPreviousButtonClick( object pSender, RoutedEventArgs pEventArgs )
 		{
-			mProjectImageCarouselControlRoot.Focus();
 			NavigatePrevious();
 		}
 
-		private void OnNextButtonClick( object pSender, RoutedEventArgs pArgs )
+		private void OnNextButtonClick( object pSender, RoutedEventArgs pEventArgs )
 		{
-			mProjectImageCarouselControlRoot.Focus();
 			NavigateNext();
 		}
 
-		private void OnExpandButtonClick( object pSender, RoutedEventArgs pArgs )
-		{
-			OpenOrActivateExpandedWindow();
-		}
-
-		private void OpenOrActivateExpandedWindow()
+		private void OnExpandButtonClick( object pSender, RoutedEventArgs pEventArgs )
 		{
 			if ( IsFullscreen )
 			{
 				return;
 			}
 
-			if ( !HasImages() )
+			int lImageCount = GetImageCount();
+			if ( lImageCount <= 0 )
 			{
 				return;
 			}
-
-			if ( mProjectImageViewerWindow != null && mProjectImageViewerWindow.IsVisible )
-			{
-				mProjectImageViewerWindow.Activate();
-				return;
-			}
-
-			var lViewerWindow = new ProjectImageViewerWindow();
 
 			var lOwnerWindow = Window.GetWindow( this );
-			if ( lOwnerWindow != null )
+			var lViewerWindow = new ProjectImageViewerWindow
 			{
-				lViewerWindow.Owner = lOwnerWindow;
-			}
-
-			var lImagesBinding = new Binding
-			{
-				Source = this,
-				Path = new PropertyPath( nameof( Images ) ),
-				Mode = BindingMode.OneWay
+				Owner = lOwnerWindow,
+				Images = ( System.Collections.ObjectModel.ObservableCollection<ImageSource> )Images,
+				SelectedIndex = SelectedIndex
 			};
-
-			var lSelectedIndexBinding = new Binding
-			{
-				Source = this,
-				Path = new PropertyPath( nameof( SelectedIndex ) ),
-				Mode = BindingMode.TwoWay,
-				UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-			};
-
-			BindingOperations.SetBinding( lViewerWindow, ProjectImageViewerWindow.sImagesProperty, lImagesBinding );
-			BindingOperations.SetBinding( lViewerWindow, ProjectImageViewerWindow.sSelectedIndexProperty, lSelectedIndexBinding );
-
-			lViewerWindow.Closed += OnProjectImageViewerWindowClosed;
-
-			mProjectImageViewerWindow = lViewerWindow;
 
 			lViewerWindow.Show();
-			lViewerWindow.Activate();
 		}
 
-		private void OnProjectImageViewerWindowClosed( object pSender, EventArgs pArgs )
+		private void OnMediaRootGridSizeChanged( object pSender, SizeChangedEventArgs pEventArgs )
 		{
-			if ( pSender is ProjectImageViewerWindow lViewerWindow && ReferenceEquals( mProjectImageViewerWindow, lViewerWindow ) )
-			{
-				mProjectImageViewerWindow.Closed -= OnProjectImageViewerWindowClosed;
-				mProjectImageViewerWindow = null;
-			}
+			UpdateCarouselVisualState( false );
 		}
 
-		private void OnRootPreviewKeyDown( object pSender, KeyEventArgs pArgs )
+		private void OnRootPreviewMouseWheel( object pSender, MouseWheelEventArgs pMouseWheelEventArgs )
 		{
-			if ( !HasMultipleImages() )
+			pMouseWheelEventArgs.Handled = true;
+		}
+
+		private void OnRootPreviewMouseLeftButtonDown( object pSender, MouseButtonEventArgs pMouseButtonEventArgs )
+		{
+			Focus();
+
+			if ( pMouseButtonEventArgs.ChangedButton != MouseButton.Left )
 			{
 				return;
 			}
 
-			switch ( pArgs.Key )
+			var lOriginalSource = pMouseButtonEventArgs.OriginalSource as DependencyObject;
+			if ( !IsValidDragStartSource( lOriginalSource ) )
+			{
+				return;
+			}
+
+			mIsDragInProgress = true;
+			mHasNavigatedDuringDrag = false;
+			mDragStartPosition = pMouseButtonEventArgs.GetPosition( mMediaRootGrid );
+			mDragThresholdPixels = GetDragThresholdPixels();
+
+			CaptureMouse();
+			pMouseButtonEventArgs.Handled = true;
+		}
+
+		private void OnRootPreviewMouseMove( object pSender, MouseEventArgs pMouseEventArgs )
+		{
+			if ( !mIsDragInProgress )
+			{
+				return;
+			}
+
+			if ( pMouseEventArgs.LeftButton != MouseButtonState.Pressed )
+			{
+				EndDrag();
+				return;
+			}
+
+			if ( mHasNavigatedDuringDrag )
+			{
+				return;
+			}
+
+			Point lCurrentPosition = pMouseEventArgs.GetPosition( mMediaRootGrid );
+			double lDeltaX = lCurrentPosition.X - mDragStartPosition.X;
+
+			if ( Math.Abs( lDeltaX ) < mDragThresholdPixels )
+			{
+				return;
+			}
+
+			if ( lDeltaX < 0 )
+			{
+				NavigateNext();
+			}
+			else
+			{
+				NavigatePrevious();
+			}
+
+			mHasNavigatedDuringDrag = true;
+			pMouseEventArgs.Handled = true;
+		}
+
+		private void OnRootPreviewMouseLeftButtonUp( object pSender, MouseButtonEventArgs pMouseButtonEventArgs )
+		{
+			if ( !mIsDragInProgress )
+			{
+				return;
+			}
+
+			EndDrag();
+			pMouseButtonEventArgs.Handled = true;
+		}
+
+		private void OnRootLostMouseCapture( object pSender, MouseEventArgs pMouseEventArgs )
+		{
+			EndDrag();
+		}
+
+		private void EndDrag()
+		{
+			if ( !mIsDragInProgress )
+			{
+				return;
+			}
+
+			mIsDragInProgress = false;
+			mHasNavigatedDuringDrag = false;
+
+			if ( IsMouseCaptured )
+			{
+				ReleaseMouseCapture();
+			}
+		}
+
+		private double GetDragThresholdPixels()
+		{
+			double lWidth = mMediaRootGrid.ActualWidth;
+			if ( lWidth <= 1 )
+			{
+				lWidth = ActualWidth;
+			}
+
+			if ( lWidth <= 1 )
+			{
+				lWidth = 900;
+			}
+
+			double lRelativeThreshold = lWidth * 0.06;
+			return Math.Max( 42, lRelativeThreshold );
+		}
+
+		private bool IsValidDragStartSource( DependencyObject pOriginalSource )
+		{
+			if ( pOriginalSource == null )
+			{
+				return false;
+			}
+
+			if ( FindAncestor<ButtonBase>( pOriginalSource ) != null )
+			{
+				return false;
+			}
+
+			if ( FindAncestor<ListBoxItem>( pOriginalSource ) != null )
+			{
+				return false;
+			}
+
+			if ( FindAncestor<TextBoxBase>( pOriginalSource ) != null )
+			{
+				return false;
+			}
+
+			if ( FindAncestor<ScrollBar>( pOriginalSource ) != null )
+			{
+				return false;
+			}
+
+			return IsDescendantOf( pOriginalSource, mMediaRootGrid );
+		}
+
+		private void OnRootPreviewKeyDown( object pSender, KeyEventArgs pKeyEventArgs )
+		{
+			switch ( pKeyEventArgs.Key )
 			{
 				case Key.Left:
 					{
 						NavigatePrevious();
-						pArgs.Handled = true;
+						pKeyEventArgs.Handled = true;
 						return;
 					}
 				case Key.Right:
 					{
 						NavigateNext();
-						pArgs.Handled = true;
+						pKeyEventArgs.Handled = true;
+						return;
+					}
+				case Key.Home:
+					{
+						if ( GetImageCount() > 0 )
+						{
+							SelectedIndex = 0;
+							pKeyEventArgs.Handled = true;
+						}
+
+						return;
+					}
+				case Key.End:
+					{
+						int lImageCount = GetImageCount();
+						if ( lImageCount > 0 )
+						{
+							SelectedIndex = lImageCount - 1;
+							pKeyEventArgs.Handled = true;
+						}
+
 						break;
 					}
 			}
 		}
 
-		private void OnRootPreviewMouseWheel( object pSender, MouseWheelEventArgs pArgs )
+		private void OnDotPreviewMouseLeftButtonDown( object pSender, MouseButtonEventArgs pMouseButtonEventArgs )
 		{
-			if ( IsFullscreen )
-			{
-				pArgs.Handled = true;
-				return;
-			}
-
-			pArgs.Handled = false;
-		}
-
-		private void OnRootPreviewMouseLeftButtonDown( object pSender, MouseButtonEventArgs pArgs )
-		{
-			mProjectImageCarouselControlRoot.Focus();
-		}
-
-		private void OnDotPreviewMouseLeftButtonDown( object pSender, MouseButtonEventArgs pArgs )
-		{
-			if ( !HasMultipleImages() )
+			if ( !( pSender is ListBoxItem lListBoxItem ) )
 			{
 				return;
 			}
 
-			if ( !( pSender is ListBoxItem lDotListBoxItem ) )
+			int lDotIndex = mDotsListBox.ItemContainerGenerator.IndexFromContainer( lListBoxItem );
+			if ( lDotIndex < 0 )
 			{
 				return;
 			}
 
-			int lClickedIndex = mDotsListBox.ItemContainerGenerator.IndexFromContainer( lDotListBoxItem );
-
-			if ( lClickedIndex < 0 )
-			{
-				return;
-			}
-
-			mProjectImageCarouselControlRoot.Focus();
-			TryNavigateToIndex( lClickedIndex );
-			pArgs.Handled = true;
-		}
-
-		private void OnMediaRootGridSizeChanged( object pSender, SizeChangedEventArgs pArgs )
-		{
-			UpdateMediaClip();
-		}
-
-		private void UpdateMediaClip()
-		{
-			if ( mMediaRootGrid == null || mMediaCardBorder == null )
-			{
-				return;
-			}
-
-			double lWidth = Math.Max( 0, mMediaRootGrid.ActualWidth );
-			double lHeight = Math.Max( 0, mMediaRootGrid.ActualHeight );
-
-			if ( lWidth <= 0 || lHeight <= 0 )
-			{
-				return;
-			}
-
-			CornerRadius lCornerRadius = mMediaCardBorder.CornerRadius;
-			double lRadius = Math.Max( 0, lCornerRadius.TopLeft );
-			double lMaxRadius = Math.Min( lWidth / 2, lHeight / 2 );
-			double lClampedRadius = Math.Min( lRadius, lMaxRadius );
-
-			mMediaRootGrid.Clip = new RectangleGeometry( new Rect( 0, 0, lWidth, lHeight ), lClampedRadius, lClampedRadius );
+			SelectedIndex = lDotIndex;
+			pMouseButtonEventArgs.Handled = true;
 		}
 	}
 }

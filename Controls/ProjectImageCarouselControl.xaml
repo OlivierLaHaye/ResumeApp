@@ -6,8 +6,11 @@
     x:Name="mProjectImageCarouselControlRoot"
     Focusable="True"
     KeyboardNavigation.TabNavigation="Local"
+    LostMouseCapture="OnRootLostMouseCapture"
     PreviewKeyDown="OnRootPreviewKeyDown"
     PreviewMouseLeftButtonDown="OnRootPreviewMouseLeftButtonDown"
+    PreviewMouseLeftButtonUp="OnRootPreviewMouseLeftButtonUp"
+    PreviewMouseMove="OnRootPreviewMouseMove"
     PreviewMouseWheel="OnRootPreviewMouseWheel"
     SnapsToDevicePixels="True"
     UseLayoutRounding="True">
@@ -18,8 +21,6 @@
             <Setter Property="Height" Value="38" />
             <Setter Property="Padding" Value="0" />
             <Setter Property="Background" Value="{DynamicResource CommonBlackBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource CommonGrayBrush}" />
-            <Setter Property="BorderThickness" Value="{StaticResource ExtraSmallThickness}" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="Template">
@@ -118,22 +119,10 @@
         </Style>
 
         <Style
-            x:Key="ArrowButtonStyle"
+            x:Key="ButtonStyle"
             BasedOn="{StaticResource NavigationButtonStyle}"
             TargetType="{x:Type Button}">
             <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-
-        <Style
-            x:Key="ExpandButtonStyle"
-            BasedOn="{StaticResource NavigationButtonStyle}"
-            TargetType="{x:Type Button}">
-            <Setter Property="Width" Value="36" />
-            <Setter Property="Height" Value="36" />
-            <Setter Property="Margin" Value="12" />
-            <Setter Property="HorizontalAlignment" Value="Right" />
-            <Setter Property="VerticalAlignment" Value="Top" />
-            <Setter Property="IsHitTestVisible" Value="True" />
         </Style>
 
         <Style x:Key="DotsListBoxItemStyle" TargetType="{x:Type ListBoxItem}">
@@ -268,39 +257,152 @@
                 SizeChanged="OnMediaRootGridSizeChanged"
                 SnapsToDevicePixels="True">
 
-                <Image
-                    x:Name="mCurrentImageImage"
-                    Opacity="0"
-                    RenderOptions.BitmapScalingMode="HighQuality"
-                    Stretch="Uniform" />
+                <Grid
+                    x:Name="mCarouselImagesHostGrid"
+                    ClipToBounds="True"
+                    IsHitTestVisible="False">
+                    <Image
+                        x:Name="mLeftStep3Image"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Opacity="0"
+                        RenderOptions.BitmapScalingMode="HighQuality"
+                        RenderTransformOrigin="0.5,0.5"
+                        Stretch="Uniform"
+                        Visibility="Collapsed">
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                                <TranslateTransform X="0" Y="0" />
+                            </TransformGroup>
+                        </Image.RenderTransform>
+                    </Image>
+
+                    <Image
+                        x:Name="mRightStep3Image"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Opacity="0"
+                        RenderOptions.BitmapScalingMode="HighQuality"
+                        RenderTransformOrigin="0.5,0.5"
+                        Stretch="Uniform"
+                        Visibility="Collapsed">
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                                <TranslateTransform X="0" Y="0" />
+                            </TransformGroup>
+                        </Image.RenderTransform>
+                    </Image>
+
+                    <Image
+                        x:Name="mLeftStep2Image"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Opacity="0"
+                        RenderOptions.BitmapScalingMode="HighQuality"
+                        RenderTransformOrigin="0.5,0.5"
+                        Stretch="Uniform"
+                        Visibility="Collapsed">
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                                <TranslateTransform X="0" Y="0" />
+                            </TransformGroup>
+                        </Image.RenderTransform>
+                    </Image>
+
+                    <Image
+                        x:Name="mRightStep2Image"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Opacity="0"
+                        RenderOptions.BitmapScalingMode="HighQuality"
+                        RenderTransformOrigin="0.5,0.5"
+                        Stretch="Uniform"
+                        Visibility="Collapsed">
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                                <TranslateTransform X="0" Y="0" />
+                            </TransformGroup>
+                        </Image.RenderTransform>
+                    </Image>
+
+                    <Image
+                        x:Name="mLeftStep1Image"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Opacity="0"
+                        RenderOptions.BitmapScalingMode="HighQuality"
+                        RenderTransformOrigin="0.5,0.5"
+                        Stretch="Uniform"
+                        Visibility="Collapsed">
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                                <TranslateTransform X="0" Y="0" />
+                            </TransformGroup>
+                        </Image.RenderTransform>
+                    </Image>
+
+                    <Image
+                        x:Name="mRightStep1Image"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Opacity="0"
+                        RenderOptions.BitmapScalingMode="HighQuality"
+                        RenderTransformOrigin="0.5,0.5"
+                        Stretch="Uniform"
+                        Visibility="Collapsed">
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                                <TranslateTransform X="0" Y="0" />
+                            </TransformGroup>
+                        </Image.RenderTransform>
+                    </Image>
+
+                    <Image
+                        x:Name="mCurrentImageImage"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Opacity="0"
+                        RenderOptions.BitmapScalingMode="HighQuality"
+                        RenderTransformOrigin="0.5,0.5"
+                        Stretch="Uniform"
+                        Visibility="Collapsed">
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                                <TranslateTransform X="0" Y="0" />
+                            </TransformGroup>
+                        </Image.RenderTransform>
+                    </Image>
+                </Grid>
 
                 <Button
                     x:Name="mExpandButton"
+                    Margin="0,12,12,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Panel.ZIndex="30"
                     Click="OnExpandButtonClick"
-                    Style="{StaticResource ExpandButtonStyle}">
-                    <Viewbox
-                        Width="16"
-                        Height="16"
+                    Style="{StaticResource ButtonStyle}">
+                    <Path
+                        x:Name="mExpandIconPath"
+                        Width="15"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Stretch="Uniform">
-                        <Grid
-                            x:Name="mExpandIconGrid"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center">
-                            <Path
-                                x:Name="mExpandIconPath"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Data="M4,9 V4 H9 M15,4 H20 V9 M20,15 V20 H15 M9,20 H4 V15"
-                                Stroke="{DynamicResource CommonWhiteBrush}"
-                                StrokeLineJoin="Round"
-                                StrokeThickness="2" />
-                        </Grid>
-                    </Viewbox>
+                        Data="F1 M 342.533,277.422 L 196.445,132.311 L 253.778,75.556 C 270.960,58.026 270.679,29.887 253.150,12.705 C 244.888,4.606 233.792,0.048 222.222,0.000 L 44.445,0.000 C 20.020,-0.001 0.171,19.709 0.000,44.133 L 0.000,220.578 C -0.028,238.482 10.904,254.579 27.556,261.156 C 44.097,268.064 63.165,264.425 76.000,251.911 L 133.333,195.022 L 279.467,340.000 C 296.973,357.236 325.071,357.236 342.578,340.000 C 359.883,322.800 359.968,294.828 342.768,277.524 C 342.705,277.460 342.641,277.397 342.578,277.333 L 342.533,277.422 Z M 457.467,277.422 L 603.689,132.356 L 546.356,75.556 C 533.784,62.900 530.098,43.906 537.022,27.467 C 543.722,10.846 559.858,-0.028 577.778,0.000 L 755.556,0.000 C 779.981,-0.001 799.829,19.709 800.000,44.133 L 800.000,220.578 C 800.010,238.465 789.082,254.540 772.445,261.111 C 755.903,268.020 736.835,264.381 724.000,251.867 L 666.667,194.978 L 520.533,340.000 C 503.027,357.236 474.929,357.236 457.422,340.000 C 440.142,322.845 440.040,294.930 457.195,277.649 C 457.271,277.573 457.346,277.498 457.422,277.422 L 457.467,277.422 Z M 457.467,516.667 L 603.689,661.778 L 546.356,718.667 C 529.173,736.196 529.454,764.335 546.983,781.517 C 555.246,789.617 566.341,794.174 577.911,794.222 L 755.689,794.222 C 780.097,794.223 799.938,774.540 800.133,750.133 L 800.133,573.689 C 800.161,555.785 789.230,539.688 772.578,533.111 C 756.037,526.203 736.968,529.841 724.133,542.356 L 666.667,599.111 L 520.445,454.044 C 502.949,436.867 474.918,436.867 457.422,454.044 C 440.117,471.175 439.976,499.090 457.106,516.395 C 457.211,516.501 457.316,516.606 457.422,516.711 L 457.467,516.667 Z M 342.533,516.711 L 196.311,661.822 L 253.645,718.800 C 270.827,736.329 270.546,764.468 253.017,781.651 C 244.754,789.750 233.659,794.308 222.089,794.356 L 44.445,794.356 C 20.020,794.356 0.171,774.647 0.000,750.222 L 0.000,573.778 C -0.046,555.858 10.888,539.738 27.556,533.156 C 44.097,526.247 63.165,529.886 76.000,542.400 L 133.333,599.111 L 279.556,454.044 C 297.051,436.867 325.082,436.867 342.578,454.044 C 359.883,471.244 359.968,499.216 342.768,516.521 C 342.705,516.585 342.641,516.648 342.578,516.711 L 342.533,516.711 Z"
+                        Stretch="Uniform"
+                        Fill="{DynamicResource CommonWhiteBrush}" />
                 </Button>
 
-                <Grid x:Name="mPlaceholderGrid" Visibility="Collapsed">
+                <Grid
+                    x:Name="mPlaceholderGrid"
+                    Panel.ZIndex="40"
+                    Visibility="Collapsed">
                     <StackPanel
                         x:Name="mPlaceholderStackPanel"
                         HorizontalAlignment="Center"
@@ -325,7 +427,10 @@
                     </StackPanel>
                 </Grid>
 
-                <Grid x:Name="mNavigationOverlayGrid" Visibility="Collapsed">
+                <Grid
+                    x:Name="mNavigationOverlayGrid"
+                    Panel.ZIndex="50"
+                    Visibility="Collapsed">
                     <Grid.Style>
                         <Style TargetType="{x:Type Grid}">
                             <Setter Property="Opacity" Value="0.5" />
@@ -351,7 +456,7 @@
                         Margin="12,0,0,0"
                         HorizontalAlignment="Left"
                         Click="OnPreviousButtonClick"
-                        Style="{StaticResource ArrowButtonStyle}">
+                        Style="{StaticResource ButtonStyle}">
                         <Path
                             Width="15"
                             Fill="{DynamicResource CommonWhiteBrush}"
@@ -370,7 +475,7 @@
                         Margin="0,0,12,0"
                         HorizontalAlignment="Right"
                         Click="OnNextButtonClick"
-                        Style="{StaticResource ArrowButtonStyle}">
+                        Style="{StaticResource ButtonStyle}">
                         <Path
                             Width="15"
                             Fill="{DynamicResource CommonWhiteBrush}"
@@ -416,6 +521,7 @@
 
                 <Border
                     x:Name="mFocusRingBorder"
+                    Panel.ZIndex="60"
                     BorderBrush="{DynamicResource CommonBrush}"
                     BorderThickness="{StaticResource ExtraSmallThickness}"
                     CornerRadius="{Binding CornerRadius, ElementName=mMediaCardBorder}"

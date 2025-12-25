@@ -1,5 +1,4 @@
-﻿<!--  Windows/ProjectImageViewerWindow.xaml  -->
-<Window
+﻿<Window
     x:Class="ResumeApp.Windows.ProjectImageViewerWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -17,21 +16,11 @@
 
     <Border
         x:Name="mWindowFrameBorder"
+        BorderBrush="{DynamicResource CommonLightGrayBrush}"
+        BorderThickness="2"
+        CornerRadius="40"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True">
-        <Border.Style>
-            <Style TargetType="{x:Type Border}">
-                <Setter Property="BorderBrush" Value="{DynamicResource CommonLightGrayBrush}" />
-                <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="CornerRadius" Value="40" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
-                        <Setter Property="BorderThickness" Value="0" />
-                        <Setter Property="CornerRadius" Value="0" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Border.Style>
 
         <Grid x:Name="mProjectImageViewerWindowLayoutRootGrid">
             <controls:ProjectImageCarouselControl
@@ -48,7 +37,10 @@
                 Panel.ZIndex="10"
                 Background="Transparent">
 
-                <Border x:Name="mCustomTitleBarDragSurfaceBorder" Background="Transparent" />
+                <Border
+                    x:Name="mCustomTitleBarDragSurfaceBorder"
+                    Background="Transparent"
+                    WindowChrome.IsHitTestVisibleInChrome="True" />
 
                 <Border
                     x:Name="mCaptionButtonsCapsuleBorder"
