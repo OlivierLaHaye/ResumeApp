@@ -18,6 +18,19 @@ namespace ResumeApp.ViewModels.Pages
 {
 	public sealed class ProjectCardViewModel : PropertyChangedNotifier
 	{
+		private const int MaximumIndexedImageProbeCount = 100;
+
+		private static readonly string[] sSupportedImageExtensions = new[]
+		{
+			"png",
+			"jpg",
+			"jpeg",
+			"bmp",
+			"gif",
+			"tif",
+			"tiff"
+		};
+
 		private readonly ResourcesService mResourcesService;
 
 		private readonly string mTitleResourceKey;
@@ -239,6 +252,107 @@ namespace ResumeApp.ViewModels.Pages
 			return null;
 		}
 
+		private static bool IsKnownImageExtension( string pPath )
+		{
+			string lPath = ( pPath ?? string.Empty ).Trim();
+
+			if ( string.IsNullOrWhiteSpace( lPath ) )
+			{
+				return false;
+			}
+
+			int lLastDotIndex = lPath.LastIndexOf( '.' );
+
+			if ( lLastDotIndex < 0 || lLastDotIndex >= lPath.Length - 1 )
+			{
+				return false;
+			}
+
+			string lExtension = lPath.Substring( lLastDotIndex + 1 ).Trim();
+
+			return sSupportedImageExtensions.Any( pSupportedExtension =>
+				string.Equals( pSupportedExtension, lExtension, StringComparison.OrdinalIgnoreCase ) );
+		}
+
+		private static IEnumerable<ImageSource> BuildImageSourcesFromResourceValue( string pImagesValueText )
+		{
+			string lValueText = ( pImagesValueText ?? string.Empty ).Trim();
+
+			if ( string.IsNullOrWhiteSpace( lValueText ) )
+			{
+				return Enumerable.Empty<ImageSource>();
+			}
+
+			bool lHasExplicitList = lValueText.Contains( ";" );
+
+			if ( lHasExplicitList )
+			{
+				return SplitSemicolonSeparatedItems( lValueText )
+					.Select( TryCreateImageSource )
+					.Where( pImageSource => pImageSource != null )
+					.ToArray();
+			}
+
+			bool lIsSingleImagePath = IsKnownImageExtension( lValueText );
+
+			if ( lIsSingleImagePath )
+			{
+				ImageSource lSingleImage = TryCreateImageSource( lValueText );
+
+				return lSingleImage == null ? Enumerable.Empty<ImageSource>() : new[] { lSingleImage };
+			}
+
+			return EnumerateIndexedImagesFromBasePath( lValueText ).ToArray();
+		}
+
+		private static IEnumerable<ImageSource> EnumerateIndexedImagesFromBasePath( string pImagesBasePath )
+		{
+			string lBasePath = ( pImagesBasePath ?? string.Empty ).Trim();
+
+			if ( string.IsNullOrWhiteSpace( lBasePath ) )
+			{
+				yield break;
+			}
+
+			string lIndexSeparator = lBasePath.EndsWith( "_", StringComparison.Ordinal ) ? string.Empty : "_";
+			string lIndexedPrefix = lBasePath + lIndexSeparator;
+
+			for ( int lImageIndex = 1; lImageIndex <= MaximumIndexedImageProbeCount; lImageIndex++ )
+			{
+				ImageSource lImageSource = TryCreateFirstExistingIndexedImage( lIndexedPrefix, lImageIndex );
+
+				if ( lImageSource == null )
+				{
+					yield break;
+				}
+
+				yield return lImageSource;
+			}
+		}
+
+		private static ImageSource TryCreateFirstExistingIndexedImage( string pIndexedPrefix, int pImageIndex )
+		{
+			string lIndexedPrefix = ( pIndexedPrefix ?? string.Empty ).Trim();
+
+			if ( string.IsNullOrWhiteSpace( lIndexedPrefix ) )
+			{
+				return null;
+			}
+
+			foreach ( string lExtension in sSupportedImageExtensions )
+			{
+				string lCandidatePath = $"{lIndexedPrefix}{pImageIndex}.{lExtension}";
+				ImageSource lImageSource = TryCreateImageSource( lCandidatePath );
+
+				if ( lImageSource != null )
+				{
+					return lImageSource;
+				}
+			}
+
+			return null;
+		}
+
 		private void ExecuteOpenProjectLink()
 		{
 			if ( !IsProjectLinkButtonVisible )
@@ -273,8 +387,7 @@ namespace ResumeApp.ViewModels.Pages
 
 			string lImagesValueText = ExtractValueAfterFirstColon( mResourcesService[ mImagesResourceKey ] );
 
-			List<ImageSource> lImages = SplitSemicolonSeparatedItems( lImagesValueText )
-				.Select( TryCreateImageSource )
+			List<ImageSource> lImages = BuildImageSourcesFromResourceValue( lImagesValueText )
 				.Where( pImageSource => pImageSource != null )
 				.ToList();
 

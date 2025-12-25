@@ -596,7 +596,7 @@
     <value>Context: Flagship desktop modernization and UI refresh during migration to WPF.</value>
   </data>
   <data name="Project1Images" xml:space="preserve">
-    <value>Images: Resources/Projects/Creaform.OS/Creaform.OS_1.png;Resources/Projects/Creaform.OS/Creaform.OS_2.png;Resources/Projects/Creaform.OS/Creaform.OS_3.png;Resources/Projects/Creaform.OS/Creaform.OS_4.png;Resources/Projects/Creaform.OS/Creaform.OS_5.png</value>
+    <value>Resources/Projects/Creaform.OS/Creaform.OS</value>
 </data>
   <data name="Project1Impact" xml:space="preserve">
     <value>Impact: strong internal feedback on the refreshed look, with improved visual consistency and reduced UI fragmentation across the product.</value>
@@ -620,8 +620,8 @@
     <value>Context: UI redesign for a peel software product to improve clarity and usability.</value>
   </data>
   <data name="Project2Images" xml:space="preserve">
-    <value>Images: Resources/Projects/Peel.OS/Peel.OS_1.png;Resources/Projects/Peel.OS/Peel.OS_2.png;Resources/Projects/Peel.OS/Peel.OS_3.png;Resources/Projects/Peel.OS/Peel.OS_4.png;Resources/Projects/Peel.OS/Peel.OS_5.png;Resources/Projects/Peel.OS/Peel.OS_6.png;Resources/Projects/Peel.OS/Peel.OS_7.png</value>
-</data>
+    <value>Resources/Projects/Peel.OS/Peel.OS</value>
+  </data>
   <data name="Project2Impact" xml:space="preserve">
     <value>Impact: clearer, more consistent UI with improved visual hierarchy and workflows that are easier to follow.</value>
   </data>
@@ -647,8 +647,8 @@
     <value>Context: Personal software to speed up photo editing workflow (import, renaming, repetitive steps) without sacrificing quality.</value>
   </data>
   <data name="Project3Images" xml:space="preserve">
-    <value>Images: Resources/Projects/OLHphotographie/OLHphotographie_1.png;Resources/Projects/OLHphotographie/OLHphotographie_2.png;Resources/Projects/OLHphotographie/OLHphotographie_3.png;Resources/Projects/OLHphotographie/OLHphotographie_4.png;Resources/Projects/OLHphotographie/OLHphotographie_5.png;Resources/Projects/OLHphotographie/OLHphotographie_6.png;Resources/Projects/OLHphotographie/OLHphotographie_7.png;Resources/Projects/OLHphotographie/OLHphotographie_8.png;Resources/Projects/OLHphotographie/OLHphotographie_9.png;Resources/Projects/OLHphotographie/OLHphotographie_10.png</value>
-</data>
+    <value>Resources/Projects/OLHphotographie/OLHphotographie</value>
+  </data>
   <data name="Project3Impact" xml:space="preserve">
     <value>Impact: personal productivity gains by reducing repetitive manual steps and speeding up real editing sessions.</value>
   </data>
