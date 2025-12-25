@@ -1,4 +1,5 @@
-// ViewModels/Pages/ProjectsPageViewModel.cs
+// Copyright (C) Olivier La Haye
+// All rights reserved.
 
 using ResumeApp.Services;
 using System.Collections.ObjectModel;
@@ -26,7 +27,8 @@ namespace ResumeApp.ViewModels.Pages
 					},
 					pImpactResourceKey: "Project3Impact",
 					pTechResourceKey: "Project3Tech",
-					pImagesResourceKey: "Project3Images" ),
+					pImagesResourceKey: "Project3Images",
+					pProjectLinkUriText: string.Empty ),
 
 				new ProjectCardViewModel(
 					pResourcesService: ResourcesService,
@@ -40,7 +42,8 @@ namespace ResumeApp.ViewModels.Pages
 					},
 					pImpactResourceKey: "Project1Impact",
 					pTechResourceKey: "Project1Tech",
-					pImagesResourceKey: "Project1Images" ),
+					pImagesResourceKey: "Project1Images",
+					pProjectLinkUriText: "https://www.creaform3d.com/en/products/software/creaform-integrity-suite" ),
 
 				new ProjectCardViewModel(
 					pResourcesService: ResourcesService,
@@ -53,7 +56,8 @@ namespace ResumeApp.ViewModels.Pages
 					},
 					pImpactResourceKey: "Project2Impact",
 					pTechResourceKey: "Project2Tech",
-					pImagesResourceKey: "Project2Images" )
+					pImagesResourceKey: "Project2Images",
+					pProjectLinkUriText: "https://store.peel-3d.com/software/peel-os/" )
 			} );
 		}
 	}

@@ -1,4 +1,3 @@
-<!--  Pages/ProjectsPage.xaml  -->
 <UserControl
     x:Class="ResumeApp.Pages.ProjectsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -99,6 +98,7 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
                                     <Border
@@ -113,6 +113,17 @@
                                         Grid.Column="1"
                                         Style="{StaticResource CardTitleTextBlockStyle}"
                                         Text="{Binding TitleText}" />
+
+                                    <Button
+                                        x:Name="mProjectOpenLinkButton"
+                                        Grid.Column="2"
+                                        Margin="{StaticResource SmallLeftRightThickness}"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding OpenProjectLinkCommand}"
+                                        Style="{StaticResource ContactActionPillButtonStyle}"
+                                        Visibility="{Binding IsProjectLinkButtonVisible, Converter={StaticResource BoolToCollapseConverter}}">
+                                        <TextBlock FontSize="{StaticResource SmallFontSize}" Text="{Binding DataContext.ResourcesService[ButtonProjectViewProject], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                    </Button>
                                 </Grid>
 
                                 <Border

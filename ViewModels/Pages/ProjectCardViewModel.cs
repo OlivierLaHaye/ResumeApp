@@ -7,8 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -24,6 +26,8 @@ namespace ResumeApp.ViewModels.Pages
 		private readonly string mImpactResourceKey;
 		private readonly string mTechResourceKey;
 		private readonly string mImagesResourceKey;
+
+		private readonly string mProjectLinkUriText;
 
 		public string TitleText => mResourcesService[ mTitleResourceKey ];
 
@@ -54,6 +58,10 @@ namespace ResumeApp.ViewModels.Pages
 
 		public ObservableCollection<ImageSource> Images { get; }
 
+		public bool IsProjectLinkButtonVisible => !string.IsNullOrWhiteSpace( mProjectLinkUriText );
+
+		public ICommand OpenProjectLinkCommand { get; }
+
 		public ProjectCardViewModel(
 			ResourcesService pResourcesService,
 			string pTitleResourceKey,
@@ -62,7 +70,8 @@ namespace ResumeApp.ViewModels.Pages
 			string[] pWhatIBuiltItemResourceKeys,
 			string pImpactResourceKey,
 			string pTechResourceKey,
-			string pImagesResourceKey )
+			string pImagesResourceKey,
+			string pProjectLinkUriText )
 		{
 			mResourcesService = pResourcesService ?? throw new ArgumentNullException( nameof( pResourcesService ) );
 
@@ -72,6 +81,9 @@ namespace ResumeApp.ViewModels.Pages
 			mImpactResourceKey = pImpactResourceKey ?? string.Empty;
 			mTechResourceKey = pTechResourceKey ?? string.Empty;
 			mImagesResourceKey = pImagesResourceKey ?? string.Empty;
+
+			mProjectLinkUriText = ( pProjectLinkUriText ?? string.Empty ).Trim();
+			OpenProjectLinkCommand = new RelayCommand( ExecuteOpenProjectLink, () => IsProjectLinkButtonVisible );
 
 			WhatIBuiltItems = new ObservableCollection<LocalizedResourceItemViewModel>( ( pWhatIBuiltItemResourceKeys ?? Array.Empty<string>() )
 				.Where( pKey => !string.IsNullOrWhiteSpace( pKey ) )
@@ -196,12 +208,7 @@ namespace ResumeApp.ViewModels.Pages
 				return string.Empty;
 			}
 
-			if ( lValue.StartsWith( "pack://", StringComparison.OrdinalIgnoreCase ) )
-			{
-				return lValue;
-			}
-
-			return BuildPackUriText( lValue );
+			return lValue.StartsWith( "pack://", StringComparison.OrdinalIgnoreCase ) ? lValue : BuildPackUriText( lValue );
 		}
 
 		private static ImageSource TryCreateImageSource( string pPackOrRelativePath )
@@ -232,6 +239,29 @@ namespace ResumeApp.ViewModels.Pages
 			return null;
 		}
 
+		private void ExecuteOpenProjectLink()
+		{
+			if ( !IsProjectLinkButtonVisible )
+			{
+				return;
+			}
+
+			try
+			{
+				var lProcessStartInfo = new ProcessStartInfo
+				{
+					FileName = mProjectLinkUriText,
+					UseShellExecute = true
+				};
+
+				Process.Start( lProcessStartInfo );
+			}
+			catch ( Exception )
+			{
+				// ignored
+			}
+		}
+
 		private void RefreshFromResources()
 		{
 			ContextValueText = ExtractValueAfterFirstColon( mResourcesService[ mContextResourceKey ] );
@@ -253,6 +283,9 @@ namespace ResumeApp.ViewModels.Pages
 			RaisePropertyChanged( nameof( TitleText ) );
 		}
 
-		private void OnResourcesServicePropertyChanged( object pSender, PropertyChangedEventArgs pArgs ) => RefreshFromResources();
+		private void OnResourcesServicePropertyChanged( object pSender, PropertyChangedEventArgs pArgs )
+		{
+			RefreshFromResources();
+		}
 	}
 }
