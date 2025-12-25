@@ -165,8 +165,7 @@ namespace ResumeApp.Controls
 					}
 			}
 
-			var lUriText = pItem as string;
-			if ( string.IsNullOrWhiteSpace( lUriText ) )
+			if ( !( pItem is string lUriText ) || string.IsNullOrWhiteSpace( lUriText ) )
 			{
 				return null;
 			}
@@ -242,6 +241,98 @@ namespace ResumeApp.Controls
 			}
 
 			pTarget.SetValue( pProperty, pValue );
+		}
+
+		private static DependencyObject GetParentDependencyObject( DependencyObject pElement )
+		{
+			if ( pElement == null )
+			{
+				return null;
+			}
+
+			var lVisualParent = VisualTreeHelper.GetParent( pElement );
+			return lVisualParent ?? LogicalTreeHelper.GetParent( pElement );
+		}
+
+		private static int GetMouseWheelNotchCount( int pWheelDelta )
+		{
+			double lNotchCount = Math.Abs( ( double )pWheelDelta ) / 120.0;
+			int lRoundedNotchCount = ( int )Math.Round( lNotchCount, MidpointRounding.AwayFromZero );
+			return Math.Max( 1, lRoundedNotchCount );
+		}
+
+		private static void ApplyMouseWheelPages( ScrollViewer pScrollViewer, int pNotchCount, bool pIsScrollingUp )
+		{
+			for ( int lNotchIndex = 0; lNotchIndex < pNotchCount; lNotchIndex++ )
+			{
+				if ( pIsScrollingUp )
+				{
+					pScrollViewer.PageUp();
+					continue;
+				}
+
+				pScrollViewer.PageDown();
+			}
+		}
+
+		private static void ApplyMouseWheelLines( ScrollViewer pScrollViewer, int pNotchCount, int pLinesPerNotch, bool pIsScrollingUp )
+		{
+			int lLineCount = Math.Max( 1, pLinesPerNotch );
+
+			for ( int lNotchIndex = 0; lNotchIndex < pNotchCount; lNotchIndex++ )
+			{
+				for ( int lLineIndex = 0; lLineIndex < lLineCount; lLineIndex++ )
+				{
+					if ( pIsScrollingUp )
+					{
+						pScrollViewer.LineUp();
+						continue;
+					}
+
+					pScrollViewer.LineDown();
+				}
+			}
+		}
+
+		private static void ApplyMouseWheelToScrollViewer( ScrollViewer pScrollViewer, int pWheelDelta )
+		{
+			if ( pScrollViewer == null || pWheelDelta == 0 )
+			{
+				return;
+			}
+			
+			int lNotchCount = GetMouseWheelNotchCount( pWheelDelta );
+			bool lIsScrollingUp = pWheelDelta > 0;
+
+			int lWheelScrollLines = SystemParameters.WheelScrollLines;
+			if ( lWheelScrollLines < 0 )
+			{
+				ApplyMouseWheelPages( pScrollViewer, lNotchCount, lIsScrollingUp );
+				return;
+			}
+
+			if ( lWheelScrollLines == 0 )
+			{
+				return;
+			}
+
+			ApplyMouseWheelLines( pScrollViewer, lNotchCount, lWheelScrollLines, lIsScrollingUp );
+		}
+
+		private ScrollViewer FindScrollableAncestorScrollViewer()
+		{
+			DependencyObject lCurrentElement = GetParentDependencyObject( this );
+			while ( lCurrentElement != null )
+			{
+				if ( lCurrentElement is ScrollViewer lScrollViewer && lScrollViewer.ScrollableHeight > 0 )
+				{
+					return lScrollViewer;
+				}
+
+				lCurrentElement = GetParentDependencyObject( lCurrentElement );
+			}
+
+			return null;
 		}
 
 		private void OnControlLoaded( object pSender, RoutedEventArgs pEventArgs )
@@ -458,7 +549,7 @@ namespace ResumeApp.Controls
 				return;
 			}
 
-			if ( !(pTarget is Animatable lAnimatable) )
+			if ( !( pTarget is Animatable lAnimatable ) )
 			{
 				return;
 			}
@@ -537,6 +628,12 @@ namespace ResumeApp.Controls
 
 		private void OnRootPreviewMouseWheel( object pSender, MouseWheelEventArgs pMouseWheelEventArgs )
 		{
+			var lScrollViewer = FindScrollableAncestorScrollViewer();
+			if ( lScrollViewer != null )
+			{
+				ApplyMouseWheelToScrollViewer( lScrollViewer, pMouseWheelEventArgs.Delta );
+			}
+
 			pMouseWheelEventArgs.Handled = true;
 		}
 
@@ -544,12 +641,7 @@ namespace ResumeApp.Controls
 		{
 			Focus();
 
-			if ( pMouseButtonEventArgs.ChangedButton != MouseButton.Left )
-			{
-				return;
-			}
-
-			if ( GetImageCount() <= 1 )
+			if ( pMouseButtonEventArgs.ChangedButton != MouseButton.Left || GetImageCount() <= 1 )
 			{
 				return;
 			}

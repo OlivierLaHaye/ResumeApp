@@ -485,13 +485,14 @@
 
                     <Border
                         x:Name="mDotsBackgroundBorder"
+                        Grid.Column="0"
                         Grid.ColumnSpan="3"
                         Margin="0,0,0,10"
                         Padding="10,6"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Bottom"
-                        Background="{DynamicResource CommonBlackBrush}"
-                        CornerRadius="{StaticResource CommonCornerRadius}"
+                        Background="{DynamicResource CommonDarkerGrayBrush}"
+                        CornerRadius="{StaticResource SmallCornerRadius}"
                         SnapsToDevicePixels="True">
                         <ListBox
                             x:Name="mDotsListBox"
