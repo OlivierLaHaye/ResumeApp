@@ -45,7 +45,7 @@
     <Border
         x:Name="mWindowFrameBorder"
         BorderBrush="{DynamicResource CommonLightGrayBrush}"
-        BorderThickness="2"
+        BorderThickness="{StaticResource ExtraSmallThickness}"
         CornerRadius="40"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True">

@@ -248,6 +248,7 @@
 
             <Grid
                 x:Name="mMediaRootGrid"
+                Margin="{StaticResource CommonTopBottomThickness}"
                 ClipToBounds="True"
                 SizeChanged="OnMediaRootGridSizeChanged"
                 SnapsToDevicePixels="True">
@@ -492,6 +493,8 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Bottom"
                         Background="{DynamicResource CommonDarkerGrayBrush}"
+                        BorderBrush="{DynamicResource CommonLightGrayBrush}"
+                        BorderThickness="{StaticResource ExtraExtraSmallThickness}"
                         CornerRadius="{StaticResource SmallCornerRadius}"
                         SnapsToDevicePixels="True">
                         <ListBox

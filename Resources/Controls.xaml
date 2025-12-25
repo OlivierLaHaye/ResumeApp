@@ -1165,7 +1165,7 @@
                             Data="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource SquircleCornerDataConverter}}"
                             Stretch="Uniform"
                             Stroke="{TemplateBinding BorderBrush}"
-                            StrokeThickness="1">
+                            StrokeThickness="{StaticResource ExtraExtraSmallThicknessValue}">
                             <Path.Effect>
                                 <DropShadowEffect
                                     BlurRadius="18"

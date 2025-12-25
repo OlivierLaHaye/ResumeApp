@@ -52,6 +52,13 @@
     <Thickness x:Key="CommonBorderThickness">0</Thickness>
     <Thickness x:Key="ExtraSmallBorderThickness">2</Thickness>
     <Thickness x:Key="SmallBorderThickness">4</Thickness>
+    <system:Double x:Key="ExtraExtraSmallThicknessValue">1</system:Double>
+    <Thickness
+        x:Key="ExtraExtraSmallThickness"
+        Bottom="{StaticResource ExtraExtraSmallThicknessValue}"
+        Left="{StaticResource ExtraExtraSmallThicknessValue}"
+        Right="{StaticResource ExtraExtraSmallThicknessValue}"
+        Top="{StaticResource ExtraExtraSmallThicknessValue}" />
     <system:Double x:Key="ExtraSmallThicknessValue">2</system:Double>
     <Thickness
         x:Key="ExtraSmallThickness"
