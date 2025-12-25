@@ -227,6 +227,7 @@
     <Compile Include="Services\AppTheme.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Services\ProjectImageCarouselAdjacentImagesVisualService.cs" />
     <Compile Include="Services\RegistrySettingsService.cs">
       <SubType>Code</SubType>
     </Compile>

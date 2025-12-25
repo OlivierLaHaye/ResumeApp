@@ -1,6 +1,4 @@
-﻿// Copyright (C) Olivier La Haye
-// All rights reserved.
-
+﻿using ResumeApp.Services;
 using ResumeApp.Windows;
 using System;
 using System.Collections;
@@ -55,6 +53,7 @@ namespace ResumeApp.Controls
 		private static readonly TimeSpan sTransitionDuration = TimeSpan.FromMilliseconds( 240 );
 
 		private readonly IEasingFunction mCarouselEasingFunction;
+		private readonly ProjectImageCarouselAdjacentImagesVisualService mAdjacentImagesVisualService;
 
 		private bool mIsUpdatingSelectedIndexInternally;
 
@@ -93,6 +92,8 @@ namespace ResumeApp.Controls
 		public ProjectImageCarouselControl()
 		{
 			mCarouselEasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
+			mAdjacentImagesVisualService = new ProjectImageCarouselAdjacentImagesVisualService();
+
 			InitializeComponent();
 
 			mDefaultCursor = Cursor;
@@ -190,10 +191,8 @@ namespace ResumeApp.Controls
 			}
 			catch ( Exception )
 			{
-				// ignored
+				return null;
 			}
-
-			return null;
 		}
 
 		private static bool IsDescendantOf( DependencyObject pElement, DependencyObject pPotentialAncestor )
@@ -300,7 +299,7 @@ namespace ResumeApp.Controls
 			{
 				return;
 			}
-			
+
 			int lNotchCount = GetMouseWheelNotchCount( pWheelDelta );
 			bool lIsScrollingUp = pWheelDelta > 0;
 
@@ -497,14 +496,7 @@ namespace ResumeApp.Controls
 			pImage.Visibility = Visibility.Visible;
 			Panel.SetZIndex( pImage, pZIndex );
 
-			double lTargetScale = pStep <= 0 ? 1.0 : Math.Exp( -pStep * 0.32 );
-			double lTargetOpacity = pStep <= 0 ? 1.0 : Math.Exp( -pStep * 0.55 );
-
-			double lOffsetX = pStep <= 0
-				? 0.0
-				: pContainerWidth * 0.18 * ( Math.Exp( pStep * 0.50 ) - 1.0 );
-
-			double lTargetTranslateX = pDirection < 0 ? -lOffsetX : ( pDirection > 0 ? lOffsetX : 0.0 );
+			ProjectImageCarouselSlotVisualTargets lTargets = ProjectImageCarouselAdjacentImagesVisualService.GetSlotVisualTargets( pStep, pDirection, pContainerWidth );
 
 			var lTransforms = GetSlotTransforms( pImage );
 			if ( lTransforms == null )
@@ -512,10 +504,10 @@ namespace ResumeApp.Controls
 				return;
 			}
 
-			ApplyDouble( lTransforms.Item1, ScaleTransform.ScaleXProperty, lTargetScale, pIsAnimated );
-			ApplyDouble( lTransforms.Item1, ScaleTransform.ScaleYProperty, lTargetScale, pIsAnimated );
-			ApplyDouble( lTransforms.Item2, TranslateTransform.XProperty, lTargetTranslateX, pIsAnimated );
-			ApplyDouble( pImage, UIElement.OpacityProperty, lTargetOpacity, pIsAnimated );
+			ApplyDouble( lTransforms.Item1, ScaleTransform.ScaleXProperty, lTargets.Scale, pIsAnimated );
+			ApplyDouble( lTransforms.Item1, ScaleTransform.ScaleYProperty, lTargets.Scale, pIsAnimated );
+			ApplyDouble( lTransforms.Item2, TranslateTransform.XProperty, lTargets.TranslateX, pIsAnimated );
+			ApplyDouble( pImage, UIElement.OpacityProperty, lTargets.Opacity, pIsAnimated );
 		}
 
 		private Tuple<ScaleTransform, TranslateTransform> GetSlotTransforms( Image pImage )

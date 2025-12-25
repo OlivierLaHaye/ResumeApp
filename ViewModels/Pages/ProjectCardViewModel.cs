@@ -25,26 +25,23 @@ namespace ResumeApp.ViewModels.Pages
 		private readonly string mTechResourceKey;
 		private readonly string mImagesResourceKey;
 
-		private string mContextValueText;
-
-		private string mConstraintsValueText;
-
-		private string mImpactValueText;
-
 		public string TitleText => mResourcesService[ mTitleResourceKey ];
 
+		private string mContextValueText;
 		public string ContextValueText
 		{
 			get => mContextValueText;
 			private set => SetProperty( ref mContextValueText, value );
 		}
 
+		private string mConstraintsValueText;
 		public string ConstraintsValueText
 		{
 			get => mConstraintsValueText;
 			private set => SetProperty( ref mConstraintsValueText, value );
 		}
 
+		private string mImpactValueText;
 		public string ImpactValueText
 		{
 			get => mImpactValueText;
@@ -187,7 +184,7 @@ namespace ResumeApp.ViewModels.Pages
 
 			string lAssemblyName = GetEntryAssemblyName();
 
-			return string.Format( "pack://application:,,,/{0};component/{1}", lAssemblyName, lNormalizedPath );
+			return $"pack://application:,,,/{lAssemblyName};component/{lNormalizedPath}";
 		}
 
 		private static string BuildImageUriText( string pPackOrRelativePath )
