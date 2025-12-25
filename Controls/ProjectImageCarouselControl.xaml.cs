@@ -16,8 +16,12 @@ using System.Windows.Media.Imaging;
 
 namespace ResumeApp.Controls
 {
-	public partial class ProjectImageCarouselControl : UserControl
+	public partial class ProjectImageCarouselControl
 	{
+		private const double MinimumDragThresholdPixels = 60.0;
+		private const double DragThresholdRatio = 0.085;
+		private const double DragDeltaScale = 0.65;
+
 		public static readonly DependencyProperty sImagesProperty =
 			DependencyProperty.Register(
 				nameof( Images ),
@@ -55,9 +59,12 @@ namespace ResumeApp.Controls
 		private bool mIsUpdatingSelectedIndexInternally;
 
 		private bool mIsDragInProgress;
-		private bool mHasNavigatedDuringDrag;
-		private Point mDragStartPosition;
+		private Point mDragLastPosition;
 		private double mDragThresholdPixels;
+		private double mDragAccumulatedHorizontalDelta;
+
+		private readonly Cursor mDefaultCursor;
+		private Cursor mPreviousCursor;
 
 		public IList Images
 		{
@@ -87,38 +94,45 @@ namespace ResumeApp.Controls
 		{
 			mCarouselEasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
 			InitializeComponent();
+
+			mDefaultCursor = Cursor;
+
 			Loaded += OnControlLoaded;
+			MouseLeave += OnRootMouseLeave;
 		}
 
 		private static void OnImagesChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
-			if ( pDependencyObject is ProjectImageCarouselControl lControl )
+			if ( !( pDependencyObject is ProjectImageCarouselControl lControl ) )
 			{
-				lControl.EnsureSelectedIndexIsValid();
-				lControl.UpdateAllVisuals( false );
+				return;
 			}
+
+			lControl.EnsureSelectedIndexIsValid();
+			lControl.UpdateAllVisuals( false );
+			lControl.UpdateHoverCursorFromMouse();
 		}
 
 		private static void OnSelectedIndexChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
-			if ( pDependencyObject is ProjectImageCarouselControl lControl )
+			if ( !( pDependencyObject is ProjectImageCarouselControl lControl ) || lControl.mIsUpdatingSelectedIndexInternally )
 			{
-				if ( lControl.mIsUpdatingSelectedIndexInternally )
-				{
-					return;
-				}
-
-				lControl.EnsureSelectedIndexIsValid();
-				lControl.UpdateAllVisuals( true );
+				return;
 			}
+
+			lControl.EnsureSelectedIndexIsValid();
+			lControl.UpdateAllVisuals( true );
 		}
 
 		private static void OnIsFullscreenChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
-			if ( pDependencyObject is ProjectImageCarouselControl lControl )
+			if ( !( pDependencyObject is ProjectImageCarouselControl lControl ) )
 			{
-				lControl.UpdateAllVisuals( false );
+				return;
 			}
+
+			lControl.UpdateAllVisuals( false );
+			lControl.UpdateHoverCursorFromMouse();
 		}
 
 		private static int WrapIndex( int pIndex, int pCount )
@@ -220,9 +234,30 @@ namespace ResumeApp.Controls
 			return null;
 		}
 
+		private static void StopAndSet( DependencyObject pTarget, DependencyProperty pProperty, double pValue )
+		{
+			if ( pTarget is Animatable lAnimatable )
+			{
+				lAnimatable.BeginAnimation( pProperty, null );
+			}
+
+			pTarget.SetValue( pProperty, pValue );
+		}
+
 		private void OnControlLoaded( object pSender, RoutedEventArgs pEventArgs )
 		{
 			UpdateAllVisuals( false );
+			UpdateHoverCursorFromMouse();
+		}
+
+		private void OnRootMouseLeave( object pSender, MouseEventArgs pEventArgs )
+		{
+			if ( mIsDragInProgress )
+			{
+				return;
+			}
+
+			Cursor = mDefaultCursor;
 		}
 
 		private void EnsureSelectedIndexIsValid()
@@ -423,8 +458,7 @@ namespace ResumeApp.Controls
 				return;
 			}
 
-			var lAnimatable = pTarget as Animatable;
-			if ( lAnimatable == null )
+			if ( !(pTarget is Animatable lAnimatable) )
 			{
 				return;
 			}
@@ -437,16 +471,6 @@ namespace ResumeApp.Controls
 			};
 
 			lAnimatable.BeginAnimation( pProperty, lDoubleAnimation );
-		}
-
-		private void StopAndSet( DependencyObject pTarget, DependencyProperty pProperty, double pValue )
-		{
-			if ( pTarget is Animatable lAnimatable )
-			{
-				lAnimatable.BeginAnimation( pProperty, null );
-			}
-
-			pTarget.SetValue( pProperty, pValue );
 		}
 
 		private void NavigatePrevious()
@@ -508,6 +532,7 @@ namespace ResumeApp.Controls
 		private void OnMediaRootGridSizeChanged( object pSender, SizeChangedEventArgs pEventArgs )
 		{
 			UpdateCarouselVisualState( false );
+			UpdateHoverCursorFromMouse();
 		}
 
 		private void OnRootPreviewMouseWheel( object pSender, MouseWheelEventArgs pMouseWheelEventArgs )
@@ -524,6 +549,11 @@ namespace ResumeApp.Controls
 				return;
 			}
 
+			if ( GetImageCount() <= 1 )
+			{
+				return;
+			}
+
 			var lOriginalSource = pMouseButtonEventArgs.OriginalSource as DependencyObject;
 			if ( !IsValidDragStartSource( lOriginalSource ) )
 			{
@@ -531,11 +561,22 @@ namespace ResumeApp.Controls
 			}
 
 			mIsDragInProgress = true;
-			mHasNavigatedDuringDrag = false;
-			mDragStartPosition = pMouseButtonEventArgs.GetPosition( mMediaRootGrid );
+			mDragAccumulatedHorizontalDelta = 0.0;
 			mDragThresholdPixels = GetDragThresholdPixels();
 
-			CaptureMouse();
+			Point lStartPosition = pMouseButtonEventArgs.GetPosition( mMediaRootGrid );
+			mDragLastPosition = lStartPosition;
+
+			bool lHasCapturedMouse = Mouse.Capture( this, CaptureMode.SubTree );
+			if ( !lHasCapturedMouse )
+			{
+				mIsDragInProgress = false;
+				return;
+			}
+
+			mPreviousCursor = Cursor;
+			Cursor = Cursors.SizeWE;
+
 			pMouseButtonEventArgs.Handled = true;
 		}
 
@@ -543,6 +584,7 @@ namespace ResumeApp.Controls
 		{
 			if ( !mIsDragInProgress )
 			{
+				UpdateHoverCursor( pMouseEventArgs.OriginalSource as DependencyObject );
 				return;
 			}
 
@@ -552,29 +594,36 @@ namespace ResumeApp.Controls
 				return;
 			}
 
-			if ( mHasNavigatedDuringDrag )
-			{
-				return;
-			}
-
 			Point lCurrentPosition = pMouseEventArgs.GetPosition( mMediaRootGrid );
-			double lDeltaX = lCurrentPosition.X - mDragStartPosition.X;
+			double lDeltaX = lCurrentPosition.X - mDragLastPosition.X;
 
-			if ( Math.Abs( lDeltaX ) < mDragThresholdPixels )
+			mDragLastPosition = lCurrentPosition;
+			mDragAccumulatedHorizontalDelta += lDeltaX * DragDeltaScale;
+
+			if ( Math.Abs( mDragAccumulatedHorizontalDelta ) < mDragThresholdPixels )
 			{
 				return;
 			}
 
-			if ( lDeltaX < 0 )
+			int lNavigationCount = ( int )( Math.Abs( mDragAccumulatedHorizontalDelta ) / mDragThresholdPixels );
+			if ( lNavigationCount <= 0 )
 			{
-				NavigateNext();
-			}
-			else
-			{
-				NavigatePrevious();
+				return;
 			}
 
-			mHasNavigatedDuringDrag = true;
+			for ( int lNavigationIndex = 0; lNavigationIndex < lNavigationCount; lNavigationIndex++ )
+			{
+				if ( mDragAccumulatedHorizontalDelta < 0.0 )
+				{
+					NavigateNext();
+					mDragAccumulatedHorizontalDelta += mDragThresholdPixels;
+					continue;
+				}
+
+				NavigatePrevious();
+				mDragAccumulatedHorizontalDelta -= mDragThresholdPixels;
+			}
+
 			pMouseEventArgs.Handled = true;
 		}
 
@@ -602,20 +651,57 @@ namespace ResumeApp.Controls
 			}
 
 			mIsDragInProgress = false;
-			mHasNavigatedDuringDrag = false;
+			mDragAccumulatedHorizontalDelta = 0.0;
 
-			if ( IsMouseCaptured )
+			if ( Mouse.Captured != null )
 			{
-				ReleaseMouseCapture();
+				Mouse.Capture( null );
+			}
+
+			Cursor = mPreviousCursor;
+			mPreviousCursor = null;
+
+			UpdateHoverCursorFromMouse();
+		}
+
+		private void UpdateHoverCursorFromMouse()
+		{
+			var lDirectlyOver = Mouse.DirectlyOver as DependencyObject;
+			UpdateHoverCursor( lDirectlyOver );
+		}
+
+		private void UpdateHoverCursor( DependencyObject pOriginalSource )
+		{
+			if ( mIsDragInProgress )
+			{
+				return;
+			}
+
+			if ( Mouse.LeftButton == MouseButtonState.Pressed )
+			{
+				return;
+			}
+
+			bool lIsDragPossible = GetImageCount() > 1 && IsValidDragStartSource( pOriginalSource );
+
+			Cursor lTargetCursor = lIsDragPossible ? Cursors.SizeWE : mDefaultCursor;
+			if ( !Equals( Cursor, lTargetCursor ) )
+			{
+				Cursor = lTargetCursor;
 			}
 		}
 
 		private double GetDragThresholdPixels()
 		{
-			double lWidth = mMediaRootGrid.ActualWidth;
+			double lWidth = ActualWidth;
 			if ( lWidth <= 1 )
 			{
-				lWidth = ActualWidth;
+				lWidth = mMediaCardBorder.ActualWidth;
+			}
+
+			if ( lWidth <= 1 )
+			{
+				lWidth = mMediaRootGrid.ActualWidth;
 			}
 
 			if ( lWidth <= 1 )
@@ -623,8 +709,8 @@ namespace ResumeApp.Controls
 				lWidth = 900;
 			}
 
-			double lRelativeThreshold = lWidth * 0.06;
-			return Math.Max( 42, lRelativeThreshold );
+			double lRelativeThreshold = lWidth * DragThresholdRatio;
+			return Math.Max( MinimumDragThresholdPixels, lRelativeThreshold );
 		}
 
 		private bool IsValidDragStartSource( DependencyObject pOriginalSource )
@@ -654,7 +740,7 @@ namespace ResumeApp.Controls
 				return false;
 			}
 
-			return IsDescendantOf( pOriginalSource, mMediaRootGrid );
+			return !IsDescendantOf( pOriginalSource, mDotsBackgroundBorder );
 		}
 
 		private void OnRootPreviewKeyDown( object pSender, KeyEventArgs pKeyEventArgs )
@@ -675,11 +761,13 @@ namespace ResumeApp.Controls
 					}
 				case Key.Home:
 					{
-						if ( GetImageCount() > 0 )
+						if ( GetImageCount() <= 0 )
 						{
-							SelectedIndex = 0;
-							pKeyEventArgs.Handled = true;
+							return;
 						}
+
+						SelectedIndex = 0;
+						pKeyEventArgs.Handled = true;
 
 						return;
 					}

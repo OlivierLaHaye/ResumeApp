@@ -4451,6 +4451,8 @@
                         Width="45"
                         Margin="0"
                         Background="{DynamicResource CommonGrayBrush}"
+                        BorderBrush="{DynamicResource CommonLightGrayBrush}"
+                        BorderThickness="2,0,0,2"
                         CornerRadius="0,0,0,15">
                         <Grid Height="30">
                             <Viewbox Margin="14" Stretch="Uniform">
@@ -4502,11 +4504,13 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Grid
+                    <Border
                         x:Name="LayoutRoot"
                         Width="45"
                         Margin="0"
-                        Background="{DynamicResource CommonGrayBrush}">
+                        Background="{DynamicResource CommonGrayBrush}"
+                        BorderBrush="{DynamicResource CommonLightGrayBrush}"
+                        BorderThickness="0,0,0,2">
                         <Grid Height="30">
                             <Viewbox Margin="11" Stretch="Uniform">
                                 <Grid>
@@ -4514,7 +4518,7 @@
                                 </Grid>
                             </Viewbox>
                         </Grid>
-                    </Grid>
+                    </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
@@ -4557,11 +4561,12 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Grid
+                    <Border
                         x:Name="LayoutRoot"
                         Width="45"
                         Margin="0"
-                        Background="{DynamicResource CommonGrayBrush}">
+                        Background="{DynamicResource CommonGrayBrush}"
+                        BorderThickness="0,0,0,2">
                         <Grid Height="30">
                             <Viewbox Margin="11" Stretch="Uniform">
                                 <Grid>
@@ -4569,7 +4574,7 @@
                                 </Grid>
                             </Viewbox>
                         </Grid>
-                    </Grid>
+                    </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
@@ -4617,6 +4622,8 @@
                         Width="45"
                         Margin="0"
                         Background="{DynamicResource CommonGrayBrush}"
+                        BorderBrush="{DynamicResource CommonLightGrayBrush}"
+                        BorderThickness="0,0,2,2"
                         CornerRadius="0,0,15,0">
                         <Grid Height="30">
                             <Viewbox Margin="11" Stretch="Uniform">

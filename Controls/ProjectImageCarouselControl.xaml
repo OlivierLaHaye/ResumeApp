@@ -1,4 +1,5 @@
-﻿<UserControl
+﻿<!--  Controls/ProjectImageCarouselControl.xaml  -->
+<UserControl
     x:Class="ResumeApp.Controls.ProjectImageCarouselControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -16,13 +17,14 @@
     UseLayoutRounding="True">
 
     <UserControl.Resources>
-        <Style x:Key="NavigationButtonStyle" TargetType="{x:Type Button}">
+        <Style x:Key="ButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Width" Value="38" />
             <Setter Property="Height" Value="38" />
             <Setter Property="Padding" Value="0" />
-            <Setter Property="Background" Value="{DynamicResource CommonBlackBrush}" />
+            <Setter Property="Background" Value="{DynamicResource CommonDarkerGrayBrush}" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
@@ -116,13 +118,6 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
-
-        <Style
-            x:Key="ButtonStyle"
-            BasedOn="{StaticResource NavigationButtonStyle}"
-            TargetType="{x:Type Button}">
-            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
 
         <Style x:Key="DotsListBoxItemStyle" TargetType="{x:Type ListBoxItem}">
@@ -394,9 +389,9 @@
                         Width="15"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
+                        Fill="{DynamicResource CommonWhiteBrush}"
                         Data="F1 M 342.533,277.422 L 196.445,132.311 L 253.778,75.556 C 270.960,58.026 270.679,29.887 253.150,12.705 C 244.888,4.606 233.792,0.048 222.222,0.000 L 44.445,0.000 C 20.020,-0.001 0.171,19.709 0.000,44.133 L 0.000,220.578 C -0.028,238.482 10.904,254.579 27.556,261.156 C 44.097,268.064 63.165,264.425 76.000,251.911 L 133.333,195.022 L 279.467,340.000 C 296.973,357.236 325.071,357.236 342.578,340.000 C 359.883,322.800 359.968,294.828 342.768,277.524 C 342.705,277.460 342.641,277.397 342.578,277.333 L 342.533,277.422 Z M 457.467,277.422 L 603.689,132.356 L 546.356,75.556 C 533.784,62.900 530.098,43.906 537.022,27.467 C 543.722,10.846 559.858,-0.028 577.778,0.000 L 755.556,0.000 C 779.981,-0.001 799.829,19.709 800.000,44.133 L 800.000,220.578 C 800.010,238.465 789.082,254.540 772.445,261.111 C 755.903,268.020 736.835,264.381 724.000,251.867 L 666.667,194.978 L 520.533,340.000 C 503.027,357.236 474.929,357.236 457.422,340.000 C 440.142,322.845 440.040,294.930 457.195,277.649 C 457.271,277.573 457.346,277.498 457.422,277.422 L 457.467,277.422 Z M 457.467,516.667 L 603.689,661.778 L 546.356,718.667 C 529.173,736.196 529.454,764.335 546.983,781.517 C 555.246,789.617 566.341,794.174 577.911,794.222 L 755.689,794.222 C 780.097,794.223 799.938,774.540 800.133,750.133 L 800.133,573.689 C 800.161,555.785 789.230,539.688 772.578,533.111 C 756.037,526.203 736.968,529.841 724.133,542.356 L 666.667,599.111 L 520.445,454.044 C 502.949,436.867 474.918,436.867 457.422,454.044 C 440.117,471.175 439.976,499.090 457.106,516.395 C 457.211,516.501 457.316,516.606 457.422,516.711 L 457.467,516.667 Z M 342.533,516.711 L 196.311,661.822 L 253.645,718.800 C 270.827,736.329 270.546,764.468 253.017,781.651 C 244.754,789.750 233.659,794.308 222.089,794.356 L 44.445,794.356 C 20.020,794.356 0.171,774.647 0.000,750.222 L 0.000,573.778 C -0.046,555.858 10.888,539.738 27.556,533.156 C 44.097,526.247 63.165,529.886 76.000,542.400 L 133.333,599.111 L 279.556,454.044 C 297.051,436.867 325.082,436.867 342.578,454.044 C 359.883,471.244 359.968,499.216 342.768,516.521 C 342.705,516.585 342.641,516.648 342.578,516.711 L 342.533,516.711 Z"
-                        Stretch="Uniform"
-                        Fill="{DynamicResource CommonWhiteBrush}" />
+                        Stretch="Uniform" />
                 </Button>
 
                 <Grid
@@ -433,7 +428,7 @@
                     Visibility="Collapsed">
                     <Grid.Style>
                         <Style TargetType="{x:Type Grid}">
-                            <Setter Property="Opacity" Value="0.5" />
+                            <Setter Property="Opacity" Value="0.9" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsMouseOver, ElementName=mMediaRootGrid}" Value="True">
                                     <Setter Property="Opacity" Value="1" />
