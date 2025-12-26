@@ -47,10 +47,19 @@
     <Border
         x:Name="mWindowFrameBorder"
         BorderBrush="{DynamicResource CommonLightGrayBrush}"
-        BorderThickness="{StaticResource ExtraSmallThickness}"
         CornerRadius="40"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True">
+        <Border.Style>
+            <Style TargetType="{x:Type Border}">
+                <Setter Property="BorderThickness" Value="{StaticResource ExtraSmallThickness}" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
+                        <Setter Property="BorderThickness" Value="0" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
 
         <Grid x:Name="mMainWindowLayoutRoot">
             <Grid.RowDefinitions>
