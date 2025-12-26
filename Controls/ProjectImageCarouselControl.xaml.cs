@@ -6,6 +6,7 @@ using ResumeApp.Windows;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -15,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace ResumeApp.Controls
 {
@@ -69,6 +71,9 @@ namespace ResumeApp.Controls
 		private readonly Cursor mDefaultCursor;
 		private Cursor mPreviousCursor;
 
+		private INotifyCollectionChanged mImagesCollectionChangedNotifier;
+		private bool mHasPendingImagesCollectionRefresh;
+
 		public IList Images
 		{
 			get => ( IList )GetValue( sImagesProperty );
@@ -103,6 +108,7 @@ namespace ResumeApp.Controls
 			mDefaultCursor = Cursor;
 
 			Loaded += OnControlLoaded;
+			Unloaded += OnControlUnloaded;
 			MouseLeave += OnRootMouseLeave;
 		}
 
@@ -112,6 +118,8 @@ namespace ResumeApp.Controls
 			{
 				return;
 			}
+
+			lControl.AttachToImagesCollectionChanged();
 
 			lControl.EnsureSelectedIndexIsValid();
 			lControl.UpdateAllVisuals( false );
@@ -180,6 +188,8 @@ namespace ResumeApp.Controls
 				return lCachedImageSource;
 			}
 
+			ImageSource lCreatedImageSource = null;
+
 			try
 			{
 				var lBitmapImage = new BitmapImage();
@@ -190,13 +200,20 @@ namespace ResumeApp.Controls
 				lBitmapImage.EndInit();
 				lBitmapImage.Freeze();
 
-				sCachedImageSourcesByUri[ lUriText ] = lBitmapImage;
-				return lBitmapImage;
+				lCreatedImageSource = lBitmapImage;
 			}
 			catch ( Exception )
 			{
+				// ignored
+			}
+
+			if ( lCreatedImageSource == null )
+			{
 				return null;
 			}
+
+			sCachedImageSourcesByUri[ lUriText ] = lCreatedImageSource;
+			return lCreatedImageSource;
 		}
 
 		private static bool IsDescendantOf( DependencyObject pElement, DependencyObject pPotentialAncestor )
@@ -253,7 +270,7 @@ namespace ResumeApp.Controls
 				return null;
 			}
 
-			var lVisualParent = VisualTreeHelper.GetParent( pElement );
+			DependencyObject lVisualParent = VisualTreeHelper.GetParent( pElement );
 			return lVisualParent ?? LogicalTreeHelper.GetParent( pElement );
 		}
 
@@ -329,8 +346,8 @@ namespace ResumeApp.Controls
 				return null;
 			}
 
-			var lScaleTransform = lTransformGroup.Children.OfType<ScaleTransform>().FirstOrDefault();
-			var lTranslateTransform = lTransformGroup.Children.OfType<TranslateTransform>().FirstOrDefault();
+			ScaleTransform lScaleTransform = lTransformGroup.Children.OfType<ScaleTransform>().FirstOrDefault();
+			TranslateTransform lTranslateTransform = lTransformGroup.Children.OfType<TranslateTransform>().FirstOrDefault();
 
 			if ( lScaleTransform == null || lTranslateTransform == null )
 			{
@@ -338,6 +355,54 @@ namespace ResumeApp.Controls
 			}
 
 			return Tuple.Create( lScaleTransform, lTranslateTransform );
+		}
+
+		private void OnControlUnloaded( object pSender, RoutedEventArgs pEventArgs )
+		{
+			DetachFromImagesCollectionChanged();
+		}
+
+		private void AttachToImagesCollectionChanged()
+		{
+			DetachFromImagesCollectionChanged();
+
+			if ( Images is INotifyCollectionChanged lNotifyCollectionChanged )
+			{
+				mImagesCollectionChangedNotifier = lNotifyCollectionChanged;
+				mImagesCollectionChangedNotifier.CollectionChanged += OnImagesCollectionChanged;
+			}
+		}
+
+		private void DetachFromImagesCollectionChanged()
+		{
+			if ( mImagesCollectionChangedNotifier == null )
+			{
+				return;
+			}
+
+			mImagesCollectionChangedNotifier.CollectionChanged -= OnImagesCollectionChanged;
+			mImagesCollectionChangedNotifier = null;
+		}
+
+		private void OnImagesCollectionChanged( object pSender, NotifyCollectionChangedEventArgs pEventArgs )
+		{
+			if ( mHasPendingImagesCollectionRefresh )
+			{
+				return;
+			}
+
+			mHasPendingImagesCollectionRefresh = true;
+
+			Dispatcher.BeginInvoke(
+				DispatcherPriority.Background,
+				new Action( () =>
+				{
+					mHasPendingImagesCollectionRefresh = false;
+
+					EnsureSelectedIndexIsValid();
+					UpdateAllVisuals( false );
+					UpdateHoverCursorFromMouse();
+				} ) );
 		}
 
 		private ScrollViewer FindScrollableAncestorScrollViewer()
@@ -358,6 +423,8 @@ namespace ResumeApp.Controls
 
 		private void OnControlLoaded( object pSender, RoutedEventArgs pEventArgs )
 		{
+			AttachToImagesCollectionChanged();
+
 			UpdateAllVisuals( false );
 			UpdateHoverCursorFromMouse();
 		}
@@ -386,6 +453,7 @@ namespace ResumeApp.Controls
 			}
 
 			mIsUpdatingSelectedIndexInternally = true;
+
 			try
 			{
 				SelectedIndex = 0;
@@ -398,7 +466,7 @@ namespace ResumeApp.Controls
 
 		private int GetImageCount()
 		{
-			var lImages = Images;
+			IList lImages = Images;
 			return lImages?.Count ?? 0;
 		}
 
@@ -490,7 +558,7 @@ namespace ResumeApp.Controls
 			pImage.Opacity = 0;
 			Panel.SetZIndex( pImage, 0 );
 
-			var lTransforms = GetSlotTransforms( pImage );
+			Tuple<ScaleTransform, TranslateTransform> lTransforms = GetSlotTransforms( pImage );
 			if ( lTransforms == null )
 			{
 				return;
@@ -520,7 +588,7 @@ namespace ResumeApp.Controls
 
 			ProjectImageCarouselSlotVisualTargets lTargets = ProjectImageCarouselAdjacentImagesVisualService.GetSlotVisualTargets( pStep, pDirection, pContainerWidth );
 
-			var lTransforms = GetSlotTransforms( pImage );
+			Tuple<ScaleTransform, TranslateTransform> lTransforms = GetSlotTransforms( pImage );
 			if ( lTransforms == null )
 			{
 				return;
@@ -605,11 +673,12 @@ namespace ResumeApp.Controls
 				return;
 			}
 
-			var lOwnerWindow = Window.GetWindow( this );
+			Window lOwnerWindow = Window.GetWindow( this );
+
 			var lViewerWindow = new ProjectImageViewerWindow
 			{
 				Owner = lOwnerWindow,
-				Images = ( ObservableCollection<ImageSource> )Images,
+				Images = Images as ObservableCollection<ImageSource>,
 				SelectedIndex = SelectedIndex
 			};
 
@@ -624,7 +693,7 @@ namespace ResumeApp.Controls
 
 		private void OnRootPreviewMouseWheel( object pSender, MouseWheelEventArgs pMouseWheelEventArgs )
 		{
-			var lScrollViewer = FindScrollableAncestorScrollViewer();
+			ScrollViewer lScrollViewer = FindScrollableAncestorScrollViewer();
 			if ( lScrollViewer != null )
 			{
 				ApplyMouseWheelToScrollViewer( lScrollViewer, pMouseWheelEventArgs.Delta );
@@ -642,7 +711,7 @@ namespace ResumeApp.Controls
 				return;
 			}
 
-			var lOriginalSource = pMouseButtonEventArgs.OriginalSource as DependencyObject;
+			DependencyObject lOriginalSource = pMouseButtonEventArgs.OriginalSource as DependencyObject;
 			if ( !IsValidDragStartSource( lOriginalSource ) )
 			{
 				return;
@@ -754,7 +823,7 @@ namespace ResumeApp.Controls
 
 		private void UpdateHoverCursorFromMouse()
 		{
-			var lDirectlyOver = Mouse.DirectlyOver as DependencyObject;
+			DependencyObject lDirectlyOver = Mouse.DirectlyOver as DependencyObject;
 			UpdateHoverCursor( lDirectlyOver );
 		}
 

@@ -171,14 +171,16 @@ namespace ResumeApp.Services
 			}
 
 			ActiveCulture = lCulture;
+
 			CultureInfo.DefaultThreadCurrentCulture = lCulture;
 			CultureInfo.DefaultThreadCurrentUICulture = lCulture;
 			Thread.CurrentThread.CurrentCulture = lCulture;
 			Thread.CurrentThread.CurrentUICulture = lCulture;
 
 			RegistrySettingsService.SaveLanguage( pLanguage );
+
 			RaisePropertyChanged( nameof( ActiveLanguageDisplayName ) );
-			RaiseAllPropertiesChanged();
+			RaisePropertyChanged( "Item[]" );
 		}
 	}
 }

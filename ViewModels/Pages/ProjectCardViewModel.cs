@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
@@ -40,6 +41,8 @@ namespace ResumeApp.ViewModels.Pages
 
 		private readonly string mProjectImagesBaseName;
 		private readonly string mProjectLinkUriText;
+
+		private bool mHasInitializedImages;
 
 		public string TitleText => mResourcesService[ mTitleResourceKey ];
 
@@ -105,9 +108,28 @@ namespace ResumeApp.ViewModels.Pages
 			TechItems = new ObservableCollection<string>();
 			Images = new ObservableCollection<ImageSource>();
 
+			InitializeImagesIfNeeded();
 			RefreshFromResources();
 
 			mResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
+		}
+
+		private void InitializeImagesIfNeeded()
+		{
+			if ( mHasInitializedImages )
+			{
+				return;
+			}
+
+			string lImagesBasePath = BuildProjectImagesBasePath( mProjectImagesBaseName );
+
+			List<ImageSource> lImages = BuildImageSourcesFromBasePathOrDescriptor( lImagesBasePath )
+				.Where( pImageSource => pImageSource != null )
+				.ToList();
+
+			ReplaceObservableImages( Images, lImages );
+
+			mHasInitializedImages = true;
 		}
 
 		private static string ExtractValueAfterFirstColon( string pText )
@@ -317,7 +339,6 @@ namespace ResumeApp.ViewModels.Pages
 			ImageSource lSingleImage = TryCreateImageSource( lValueText );
 
 			return lSingleImage == null ? Enumerable.Empty<ImageSource>() : new[] { lSingleImage };
-
 		}
 
 		private static IEnumerable<ImageSource> EnumerateIndexedImagesFromBasePath( string pImagesBasePath )
@@ -349,7 +370,12 @@ namespace ResumeApp.ViewModels.Pages
 		{
 			string lIndexedPrefix = ( pIndexedPrefix ?? string.Empty ).Trim();
 
-			return string.IsNullOrWhiteSpace( lIndexedPrefix ) ? null : sSupportedImageExtensions.Select( pExtension => $"{lIndexedPrefix}{pImageIndex}.{pExtension}" ).Select( TryCreateImageSource ).FirstOrDefault( pImageSource => pImageSource != null );
+			return string.IsNullOrWhiteSpace( lIndexedPrefix )
+				? null
+				: sSupportedImageExtensions
+					.Select( pExtension => $"{lIndexedPrefix}{pImageIndex}.{pExtension}" )
+					.Select( TryCreateImageSource )
+					.FirstOrDefault( pImageSource => pImageSource != null );
 		}
 
 		private void ExecuteOpenProjectLink()
@@ -384,19 +410,18 @@ namespace ResumeApp.ViewModels.Pages
 			string lTechValueText = ExtractValueAfterFirstColon( mResourcesService[ mTechResourceKey ] );
 			ReplaceObservableItems( TechItems, SplitCommaSeparatedItems( lTechValueText ) );
 
-			string lImagesBasePath = BuildProjectImagesBasePath( mProjectImagesBaseName );
-
-			List<ImageSource> lImages = BuildImageSourcesFromBasePathOrDescriptor( lImagesBasePath )
-				.Where( pImageSource => pImageSource != null )
-				.ToList();
-
-			ReplaceObservableImages( Images, lImages );
-
 			RaisePropertyChanged( nameof( TitleText ) );
 		}
 
 		private void OnResourcesServicePropertyChanged( object pSender, PropertyChangedEventArgs pArgs )
 		{
+			string lPropertyName = pArgs?.PropertyName ?? string.Empty;
+
+			if ( !string.Equals( lPropertyName, "Item[]", StringComparison.Ordinal ) )
+			{
+				return;
+			}
+
 			RefreshFromResources();
 		}
 	}

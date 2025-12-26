@@ -5,13 +5,13 @@ using ResumeApp.Infrastructure;
 using ResumeApp.Services;
 using ResumeApp.ViewModels.Pages;
 using System;
+using System.ComponentModel;
 using System.Windows;
 
 namespace ResumeApp.ViewModels
 {
 	public sealed class MainViewModel : ViewModelBase
 	{
-
 		public OverviewPageViewModel OverviewPageViewModel { get; }
 
 		public ExperiencePageViewModel ExperiencePageViewModel { get; }
@@ -83,13 +83,21 @@ namespace ResumeApp.ViewModels
 
 			mIsTopBarCollapsed = false;
 
-			pResourcesService.PropertyChanged += ( pSender, pEventArgs ) =>
-			{
-				RaisePropertyChanged( nameof( ActiveLanguageDisplayName ) );
-				RaisePropertyChanged( nameof( IsFrenchLanguageActive ) );
-			};
-
+			pResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
 			pThemeService.PropertyChanged += ( pSender, pEventArgs ) => RaisePropertyChanged( nameof( IsDarkThemeActive ) );
+		}
+
+		private void OnResourcesServicePropertyChanged( object pSender, PropertyChangedEventArgs pEventArgs )
+		{
+			string lPropertyName = pEventArgs?.PropertyName ?? string.Empty;
+
+			if ( !string.Equals( lPropertyName, "Item[]", StringComparison.Ordinal ) )
+			{
+				return;
+			}
+
+			RaisePropertyChanged( nameof( ActiveLanguageDisplayName ) );
+			RaisePropertyChanged( nameof( IsFrenchLanguageActive ) );
 		}
 
 		private void ToggleTheme()
