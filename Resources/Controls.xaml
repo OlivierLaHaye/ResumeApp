@@ -1,5 +1,5 @@
-﻿<!--Copyright (C) Olivier La Haye-->
-<!--All rights reserved.-->
+﻿<!--  Copyright (C) Olivier La Haye  -->
+<!--  All rights reserved.  -->
 
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -4569,6 +4569,7 @@
                         Width="45"
                         Margin="0"
                         Background="{DynamicResource CommonGrayBrush}"
+                        BorderBrush="{DynamicResource CommonLightGrayBrush}"
                         BorderThickness="0,0,0,2">
                         <Grid Height="30">
                             <Viewbox Margin="11" Stretch="Uniform">

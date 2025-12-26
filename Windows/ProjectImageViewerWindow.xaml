@@ -43,6 +43,7 @@
                 <Border
                     x:Name="mCustomTitleBarDragSurfaceBorder"
                     Background="Transparent"
+                    MouseLeftButtonDown="OnCustomTitleBarDragSurfaceBorderMouseLeftButtonDown"
                     WindowChrome.IsHitTestVisibleInChrome="True" />
 
                 <Border

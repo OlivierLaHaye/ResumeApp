@@ -5,6 +5,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Shell;
@@ -202,6 +203,16 @@ namespace ResumeApp.Windows
 			return IntPtr.Zero;
 		}
 
+		private static double Clamp( double pValue, double pMin, double pMax )
+		{
+			if ( pValue < pMin )
+			{
+				return pMin;
+			}
+
+			return pValue > pMax ? pMax : pValue;
+		}
+
 		protected override void OnSourceInitialized( EventArgs pEventArgs )
 		{
 			base.OnSourceInitialized( pEventArgs );
@@ -340,6 +351,69 @@ namespace ResumeApp.Windows
 		private void OnCloseWindowButtonClick( object pSender, RoutedEventArgs pEventArgs )
 		{
 			Close();
+		}
+
+		private void OnCustomTitleBarDragSurfaceBorderMouseLeftButtonDown( object pSender, MouseButtonEventArgs pMouseButtonEventArgs )
+		{
+			if ( pMouseButtonEventArgs == null )
+			{
+				return;
+			}
+
+			if ( pMouseButtonEventArgs.ButtonState != MouseButtonState.Pressed )
+			{
+				return;
+			}
+
+			if ( pMouseButtonEventArgs.ClickCount != 1 )
+			{
+				return;
+			}
+
+			RestoreFromMaximizedForDragIfNeeded( pMouseButtonEventArgs );
+
+			try
+			{
+				DragMove();
+			}
+			catch ( Exception )
+			{
+				// ignored
+			}
+		}
+
+		private void RestoreFromMaximizedForDragIfNeeded( MouseEventArgs pMouseButtonEventArgs )
+		{
+			if ( WindowState != WindowState.Maximized )
+			{
+				return;
+			}
+
+			System.Windows.Point lCursorPositionInWindowDip = pMouseButtonEventArgs.GetPosition( this );
+			System.Windows.Rect lRestoreBounds = RestoreBounds;
+
+			double lHorizontalRatio = ActualWidth > 0.0 ? lCursorPositionInWindowDip.X / ActualWidth : 0.5;
+			lHorizontalRatio = Clamp( lHorizontalRatio, 0.0, 1.0 );
+
+			double lCursorOffsetXInRestoredWindow = lRestoreBounds.Width * lHorizontalRatio;
+			double lCursorOffsetYInRestoredWindow = Math.Min( lCursorPositionInWindowDip.Y, Math.Max( 0.0, TitleBarHeight - 1.0 ) );
+
+			System.Windows.Point lCursorPositionOnScreenDip = GetCursorScreenPositionDip( lCursorPositionInWindowDip );
+
+			WindowState = WindowState.Normal;
+
+			Left = lCursorPositionOnScreenDip.X - lCursorOffsetXInRestoredWindow;
+			Top = lCursorPositionOnScreenDip.Y - lCursorOffsetYInRestoredWindow;
+		}
+
+		private System.Windows.Point GetCursorScreenPositionDip( System.Windows.Point pCursorPositionInWindowDip )
+		{
+			System.Windows.Point lCursorPositionOnScreenPixels = PointToScreen( pCursorPositionInWindowDip );
+
+			IntPtr lWindowHandle = new WindowInteropHelper( this ).Handle;
+			Matrix lTransformFromDevice = GetTransformFromDeviceOrIdentity( lWindowHandle );
+
+			return lTransformFromDevice.Transform( lCursorPositionOnScreenPixels );
 		}
 	}
 }
