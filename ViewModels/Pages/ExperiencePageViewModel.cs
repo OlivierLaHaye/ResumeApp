@@ -1,3 +1,6 @@
+// Copyright (C) Olivier La Haye
+// All rights reserved.
+
 using ResumeApp.Helpers;
 using ResumeApp.Infrastructure;
 using ResumeApp.Models;
@@ -51,13 +54,13 @@ namespace ResumeApp.ViewModels.Pages
 
 		private ICommand mSelectExperienceCommand;
 		public ICommand SelectExperienceCommand =>
-			mSelectExperienceCommand ??
-			( mSelectExperienceCommand = new ParameterRelayCommand( ExecuteSelectExperience ) );
+							mSelectExperienceCommand ??
+							( mSelectExperienceCommand = new ParameterRelayCommand( ExecuteSelectExperience ) );
 
 		private ICommand mSelectDateCommand;
 		public ICommand SelectDateCommand =>
-			mSelectDateCommand ??
-			( mSelectDateCommand = new ParameterRelayCommand( ExecuteSelectDate ) );
+							mSelectDateCommand ??
+							( mSelectDateCommand = new ParameterRelayCommand( ExecuteSelectDate ) );
 
 		public ExperiencePageViewModel( ResourcesService pResourcesService, ThemeService pThemeService )
 			: base( pResourcesService, pThemeService )

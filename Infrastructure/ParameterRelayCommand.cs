@@ -1,28 +1,20 @@
-﻿using System;
+﻿// Copyright (C) Olivier La Haye
+// All rights reserved.
+
+using System;
 using System.Windows.Input;
 
 namespace ResumeApp.Infrastructure
 {
 	public sealed class ParameterRelayCommand : ICommand
 	{
+		public event EventHandler CanExecuteChanged;
 		private readonly Action<object> mExecuteAction;
 		private readonly Func<object, bool> mCanExecutePredicate;
 
-		public event EventHandler CanExecuteChanged;
-
-		public ParameterRelayCommand( Action<object> pExecuteAction )
-			: this( pExecuteAction, null )
+		public ParameterRelayCommand( Action<object> pExecuteAction, Func<object, bool> pCanExecutePredicate = null )
 		{
-		}
-
-		public ParameterRelayCommand( Action<object> pExecuteAction, Func<object, bool> pCanExecutePredicate )
-		{
-			if ( pExecuteAction == null )
-			{
-				throw new ArgumentNullException( nameof( pExecuteAction ) );
-			}
-
-			mExecuteAction = pExecuteAction;
+			mExecuteAction = pExecuteAction ?? throw new ArgumentNullException( nameof( pExecuteAction ) );
 			mCanExecutePredicate = pCanExecutePredicate;
 		}
 

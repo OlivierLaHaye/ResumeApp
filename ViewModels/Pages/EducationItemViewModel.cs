@@ -1,4 +1,7 @@
-﻿using ResumeApp.Infrastructure;
+﻿// Copyright (C) Olivier La Haye
+// All rights reserved.
+
+using ResumeApp.Infrastructure;
 using ResumeApp.Services;
 using System;
 

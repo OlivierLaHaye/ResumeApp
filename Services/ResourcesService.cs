@@ -1,3 +1,6 @@
+// Copyright (C) Olivier La Haye
+// All rights reserved.
+
 using ResumeApp.Infrastructure;
 using System;
 using System.Globalization;

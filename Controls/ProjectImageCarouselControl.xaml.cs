@@ -322,6 +322,24 @@ namespace ResumeApp.Controls
 			ApplyMouseWheelLines( pScrollViewer, lNotchCount, lWheelScrollLines, lIsScrollingUp );
 		}
 
+		private static Tuple<ScaleTransform, TranslateTransform> GetSlotTransforms( UIElement pImage )
+		{
+			if ( !( pImage.RenderTransform is TransformGroup lTransformGroup ) )
+			{
+				return null;
+			}
+
+			var lScaleTransform = lTransformGroup.Children.OfType<ScaleTransform>().FirstOrDefault();
+			var lTranslateTransform = lTransformGroup.Children.OfType<TranslateTransform>().FirstOrDefault();
+
+			if ( lScaleTransform == null || lTranslateTransform == null )
+			{
+				return null;
+			}
+
+			return Tuple.Create( lScaleTransform, lTranslateTransform );
+		}
+
 		private ScrollViewer FindScrollableAncestorScrollViewer()
 		{
 			DependencyObject lCurrentElement = GetParentDependencyObject( this );
@@ -512,24 +530,6 @@ namespace ResumeApp.Controls
 			ApplyDouble( lTransforms.Item1, ScaleTransform.ScaleYProperty, lTargets.Scale, pIsAnimated );
 			ApplyDouble( lTransforms.Item2, TranslateTransform.XProperty, lTargets.TranslateX, pIsAnimated );
 			ApplyDouble( pImage, OpacityProperty, lTargets.Opacity, pIsAnimated );
-		}
-
-		private static Tuple<ScaleTransform, TranslateTransform> GetSlotTransforms( UIElement pImage )
-		{
-			if ( !( pImage.RenderTransform is TransformGroup lTransformGroup ) )
-			{
-				return null;
-			}
-
-			var lScaleTransform = lTransformGroup.Children.OfType<ScaleTransform>().FirstOrDefault();
-			var lTranslateTransform = lTransformGroup.Children.OfType<TranslateTransform>().FirstOrDefault();
-
-			if ( lScaleTransform == null || lTranslateTransform == null )
-			{
-				return null;
-			}
-
-			return Tuple.Create( lScaleTransform, lTranslateTransform );
 		}
 
 		private void ApplyDouble( DependencyObject pTarget, DependencyProperty pProperty, double pToValue, bool pIsAnimated )

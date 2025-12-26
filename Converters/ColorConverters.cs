@@ -77,6 +77,16 @@ namespace ResumeApp.Converters
 	[ValueConversion( typeof( int ), typeof( Brush ) )]
 	public sealed class PaletteIndexToBrushConverter : IValueConverter
 	{
+		private static Brush TryFindBrushOrNull( string pBrushKey )
+		{
+			if ( string.IsNullOrWhiteSpace( pBrushKey ) )
+			{
+				return null;
+			}
+
+			return Application.Current?.TryFindResource( pBrushKey ) as Brush;
+		}
+
 		public object Convert( object pValue, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
 			int lPaletteIndex = 0;
@@ -111,16 +121,6 @@ namespace ResumeApp.Converters
 		public object ConvertBack( object pValue, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
 			return Binding.DoNothing;
-		}
-
-		private static Brush TryFindBrushOrNull( string pBrushKey )
-		{
-			if ( string.IsNullOrWhiteSpace( pBrushKey ) )
-			{
-				return null;
-			}
-
-			return Application.Current?.TryFindResource( pBrushKey ) as Brush;
 		}
 	}
 }

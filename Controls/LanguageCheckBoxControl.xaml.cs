@@ -1,4 +1,7 @@
-﻿using ResumeApp.Services;
+﻿// Copyright (C) Olivier La Haye
+// All rights reserved.
+
+using ResumeApp.Services;
 using System.Windows;
 using System.Windows.Input;
 
@@ -48,11 +51,6 @@ namespace ResumeApp.Controls
 			typeof( LanguageCheckBoxControl ),
 			new PropertyMetadata( string.Empty ) );
 
-		public LanguageCheckBoxControl()
-		{
-			InitializeComponent();
-		}
-
 		public bool IsFrenchLanguageActive
 		{
 			get => ( bool )GetValue( sIsFrenchLanguageActiveProperty );
@@ -93,6 +91,11 @@ namespace ResumeApp.Controls
 		{
 			get => ( string )GetValue( sFrenchLanguageTextProperty );
 			private set => SetValue( sFrenchLanguageTextProperty, value );
+		}
+
+		public LanguageCheckBoxControl()
+		{
+			InitializeComponent();
 		}
 
 		private static void OnResourcesChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )

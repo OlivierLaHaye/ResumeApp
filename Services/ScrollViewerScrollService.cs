@@ -14,13 +14,13 @@ namespace ResumeApp.Services
 
 		private static ICommand sScrollToTopCommand;
 		public static ICommand ScrollToTopCommand =>
-					sScrollToTopCommand ??
-					( sScrollToTopCommand = new RelayCommand( ExecuteScrollToTop ) );
+									sScrollToTopCommand ??
+									( sScrollToTopCommand = new RelayCommand( ExecuteScrollToTop ) );
 
 		private static ICommand sScrollToBottomCommand;
 		public static ICommand ScrollToBottomCommand =>
-					sScrollToBottomCommand ??
-					( sScrollToBottomCommand = new RelayCommand( ExecuteScrollToBottom ) );
+									sScrollToBottomCommand ??
+									( sScrollToBottomCommand = new RelayCommand( ExecuteScrollToBottom ) );
 
 		private static void ExecuteScrollToTop()
 		{

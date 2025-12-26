@@ -1,3 +1,6 @@
+// Copyright (C) Olivier La Haye
+// All rights reserved.
+
 using ResumeApp.Infrastructure;
 using ResumeApp.Services;
 using ResumeApp.ViewModels.Pages;
@@ -8,6 +11,7 @@ namespace ResumeApp.ViewModels
 {
 	public sealed class MainViewModel : ViewModelBase
 	{
+
 		public OverviewPageViewModel OverviewPageViewModel { get; }
 
 		public ExperiencePageViewModel ExperiencePageViewModel { get; }

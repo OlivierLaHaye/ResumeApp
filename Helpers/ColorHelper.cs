@@ -14,17 +14,6 @@ namespace ResumeApp.Helpers
 {
 	public static class ColorHelper
 	{
-		public static readonly string[] sAccentBrushKeys =
-		{
-			"CommonBlueStrongBrush",
-			"CommonGreenStrongBrush",
-			"CommonYellowStrongBrush",
-			"CommonRedStrongBrush",
-			"CommonPurpleStrongBrush",
-			"CommonOrangeStrongBrush",
-			"CommonCyanStrongBrush",
-			"CommonPinkStrongBrush"
-		};
 		public class CmykColor
 		{
 			public double C { get; set; }
@@ -70,6 +59,18 @@ namespace ResumeApp.Helpers
 				B = pBlueYellow;
 			}
 		}
+
+		public static readonly string[] sAccentBrushKeys =
+		{
+			"CommonBlueStrongBrush",
+			"CommonGreenStrongBrush",
+			"CommonYellowStrongBrush",
+			"CommonRedStrongBrush",
+			"CommonPurpleStrongBrush",
+			"CommonOrangeStrongBrush",
+			"CommonCyanStrongBrush",
+			"CommonPinkStrongBrush"
+		};
 
 		private static readonly Dictionary<string, object> sPendingResourceUpdates = new Dictionary<string, object>();
 

@@ -1,4 +1,7 @@
-﻿using ResumeApp.Infrastructure;
+﻿// Copyright (C) Olivier La Haye
+// All rights reserved.
+
+using ResumeApp.Infrastructure;
 using System;
 using System.Windows.Media;
 
@@ -6,6 +9,7 @@ namespace ResumeApp.Models
 {
 	public sealed class TimelineTimeFrameItem : PropertyChangedNotifier
 	{
+
 		private DateTime mStartDate;
 		public DateTime StartDate
 		{
@@ -48,7 +52,7 @@ namespace ResumeApp.Models
 
 			if ( lEndDate < lStartDate )
 			{
-				( lStartDate, lEndDate ) = ( lEndDate, lStartDate );
+				(lStartDate, lEndDate) = (lEndDate, lStartDate);
 			}
 
 			mStartDate = lStartDate;
