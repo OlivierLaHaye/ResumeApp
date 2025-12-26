@@ -11,6 +11,10 @@
     <converters:BottomOffsetConverter x:Key="BottomOffsetConverter" />
     <converters:RightOffsetConverter x:Key="RightOffsetConverter" />
     <converters:LeftOffsetConverter x:Key="LeftOffsetConverter" />
+    <converters:GradientOffsetLeftConverter x:Key="GradientOffsetLeftConverter" />
+    <converters:GradientOffsetRightConverter x:Key="GradientOffsetRightConverter" />
+    <converters:GradientOffsetTopConverter x:Key="GradientOffsetTopConverter" />
+    <converters:GradientOffsetBottomConverter x:Key="GradientOffsetBottomConverter" />
     <converters:MathOperationConverter x:Key="MathOperationConverter" />
     <converters:BoolToCollapseConverter x:Key="BoolToCollapseConverter" />
     <converters:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />

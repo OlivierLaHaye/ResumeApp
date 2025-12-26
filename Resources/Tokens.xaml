@@ -202,7 +202,7 @@
 
     <Duration x:Key="FadeDuration">0:0:1.5</Duration>
 
-    <system:Double x:Key="ModuleGradientOffsetPixels">300.0</system:Double>
+    <system:Double x:Key="PageGradientOffsetPixels">150.0</system:Double>
     <system:Double x:Key="MaxHeightDraggableControl">1500</system:Double>
 
 </ResourceDictionary>

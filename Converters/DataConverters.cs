@@ -415,6 +415,111 @@ namespace ResumeApp.Converters
 		}
 	}
 
+	[ValueConversion( typeof( double[] ), typeof( double ) )]
+	public abstract class GradientOffsetConverterBase : IMultiValueConverter
+	{
+		protected const double GradientAccelerationFactor = 2.0;
+
+		public abstract object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture );
+
+		public object[] ConvertBack( object pValue, Type[] pTargetTypes, object pParameter, CultureInfo pCulture )
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+	[ValueConversion( typeof( double[] ), typeof( double ) )]
+	public class GradientOffsetLeftConverter : GradientOffsetConverterBase
+	{
+		public override object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
+		{
+			if ( !( pValues[ 0 ] is double lActualWidth ) || !( pValues[ 1 ] is double lHorizontalOffset ) ||
+				 !( pParameter is double lOffsetPixels ) )
+			{
+				return 0.0;
+			}
+
+			double lCurrentScrollPositionPercentage = lHorizontalOffset / lActualWidth;
+			double lOffset = GradientAccelerationFactor * lOffsetPixels * lCurrentScrollPositionPercentage /
+							 lActualWidth;
+
+			double lLeftOffset = Math.Min( lOffset, lOffsetPixels / lActualWidth );
+
+			return lLeftOffset;
+		}
+	}
+
+	[ValueConversion( typeof( double[] ), typeof( double ) )]
+	public class GradientOffsetRightConverter : GradientOffsetConverterBase
+	{
+		public override object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
+		{
+			if ( !( pValues[ 0 ] is double lActualWidth )
+				 || !( pValues[ 1 ] is double lHorizontalOffset )
+				 || !( pValues[ 2 ] is double lScrollableWidth )
+				 || !( pParameter is double lOffsetPixels ) )
+			{
+				return 1.0;
+			}
+
+			double lRemainingScrollableWidth = lScrollableWidth - lHorizontalOffset;
+			double lCurrentScrollPositionPercentage = lRemainingScrollableWidth / lActualWidth;
+			double lOffset = GradientAccelerationFactor * lOffsetPixels * lCurrentScrollPositionPercentage /
+							 lActualWidth;
+
+			double lRightOffset = Math.Max( 1 - lOffset, 1 - lOffsetPixels / lActualWidth );
+
+			return lRightOffset;
+		}
+	}
+
+	[ValueConversion( typeof( double[] ), typeof( double ) )]
+	public class GradientOffsetTopConverter : GradientOffsetConverterBase
+	{
+		public override object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
+		{
+			if ( !( pValues[ 0 ] is double lActualHeight )
+				 || !( pValues[ 1 ] is double lVerticalOffset )
+				 || !( pParameter is double lOffsetPixels ) )
+			{
+				return 0.0;
+			}
+
+			double lCurrentScrollPositionPercentage = lVerticalOffset / lActualHeight;
+			double lOffset = GradientAccelerationFactor * lOffsetPixels * lCurrentScrollPositionPercentage /
+							 lActualHeight;
+
+			double lTopOffset = Math.Min( lOffset, lOffsetPixels / lActualHeight );
+
+			return lTopOffset;
+		}
+	}
+
+	[ValueConversion( typeof( double[] ), typeof( double ) )]
+	public class GradientOffsetBottomConverter : GradientOffsetConverterBase
+	{
+		public override object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
+		{
+			if ( !( pValues[ 0 ] is double lActualHeight )
+				 || !( pValues[ 1 ] is double lVerticalOffset )
+				 || !( pValues[ 2 ] is double lScrollableHeight )
+				 || !( pParameter is double lOffsetPixels ) )
+			{
+				return 1.0;
+			}
+
+			double lRemainingScrollableHeight = lScrollableHeight - lVerticalOffset;
+			double lCurrentScrollPositionPercentage = lRemainingScrollableHeight / lActualHeight;
+			double lOffset = GradientAccelerationFactor * lOffsetPixels * lCurrentScrollPositionPercentage /
+							 lActualHeight;
+
+			double lBottomOffset = Math.Max( 1 - lOffset, 1 - lOffsetPixels / lActualHeight );
+
+			return lBottomOffset;
+		}
+	}
+
+
 	[ValueConversion( typeof( object[] ), typeof( object ) )]
 	public class MathOperationConverter : IMultiValueConverter
 	{

@@ -60,6 +60,29 @@
         x:Name="mEducationScrollViewer"
         HorizontalScrollBarVisibility="Disabled"
         VerticalScrollBarVisibility="Auto">
+        <ScrollViewer.OpacityMask>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Offset="0" Color="Transparent" />
+                <GradientStop Color="Black">
+                    <GradientStop.Offset>
+                        <MultiBinding Converter="{StaticResource GradientOffsetTopConverter}" ConverterParameter="{StaticResource PageGradientOffsetPixels}">
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
+                            <Binding Path="VerticalOffset" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
+                        </MultiBinding>
+                    </GradientStop.Offset>
+                </GradientStop>
+                <GradientStop Color="Black">
+                    <GradientStop.Offset>
+                        <MultiBinding Converter="{StaticResource GradientOffsetBottomConverter}" ConverterParameter="{StaticResource PageGradientOffsetPixels}">
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
+                            <Binding Path="VerticalOffset" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
+                            <Binding Path="ScrollableHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
+                        </MultiBinding>
+                    </GradientStop.Offset>
+                </GradientStop>
+                <GradientStop Offset="1" Color="Transparent" />
+            </LinearGradientBrush>
+        </ScrollViewer.OpacityMask>
         <StackPanel x:Name="mEducationLayoutRoot" Margin="{StaticResource LargeThickness}">
             <Border x:Name="mEducationHeaderBorder" Style="{StaticResource SubSectionCardBorderStyle}">
                 <StackPanel x:Name="mEducationHeaderStackPanel" Margin="{StaticResource CommonThickness}">
