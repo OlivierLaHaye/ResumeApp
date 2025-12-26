@@ -8,95 +8,95 @@ using System.Windows.Input;
 
 namespace ResumeApp.Controls
 {
-	public partial class ThemeCheckBox : UserControl
+	public partial class ThemeCheckBox
 	{
 		public static readonly DependencyProperty sIsDarkThemeActiveProperty = DependencyProperty.Register(
-			nameof( sIsDarkThemeActive ),
+			nameof( IsDarkThemeActive ),
 			typeof( bool ),
 			typeof( ThemeCheckBox ),
 			new PropertyMetadata( false ) );
 
 		public static readonly DependencyProperty sCheckBoxThemeCommandProperty = DependencyProperty.Register(
-			nameof( sCheckBoxThemeCommand ),
+			nameof( CheckBoxThemeCommand ),
 			typeof( ICommand ),
 			typeof( ThemeCheckBox ),
 			new PropertyMetadata( null ) );
 
 		public static readonly DependencyProperty sResourcesServiceProperty = DependencyProperty.Register(
-			nameof( sResourcesService ),
+			nameof( ResourcesService ),
 			typeof( ResourcesService ),
 			typeof( ThemeCheckBox ),
 			new PropertyMetadata( null, OnResourcesChanged ) );
 
 		public static readonly DependencyProperty sLabelResourceKeyProperty = DependencyProperty.Register(
-			nameof( sLabelResourceKey ),
+			nameof( LabelResourceKey ),
 			typeof( string ),
 			typeof( ThemeCheckBox ),
 			new PropertyMetadata( string.Empty, OnResourcesChanged ) );
 
 		public static readonly DependencyProperty sLabelTextProperty = DependencyProperty.Register(
-			nameof( sLabelText ),
+			nameof( LabelText ),
 			typeof( string ),
 			typeof( ThemeCheckBox ),
 			new PropertyMetadata( string.Empty ) );
 
 		public static readonly DependencyProperty sLightModeTextProperty = DependencyProperty.Register(
-			nameof( sLightModeText ),
+			nameof( LightModeText ),
 			typeof( string ),
 			typeof( ThemeCheckBox ),
 			new PropertyMetadata( string.Empty ) );
 
 		public static readonly DependencyProperty sDarkModeTextProperty = DependencyProperty.Register(
-			nameof( sDarkModeText ),
+			nameof( DarkModeText ),
 			typeof( string ),
 			typeof( ThemeCheckBox ),
 			new PropertyMetadata( string.Empty ) );
 
+		public bool IsDarkThemeActive
+		{
+			get => (bool) GetValue( sIsDarkThemeActiveProperty );
+			set => SetValue( sIsDarkThemeActiveProperty, value );
+		}
+
+		public ICommand CheckBoxThemeCommand
+		{
+			get => (ICommand) GetValue( sCheckBoxThemeCommandProperty );
+			set => SetValue( sCheckBoxThemeCommandProperty, value );
+		}
+
+		public ResourcesService ResourcesService
+		{
+			get => (ResourcesService) GetValue( sResourcesServiceProperty );
+			set => SetValue( sResourcesServiceProperty, value );
+		}
+
+		public string LabelResourceKey
+		{
+			get => (string) GetValue( sLabelResourceKeyProperty );
+			set => SetValue( sLabelResourceKeyProperty, value );
+		}
+
+		public string LabelText
+		{
+			get => (string) GetValue( sLabelTextProperty );
+			private set => SetValue( sLabelTextProperty, value );
+		}
+
+		public string LightModeText
+		{
+			get => (string) GetValue( sLightModeTextProperty );
+			private set => SetValue( sLightModeTextProperty, value );
+		}
+
+		public string DarkModeText
+		{
+			get => (string) GetValue( sDarkModeTextProperty );
+			private set => SetValue( sDarkModeTextProperty, value );
+		}
+
 		public ThemeCheckBox()
 		{
 			InitializeComponent();
-		}
-
-		public bool sIsDarkThemeActive
-		{
-			get { return (bool) GetValue( sIsDarkThemeActiveProperty ); }
-			set { SetValue( sIsDarkThemeActiveProperty, value ); }
-		}
-
-		public ICommand sCheckBoxThemeCommand
-		{
-			get { return (ICommand) GetValue( sCheckBoxThemeCommandProperty ); }
-			set { SetValue( sCheckBoxThemeCommandProperty, value ); }
-		}
-
-		public ResourcesService sResourcesService
-		{
-			get { return (ResourcesService) GetValue( sResourcesServiceProperty ); }
-			set { SetValue( sResourcesServiceProperty, value ); }
-		}
-
-		public string sLabelResourceKey
-		{
-			get { return (string) GetValue( sLabelResourceKeyProperty ); }
-			set { SetValue( sLabelResourceKeyProperty, value ); }
-		}
-
-		public string sLabelText
-		{
-			get { return (string) GetValue( sLabelTextProperty ); }
-			private set { SetValue( sLabelTextProperty, value ); }
-		}
-
-		public string sLightModeText
-		{
-			get { return (string) GetValue( sLightModeTextProperty ); }
-			private set { SetValue( sLightModeTextProperty, value ); }
-		}
-
-		public string sDarkModeText
-		{
-			get { return (string) GetValue( sDarkModeTextProperty ); }
-			private set { SetValue( sDarkModeTextProperty, value ); }
 		}
 
 		private static void OnResourcesChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
@@ -109,21 +109,21 @@ namespace ResumeApp.Controls
 
 		private void RefreshTexts()
 		{
-			ResourcesService lResourcesService = sResourcesService;
+			ResourcesService lResourcesService = ResourcesService;
 
 			if ( lResourcesService == null )
 			{
-				sLabelText = string.Empty;
-				sLightModeText = string.Empty;
-				sDarkModeText = string.Empty;
+				LabelText = string.Empty;
+				LightModeText = string.Empty;
+				DarkModeText = string.Empty;
 				return;
 			}
 
-			string lLabelKey = sLabelResourceKey ?? string.Empty;
+			string lLabelKey = LabelResourceKey ?? string.Empty;
 
-			sLabelText = lResourcesService[ lLabelKey ];
-			sLightModeText = lResourcesService[ "ButtonLightMode" ];
-			sDarkModeText = lResourcesService[ "ButtonDarkMode" ];
+			LabelText = lResourcesService[ lLabelKey ];
+			LightModeText = lResourcesService[ "ButtonLightMode" ];
+			DarkModeText = lResourcesService[ "ButtonDarkMode" ];
 		}
 	}
 }

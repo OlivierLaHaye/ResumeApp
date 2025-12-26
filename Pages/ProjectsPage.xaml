@@ -111,6 +111,7 @@
                                     <TextBlock
                                         x:Name="mProjectTitleTextBlock"
                                         Grid.Column="1"
+                                        VerticalAlignment="Center"
                                         Style="{StaticResource CardTitleTextBlockStyle}"
                                         Text="{Binding TitleText}" />
 

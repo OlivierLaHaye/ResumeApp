@@ -1,8 +1,12 @@
-﻿using ResumeApp.Services;
+﻿// Copyright (C) Olivier La Haye
+// All rights reserved.
+
+using ResumeApp.Services;
 using ResumeApp.Windows;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -507,10 +511,10 @@ namespace ResumeApp.Controls
 			ApplyDouble( lTransforms.Item1, ScaleTransform.ScaleXProperty, lTargets.Scale, pIsAnimated );
 			ApplyDouble( lTransforms.Item1, ScaleTransform.ScaleYProperty, lTargets.Scale, pIsAnimated );
 			ApplyDouble( lTransforms.Item2, TranslateTransform.XProperty, lTargets.TranslateX, pIsAnimated );
-			ApplyDouble( pImage, UIElement.OpacityProperty, lTargets.Opacity, pIsAnimated );
+			ApplyDouble( pImage, OpacityProperty, lTargets.Opacity, pIsAnimated );
 		}
 
-		private Tuple<ScaleTransform, TranslateTransform> GetSlotTransforms( Image pImage )
+		private static Tuple<ScaleTransform, TranslateTransform> GetSlotTransforms( UIElement pImage )
 		{
 			if ( !( pImage.RenderTransform is TransformGroup lTransformGroup ) )
 			{
@@ -605,7 +609,7 @@ namespace ResumeApp.Controls
 			var lViewerWindow = new ProjectImageViewerWindow
 			{
 				Owner = lOwnerWindow,
-				Images = ( System.Collections.ObjectModel.ObservableCollection<ImageSource> )Images,
+				Images = ( ObservableCollection<ImageSource> )Images,
 				SelectedIndex = SelectedIndex
 			};
 

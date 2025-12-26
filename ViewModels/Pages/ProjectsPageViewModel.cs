@@ -27,7 +27,7 @@ namespace ResumeApp.ViewModels.Pages
 					},
 					pImpactResourceKey: "Project3Impact",
 					pTechResourceKey: "Project3Tech",
-					pImagesResourceKey: "Project3Images",
+					pProjectImagesBaseName: "OLHphotographie",
 					pProjectLinkUriText: string.Empty ),
 
 				new ProjectCardViewModel(
@@ -42,7 +42,7 @@ namespace ResumeApp.ViewModels.Pages
 					},
 					pImpactResourceKey: "Project1Impact",
 					pTechResourceKey: "Project1Tech",
-					pImagesResourceKey: "Project1Images",
+					pProjectImagesBaseName: "Creaform.OS",
 					pProjectLinkUriText: "https://www.creaform3d.com/en/products/software/creaform-integrity-suite" ),
 
 				new ProjectCardViewModel(
@@ -56,7 +56,7 @@ namespace ResumeApp.ViewModels.Pages
 					},
 					pImpactResourceKey: "Project2Impact",
 					pTechResourceKey: "Project2Tech",
-					pImagesResourceKey: "Project2Images",
+					pProjectImagesBaseName: "Peel.OS",
 					pProjectLinkUriText: "https://store.peel-3d.com/software/peel-os/" )
 			} );
 		}

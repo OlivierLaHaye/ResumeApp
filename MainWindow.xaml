@@ -205,10 +205,10 @@
 
                             <controls:ThemeCheckBox
                                 x:Name="mThemeToggleControl"
-                                sCheckBoxThemeCommand="{Binding CheckBoxThemeCommand}"
-                                sIsDarkThemeActive="{Binding IsDarkThemeActive}"
-                                sLabelResourceKey="ButtonToggleTheme"
-                                sResourcesService="{Binding ResourcesService}" />
+                                CheckBoxThemeCommand="{Binding CheckBoxThemeCommand}"
+                                IsDarkThemeActive="{Binding IsDarkThemeActive}"
+                                LabelResourceKey="ButtonToggleTheme"
+                                ResourcesService="{Binding ResourcesService}" />
 
                             <controls:LanguageCheckBoxControl
                                 x:Name="mLanguageToggleControl"

@@ -20,8 +20,7 @@ namespace ResumeApp.ViewModels.Pages
 	{
 		private const int MaximumIndexedImageProbeCount = 100;
 
-		private static readonly string[] sSupportedImageExtensions = new[]
-		{
+		private static readonly string[] sSupportedImageExtensions = {
 			"png",
 			"jpg",
 			"jpeg",
@@ -38,8 +37,8 @@ namespace ResumeApp.ViewModels.Pages
 		private readonly string mConstraintsResourceKey;
 		private readonly string mImpactResourceKey;
 		private readonly string mTechResourceKey;
-		private readonly string mImagesResourceKey;
 
+		private readonly string mProjectImagesBaseName;
 		private readonly string mProjectLinkUriText;
 
 		public string TitleText => mResourcesService[ mTitleResourceKey ];
@@ -83,7 +82,7 @@ namespace ResumeApp.ViewModels.Pages
 			string[] pWhatIBuiltItemResourceKeys,
 			string pImpactResourceKey,
 			string pTechResourceKey,
-			string pImagesResourceKey,
+			string pProjectImagesBaseName,
 			string pProjectLinkUriText )
 		{
 			mResourcesService = pResourcesService ?? throw new ArgumentNullException( nameof( pResourcesService ) );
@@ -93,9 +92,10 @@ namespace ResumeApp.ViewModels.Pages
 			mConstraintsResourceKey = pConstraintsResourceKey ?? string.Empty;
 			mImpactResourceKey = pImpactResourceKey ?? string.Empty;
 			mTechResourceKey = pTechResourceKey ?? string.Empty;
-			mImagesResourceKey = pImagesResourceKey ?? string.Empty;
 
+			mProjectImagesBaseName = ( pProjectImagesBaseName ?? string.Empty ).Trim();
 			mProjectLinkUriText = ( pProjectLinkUriText ?? string.Empty ).Trim();
+
 			OpenProjectLinkCommand = new RelayCommand( ExecuteOpenProjectLink, () => IsProjectLinkButtonVisible );
 
 			WhatIBuiltItems = new ObservableCollection<LocalizedResourceItemViewModel>( ( pWhatIBuiltItemResourceKeys ?? Array.Empty<string>() )
@@ -274,9 +274,23 @@ namespace ResumeApp.ViewModels.Pages
 				string.Equals( pSupportedExtension, lExtension, StringComparison.OrdinalIgnoreCase ) );
 		}
 
-		private static IEnumerable<ImageSource> BuildImageSourcesFromResourceValue( string pImagesValueText )
+		private static string BuildProjectImagesBasePath( string pProjectImagesBaseName )
 		{
-			string lValueText = ( pImagesValueText ?? string.Empty ).Trim();
+			string lProjectImagesBaseName = ( pProjectImagesBaseName ?? string.Empty ).Trim().TrimStart( '/' );
+
+			if ( string.IsNullOrWhiteSpace( lProjectImagesBaseName ) )
+			{
+				return string.Empty;
+			}
+
+			bool lLooksLikeAPath = lProjectImagesBaseName.Contains( "/" ) || lProjectImagesBaseName.Contains( "\\" );
+
+			return lLooksLikeAPath ? lProjectImagesBaseName.Replace( "\\", "/" ).TrimStart( '/' ) : $"Resources/Projects/{lProjectImagesBaseName}/{lProjectImagesBaseName}";
+		}
+
+		private static IEnumerable<ImageSource> BuildImageSourcesFromBasePathOrDescriptor( string pImagesDescriptorOrBasePath )
+		{
+			string lValueText = ( pImagesDescriptorOrBasePath ?? string.Empty ).Trim();
 
 			if ( string.IsNullOrWhiteSpace( lValueText ) )
 			{
@@ -295,14 +309,15 @@ namespace ResumeApp.ViewModels.Pages
 
 			bool lIsSingleImagePath = IsKnownImageExtension( lValueText );
 
-			if ( lIsSingleImagePath )
+			if ( !lIsSingleImagePath )
 			{
-				ImageSource lSingleImage = TryCreateImageSource( lValueText );
-
-				return lSingleImage == null ? Enumerable.Empty<ImageSource>() : new[] { lSingleImage };
+				return EnumerateIndexedImagesFromBasePath( lValueText ).ToArray();
 			}
 
-			return EnumerateIndexedImagesFromBasePath( lValueText ).ToArray();
+			ImageSource lSingleImage = TryCreateImageSource( lValueText );
+
+			return lSingleImage == null ? Enumerable.Empty<ImageSource>() : new[] { lSingleImage };
+
 		}
 
 		private static IEnumerable<ImageSource> EnumerateIndexedImagesFromBasePath( string pImagesBasePath )
@@ -334,23 +349,7 @@ namespace ResumeApp.ViewModels.Pages
 		{
 			string lIndexedPrefix = ( pIndexedPrefix ?? string.Empty ).Trim();
 
-			if ( string.IsNullOrWhiteSpace( lIndexedPrefix ) )
-			{
-				return null;
-			}
-
-			foreach ( string lExtension in sSupportedImageExtensions )
-			{
-				string lCandidatePath = $"{lIndexedPrefix}{pImageIndex}.{lExtension}";
-				ImageSource lImageSource = TryCreateImageSource( lCandidatePath );
-
-				if ( lImageSource != null )
-				{
-					return lImageSource;
-				}
-			}
-
-			return null;
+			return string.IsNullOrWhiteSpace( lIndexedPrefix ) ? null : sSupportedImageExtensions.Select( pExtension => $"{lIndexedPrefix}{pImageIndex}.{pExtension}" ).Select( TryCreateImageSource ).FirstOrDefault( pImageSource => pImageSource != null );
 		}
 
 		private void ExecuteOpenProjectLink()
@@ -385,9 +384,9 @@ namespace ResumeApp.ViewModels.Pages
 			string lTechValueText = ExtractValueAfterFirstColon( mResourcesService[ mTechResourceKey ] );
 			ReplaceObservableItems( TechItems, SplitCommaSeparatedItems( lTechValueText ) );
 
-			string lImagesValueText = ExtractValueAfterFirstColon( mResourcesService[ mImagesResourceKey ] );
+			string lImagesBasePath = BuildProjectImagesBasePath( mProjectImagesBaseName );
 
-			List<ImageSource> lImages = BuildImageSourcesFromResourceValue( lImagesValueText )
+			List<ImageSource> lImages = BuildImageSourcesFromBasePathOrDescriptor( lImagesBasePath )
 				.Where( pImageSource => pImageSource != null )
 				.ToList();
 

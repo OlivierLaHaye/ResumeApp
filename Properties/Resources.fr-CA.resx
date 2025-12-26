@@ -595,9 +595,6 @@
   <data name="Project1Context" xml:space="preserve">
     <value>Contexte: Modernisation d’un logiciel desktop principal et rafraîchissement UI pendant la migration vers WPF.</value>
   </data>
-  <data name="Project1Images" xml:space="preserve">
-    <value>Resources/Projects/Creaform.OS/Creaform.OS</value>
-</data>
   <data name="Project1Impact" xml:space="preserve">
     <value>Impact: retours internes très positifs sur le look modernisé, avec une cohérence visuelle renforcée et moins de fragmentation UI à travers le produit.</value>
   </data>
@@ -618,9 +615,6 @@
   </data>
   <data name="Project2Context" xml:space="preserve">
     <value>Contexte: Refonte de l’interface d’un produit peel pour améliorer la clarté et l’utilisabilité.</value>
-  </data>
-  <data name="Project2Images" xml:space="preserve">
-    <value>Resources/Projects/Peel.OS/Peel.OS</value>
   </data>
   <data name="Project2Impact" xml:space="preserve">
     <value>Impact: interface plus claire et cohérente, avec une hiérarchie visuelle améliorée et des workflows plus faciles à suivre.</value>
@@ -645,9 +639,6 @@
   </data>
   <data name="Project3Context" xml:space="preserve">
     <value>Contexte: Logiciel personnel pour accélérer le workflow de retouche photo (import, renommage, étapes répétitives) sans réduire la qualité.</value>
-  </data>
-  <data name="Project3Images" xml:space="preserve">
-    <value>Resources/Projects/OLHphotographie/OLHphotographie</value>
   </data>
   <data name="Project3Impact" xml:space="preserve">
     <value>Impact: gains de productivité personnels grâce à la réduction des étapes manuelles répétitives et à une exécution plus rapide des tâches.</value>
