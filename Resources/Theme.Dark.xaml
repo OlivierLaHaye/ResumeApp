@@ -1,4 +1,6 @@
-<!--  theme.dark.xaml  -->
+﻿<!--Copyright (C) Olivier La Haye-->
+<!--All rights reserved.-->
+
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Color x:Key="CommonColor">#047af7</Color>
