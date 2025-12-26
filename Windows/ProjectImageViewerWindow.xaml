@@ -7,6 +7,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:ResumeApp.Controls"
     x:Name="mProjectImageViewerWindowRoot"
+    MinWidth="1400"
     AllowsTransparency="False"
     Background="{DynamicResource CommonBlackBrush}"
     BorderThickness="0"

@@ -9,6 +9,7 @@
     xmlns:pages="clr-namespace:ResumeApp.Pages"
     x:Name="mMainWindowRoot"
     Title="{Binding ResourcesService[AppTitle], Mode=OneWay}"
+    MinWidth="1400"
     AllowsTransparency="False"
     Background="{DynamicResource CommonBlackBrush}"
     BorderThickness="0"

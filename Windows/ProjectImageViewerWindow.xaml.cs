@@ -27,8 +27,8 @@ namespace ResumeApp.Windows
 			public readonly Point ptReserved;
 			public Point ptMaxSize;
 			public Point ptMaxPosition;
-			public readonly Point ptMinTrackSize;
-			public readonly Point ptMaxTrackSize;
+			public Point ptMinTrackSize;
+			public Point ptMaxTrackSize;
 		}
 
 		[StructLayout( LayoutKind.Sequential, CharSet = CharSet.Auto )]
@@ -52,6 +52,7 @@ namespace ResumeApp.Windows
 		private const double TitleBarHeight = 48.0;
 		private const double NormalCornerRadius = 80.0;
 		private const double InitialNormalSizeRatio = 0.95;
+		private const double MinimumWindowWidth = 1400.0;
 
 		private const int WmGetMinMaxInfo = 0x0024;
 		private const int MonitorDefaultToNearest = 2;
@@ -92,6 +93,8 @@ namespace ResumeApp.Windows
 
 			WindowStartupLocation = WindowStartupLocation.Manual;
 
+			MinWidth = MinimumWindowWidth;
+
 			StateChanged += OnWindowStateChanged;
 			Closed += OnWindowClosed;
 			Loaded += OnProjectImageViewerWindowLoaded;
@@ -103,6 +106,14 @@ namespace ResumeApp.Windows
 
 			CompositionTarget lCompositionTarget = lHwndSource?.CompositionTarget;
 			return lCompositionTarget?.TransformFromDevice ?? Matrix.Identity;
+		}
+
+		private static Matrix GetTransformToDeviceOrIdentity( IntPtr pWindowHandle )
+		{
+			HwndSource lHwndSource = HwndSource.FromHwnd( pWindowHandle );
+
+			CompositionTarget lCompositionTarget = lHwndSource?.CompositionTarget;
+			return lCompositionTarget?.TransformToDevice ?? Matrix.Identity;
 		}
 
 		private static System.Windows.Rect ConvertRectFromPixelsToDip( Rect pRectPixels, Matrix pTransformFromDevice )
@@ -145,6 +156,64 @@ namespace ResumeApp.Windows
 			return true;
 		}
 
+		private static bool TryGetMonitorWorkAreaWidthPixels( IntPtr pHwnd, out int pWorkAreaWidthPixels )
+		{
+			pWorkAreaWidthPixels = 0;
+
+			IntPtr lMonitorHandle = MonitorFromWindow( pHwnd, MonitorDefaultToNearest );
+			if ( lMonitorHandle == IntPtr.Zero )
+			{
+				return false;
+			}
+
+			MonitorInfo lMonitorInfo = new MonitorInfo
+			{
+				cbSize = Marshal.SizeOf( typeof( MonitorInfo ) )
+			};
+
+			bool lHasMonitorInfo = GetMonitorInfo( lMonitorHandle, ref lMonitorInfo );
+			if ( !lHasMonitorInfo )
+			{
+				return false;
+			}
+
+			pWorkAreaWidthPixels = Math.Max( 0, lMonitorInfo.rcWork.right - lMonitorInfo.rcWork.left );
+			return pWorkAreaWidthPixels > 0;
+		}
+
+		private static bool TryGetRequestedMinSizeDip( IntPtr pHwnd, out double pMinWidthDip, out double pMinHeightDip )
+		{
+			pMinWidthDip = 0.0;
+			pMinHeightDip = 0.0;
+
+			HwndSource lHwndSource = HwndSource.FromHwnd( pHwnd );
+			if ( !( lHwndSource?.RootVisual is Window lWindow ) )
+			{
+				return false;
+			}
+
+			pMinWidthDip = lWindow.MinWidth;
+			pMinHeightDip = lWindow.MinHeight;
+
+			return true;
+		}
+
+		private static int ClampToInt32Ceiling( double pValue )
+		{
+			if ( double.IsNaN( pValue ) || double.IsInfinity( pValue ) || pValue <= 0.0 )
+			{
+				return 0;
+			}
+
+			double lCeiling = Math.Ceiling( pValue );
+			if ( lCeiling >= int.MaxValue )
+			{
+				return int.MaxValue;
+			}
+
+			return ( int )lCeiling;
+		}
+
 		private static void ApplyWorkingAreaMaximizeBounds( IntPtr pHwnd, IntPtr pLParam )
 		{
 			MinMaxInfo lMinMaxInfo = ( MinMaxInfo )Marshal.PtrToStructure( pLParam, typeof( MinMaxInfo ) );
@@ -178,6 +247,46 @@ namespace ResumeApp.Windows
 			Marshal.StructureToPtr( lMinMaxInfo, pLParam, true );
 		}
 
+		private static void ApplyMinimumTrackSizeBounds( IntPtr pHwnd, IntPtr pLParam )
+		{
+			MinMaxInfo lMinMaxInfo = ( MinMaxInfo )Marshal.PtrToStructure( pLParam, typeof( MinMaxInfo ) );
+
+			bool lHasRequestedMinSize = TryGetRequestedMinSizeDip( pHwnd, out double lRequestedMinWidthDip, out double lRequestedMinHeightDip );
+			if ( !lHasRequestedMinSize )
+			{
+				lRequestedMinWidthDip = MinimumWindowWidth;
+				lRequestedMinHeightDip = 0.0;
+			}
+
+			lRequestedMinWidthDip = Math.Max( lRequestedMinWidthDip, MinimumWindowWidth );
+
+			Matrix lTransformToDevice = GetTransformToDeviceOrIdentity( pHwnd );
+
+			int lRequestedMinWidthPixels = ClampToInt32Ceiling( lRequestedMinWidthDip * lTransformToDevice.M11 );
+			int lRequestedMinHeightPixels = ClampToInt32Ceiling( lRequestedMinHeightDip * lTransformToDevice.M22 );
+
+			int lMinTrackWidthPixels = Math.Max( lMinMaxInfo.ptMinTrackSize.x, lRequestedMinWidthPixels );
+			int lMinTrackHeightPixels = Math.Max( lMinMaxInfo.ptMinTrackSize.y, lRequestedMinHeightPixels );
+
+			bool lHasWorkAreaWidthPixels = TryGetMonitorWorkAreaWidthPixels( pHwnd, out int lWorkAreaWidthPixels );
+			if ( lHasWorkAreaWidthPixels && lWorkAreaWidthPixels > 0 )
+			{
+				lMinTrackWidthPixels = Math.Min( lMinTrackWidthPixels, lWorkAreaWidthPixels );
+			}
+
+			if ( lMinTrackWidthPixels > 0 )
+			{
+				lMinMaxInfo.ptMinTrackSize.x = lMinTrackWidthPixels;
+			}
+
+			if ( lMinTrackHeightPixels > 0 )
+			{
+				lMinMaxInfo.ptMinTrackSize.y = lMinTrackHeightPixels;
+			}
+
+			Marshal.StructureToPtr( lMinMaxInfo, pLParam, true );
+		}
+
 		[DllImport( "user32.dll" )]
 		private static extern IntPtr MonitorFromWindow( IntPtr pHwnd, int pFlags );
 
@@ -198,6 +307,8 @@ namespace ResumeApp.Windows
 			}
 
 			ApplyWorkingAreaMaximizeBounds( pHwnd, pLParam );
+			ApplyMinimumTrackSizeBounds( pHwnd, pLParam );
+
 			pIsHandled = true;
 
 			return IntPtr.Zero;
@@ -293,6 +404,8 @@ namespace ResumeApp.Windows
 
 			lTargetWidth = Math.Min( lTargetWidth, lWorkAreaRectDip.Width );
 			lTargetHeight = Math.Min( lTargetHeight, lWorkAreaRectDip.Height );
+
+			lTargetWidth = Math.Max( lTargetWidth, MinWidth );
 
 			if ( lTargetWidth <= 0.0 || lTargetHeight <= 0.0 )
 			{
