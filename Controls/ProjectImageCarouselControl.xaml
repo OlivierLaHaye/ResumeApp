@@ -10,7 +10,6 @@
     Focusable="True"
     KeyboardNavigation.TabNavigation="Local"
     LostMouseCapture="OnRootLostMouseCapture"
-    PreviewKeyDown="OnRootPreviewKeyDown"
     PreviewMouseLeftButtonDown="OnRootPreviewMouseLeftButtonDown"
     PreviewMouseLeftButtonUp="OnRootPreviewMouseLeftButtonUp"
     PreviewMouseMove="OnRootPreviewMouseMove"

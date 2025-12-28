@@ -1,7 +1,4 @@
-﻿// Copyright (C) Olivier La Haye
-// All rights reserved.
-
-using ResumeApp.Services;
+﻿using ResumeApp.Services;
 using ResumeApp.Windows;
 using System;
 using System.Collections;
@@ -357,6 +354,29 @@ namespace ResumeApp.Controls
 			return Tuple.Create( lScaleTransform, lTranslateTransform );
 		}
 
+		private static void SetSlotCollapsed( Image pImage )
+		{
+			if ( pImage == null )
+			{
+				return;
+			}
+
+			pImage.Source = null;
+			pImage.Visibility = Visibility.Collapsed;
+			pImage.Opacity = 0;
+			Panel.SetZIndex( pImage, 0 );
+
+			Tuple<ScaleTransform, TranslateTransform> lTransforms = GetSlotTransforms( pImage );
+			if ( lTransforms == null )
+			{
+				return;
+			}
+
+			StopAndSet( lTransforms.Item1, ScaleTransform.ScaleXProperty, 1 );
+			StopAndSet( lTransforms.Item1, ScaleTransform.ScaleYProperty, 1 );
+			StopAndSet( lTransforms.Item2, TranslateTransform.XProperty, 0 );
+		}
+
 		private void OnControlUnloaded( object pSender, RoutedEventArgs pEventArgs )
 		{
 			DetachFromImagesCollectionChanged();
@@ -366,11 +386,13 @@ namespace ResumeApp.Controls
 		{
 			DetachFromImagesCollectionChanged();
 
-			if ( Images is INotifyCollectionChanged lNotifyCollectionChanged )
+			if ( !( Images is INotifyCollectionChanged lNotifyCollectionChanged ) )
 			{
-				mImagesCollectionChangedNotifier = lNotifyCollectionChanged;
-				mImagesCollectionChangedNotifier.CollectionChanged += OnImagesCollectionChanged;
+				return;
 			}
+
+			mImagesCollectionChangedNotifier = lNotifyCollectionChanged;
+			mImagesCollectionChangedNotifier.CollectionChanged += OnImagesCollectionChanged;
 		}
 
 		private void DetachFromImagesCollectionChanged()
@@ -544,29 +566,6 @@ namespace ResumeApp.Controls
 
 			object lItem = Images[ lWrappedIndex ];
 			return ConvertToImageSource( lItem );
-		}
-
-		private void SetSlotCollapsed( Image pImage )
-		{
-			if ( pImage == null )
-			{
-				return;
-			}
-
-			pImage.Source = null;
-			pImage.Visibility = Visibility.Collapsed;
-			pImage.Opacity = 0;
-			Panel.SetZIndex( pImage, 0 );
-
-			Tuple<ScaleTransform, TranslateTransform> lTransforms = GetSlotTransforms( pImage );
-			if ( lTransforms == null )
-			{
-				return;
-			}
-
-			StopAndSet( lTransforms.Item1, ScaleTransform.ScaleXProperty, 1 );
-			StopAndSet( lTransforms.Item1, ScaleTransform.ScaleYProperty, 1 );
-			StopAndSet( lTransforms.Item2, TranslateTransform.XProperty, 0 );
 		}
 
 		private void SetSlotState( Image pImage, ImageSource pImageSource, int pStep, int pDirection, double pContainerWidth, bool pIsAnimated, int pZIndex )
@@ -898,48 +897,6 @@ namespace ResumeApp.Controls
 			}
 
 			return !IsDescendantOf( pOriginalSource, mDotsBackgroundBorder );
-		}
-
-		private void OnRootPreviewKeyDown( object pSender, KeyEventArgs pKeyEventArgs )
-		{
-			switch ( pKeyEventArgs.Key )
-			{
-				case Key.Left:
-					{
-						NavigatePrevious();
-						pKeyEventArgs.Handled = true;
-						return;
-					}
-				case Key.Right:
-					{
-						NavigateNext();
-						pKeyEventArgs.Handled = true;
-						return;
-					}
-				case Key.Home:
-					{
-						if ( GetImageCount() <= 0 )
-						{
-							return;
-						}
-
-						SelectedIndex = 0;
-						pKeyEventArgs.Handled = true;
-
-						return;
-					}
-				case Key.End:
-					{
-						int lImageCount = GetImageCount();
-						if ( lImageCount > 0 )
-						{
-							SelectedIndex = lImageCount - 1;
-							pKeyEventArgs.Handled = true;
-						}
-
-						break;
-					}
-			}
 		}
 
 		private void OnDotPreviewMouseLeftButtonDown( object pSender, MouseButtonEventArgs pMouseButtonEventArgs )
