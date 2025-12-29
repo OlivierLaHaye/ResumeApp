@@ -361,6 +361,16 @@
                     <pages:ProjectsPage x:Name="mProjectsPage" DataContext="{Binding ProjectsPageViewModel}" />
                 </TabItem>
 
+                <TabItem x:Name="mPhotographyTabItem">
+                    <TabItem.Header>
+                        <TextBlock
+                            x:Name="mPhotographyTabHeaderTextBlock"
+                            Text="{Binding ResourcesService[TabPhotographyTitle], Mode=OneWay}"
+                            TextAlignment="Center" />
+                    </TabItem.Header>
+                    <pages:PhotographyPage x:Name="mPhotographyPage" DataContext="{Binding PhotographyPageViewModel}" />
+                </TabItem>
+
                 <TabItem x:Name="mEducationTabItem">
                     <TabItem.Header>
                         <TextBlock

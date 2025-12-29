@@ -10,15 +10,12 @@ namespace ResumeApp
 {
 	public partial class App
 	{
-		private RegistrySettingsService mRegistrySettingsService;
 		private ThemeService mThemeService;
 		private ResourcesService mResourcesService;
 
 		protected override void OnStartup( StartupEventArgs pStartupEventArgs )
 		{
 			base.OnStartup( pStartupEventArgs );
-
-			mRegistrySettingsService = new RegistrySettingsService();
 
 			mThemeService = new ThemeService();
 			mResourcesService = new ResourcesService();
@@ -30,6 +27,7 @@ namespace ResumeApp
 			ExperiencePageViewModel lExperiencePageViewModel = new ExperiencePageViewModel( mResourcesService, mThemeService );
 			SkillsPageViewModel lSkillsPageViewModel = new SkillsPageViewModel( mResourcesService, mThemeService );
 			ProjectsPageViewModel lProjectsPageViewModel = new ProjectsPageViewModel( mResourcesService, mThemeService );
+			PhotographyPageViewModel lPhotographyPageViewModel = new PhotographyPageViewModel( mResourcesService, mThemeService );
 			EducationPageViewModel lEducationPageViewModel = new EducationPageViewModel( mResourcesService, mThemeService );
 
 			MainViewModel lMainViewModel = new MainViewModel(
@@ -39,6 +37,7 @@ namespace ResumeApp
 				lExperiencePageViewModel,
 				lSkillsPageViewModel,
 				lProjectsPageViewModel,
+				lPhotographyPageViewModel,
 				lEducationPageViewModel );
 
 			MainWindow lMainWindow = new MainWindow

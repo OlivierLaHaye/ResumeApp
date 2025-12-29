@@ -82,6 +82,10 @@
         Left="{StaticResource SmallThicknessValue}"
         Right="{StaticResource SmallThicknessValue}"
         Top="0" />
+    <Thickness
+        x:Key="SmallTopBottomThickness"
+        Bottom="{StaticResource SmallThicknessValue}"
+        Top="{StaticResource SmallThicknessValue}" />
     <system:Double x:Key="CommonThicknessValue">10</system:Double>
     <Thickness
         x:Key="CommonThickness"

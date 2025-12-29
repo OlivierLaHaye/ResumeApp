@@ -112,6 +112,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Pages\PhotographyPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\ProjectsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -205,6 +209,9 @@
       <DependentUpon>OverviewPage.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Pages\PhotographyPage.xaml.cs">
+      <DependentUpon>PhotographyPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\ProjectsPage.xaml.cs">
       <DependentUpon>ProjectsPage.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -253,6 +260,8 @@
     <Compile Include="ViewModels\Pages\OverviewPageViewModel.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ViewModels\Pages\PhotographyAlbumCardViewModel.cs" />
+    <Compile Include="ViewModels\Pages\PhotographyPageViewModel.cs" />
     <Compile Include="ViewModels\Pages\ProjectCardViewModel.cs" />
     <Compile Include="ViewModels\Pages\ProjectsPageViewModel.cs">
       <SubType>Code</SubType>

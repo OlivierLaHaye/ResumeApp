@@ -20,6 +20,8 @@ namespace ResumeApp.ViewModels
 
 		public ProjectsPageViewModel ProjectsPageViewModel { get; }
 
+		public PhotographyPageViewModel PhotographyPageViewModel { get; }
+
 		public EducationPageViewModel EducationPageViewModel { get; }
 
 		public RelayCommand CheckBoxThemeCommand { get; }
@@ -64,6 +66,7 @@ namespace ResumeApp.ViewModels
 			ExperiencePageViewModel pExperiencePageViewModel,
 			SkillsPageViewModel pSkillsPageViewModel,
 			ProjectsPageViewModel pProjectsPageViewModel,
+			PhotographyPageViewModel pPhotographyPageViewModel,
 			EducationPageViewModel pEducationPageViewModel )
 			: base( pResourcesService, pThemeService )
 		{
@@ -71,6 +74,7 @@ namespace ResumeApp.ViewModels
 			ExperiencePageViewModel = pExperiencePageViewModel ?? throw new ArgumentNullException( nameof( pExperiencePageViewModel ) );
 			SkillsPageViewModel = pSkillsPageViewModel ?? throw new ArgumentNullException( nameof( pSkillsPageViewModel ) );
 			ProjectsPageViewModel = pProjectsPageViewModel ?? throw new ArgumentNullException( nameof( pProjectsPageViewModel ) );
+			PhotographyPageViewModel = pPhotographyPageViewModel ?? throw new ArgumentNullException( nameof( pPhotographyPageViewModel ) );
 			EducationPageViewModel = pEducationPageViewModel ?? throw new ArgumentNullException( nameof( pEducationPageViewModel ) );
 
 			CheckBoxThemeCommand = new RelayCommand( ToggleTheme );

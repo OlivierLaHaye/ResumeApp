@@ -1,0 +1,157 @@
+﻿<!--  Copyright (C) Olivier La Haye  -->
+<!--  All rights reserved.  -->
+
+<UserControl
+    x:Class="ResumeApp.Pages.PhotographyPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ResumeApp.Controls"
+    x:Name="mPhotographyPageRoot"
+    SnapsToDevicePixels="True"
+    UseLayoutRounding="True">
+
+    <UserControl.Resources>
+        <Style x:Key="BaseTextBlockStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
+            <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+
+        <Style BasedOn="{StaticResource BaseTextBlockStyle}" TargetType="{x:Type TextBlock}" />
+
+        <Style
+            x:Key="PageTitleTextBlockStyle"
+            BasedOn="{StaticResource BaseTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="{StaticResource LargeFontSize}" />
+        </Style>
+
+        <Style
+            x:Key="PageSubtitleTextBlockStyle"
+            BasedOn="{StaticResource BaseTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+            <Setter Property="Opacity" Value="{StaticResource LowOpacity}" />
+        </Style>
+
+        <Style
+            x:Key="CardTitleTextBlockStyle"
+            BasedOn="{StaticResource BaseTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="{StaticResource CommonFontSize}" />
+        </Style>
+
+        <Style
+            x:Key="BodyTextBlockStyle"
+            BasedOn="{StaticResource BaseTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer
+        x:Name="mPhotographyScrollViewer"
+        HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto">
+        <ScrollViewer.OpacityMask>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Offset="0" Color="Transparent" />
+                <GradientStop Color="Black">
+                    <GradientStop.Offset>
+                        <MultiBinding Converter="{StaticResource GradientOffsetTopConverter}" ConverterParameter="{StaticResource PageGradientOffsetPixels}">
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
+                            <Binding Path="VerticalOffset" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
+                        </MultiBinding>
+                    </GradientStop.Offset>
+                </GradientStop>
+                <GradientStop Color="Black">
+                    <GradientStop.Offset>
+                        <MultiBinding Converter="{StaticResource GradientOffsetBottomConverter}" ConverterParameter="{StaticResource PageGradientOffsetPixels}">
+                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
+                            <Binding Path="VerticalOffset" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
+                            <Binding Path="ScrollableHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
+                        </MultiBinding>
+                    </GradientStop.Offset>
+                </GradientStop>
+                <GradientStop Offset="1" Color="Transparent" />
+            </LinearGradientBrush>
+        </ScrollViewer.OpacityMask>
+
+        <Grid x:Name="mPhotographyLayoutRoot" Margin="{StaticResource LargeThickness}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <TextBlock
+                x:Name="mPhotographyTitleTextBlock"
+                Grid.Row="0"
+                Style="{StaticResource PageTitleTextBlockStyle}"
+                Text="{Binding ResourcesService[TabPhotographyTitle], Mode=OneWay}" />
+
+            <TextBlock
+                x:Name="mPhotographySubtitleTextBlock"
+                Grid.Row="1"
+                Margin="{StaticResource SmallTopBottomThickness}"
+                Style="{StaticResource PageSubtitleTextBlockStyle}"
+                Text="{Binding ResourcesService[PhotographyPageSubtitle], Mode=OneWay}" />
+
+            <ItemsControl
+                x:Name="mPhotographyAlbumsItemsControl"
+                Grid.Row="2"
+                Margin="{StaticResource SmallThickness}"
+                ItemsSource="{Binding Albums}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel x:Name="mPhotographyAlbumsStackPanel" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border x:Name="mAlbumCardBorder" Style="{StaticResource SubSectionCardBorderStyle}">
+                            <Grid x:Name="mAlbumCardLayoutRoot" Margin="{StaticResource CommonThickness}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock
+                                    x:Name="mAlbumTitleTextBlock"
+                                    Grid.Row="0"
+                                    Style="{StaticResource CardTitleTextBlockStyle}"
+                                    Text="{Binding TitleText, Mode=OneWay}" />
+
+                                <TextBlock
+                                    x:Name="mAlbumSubtitleTextBlock"
+                                    Grid.Row="1"
+                                    Margin="{StaticResource ExtraSmallThickness}"
+                                    Style="{StaticResource BodyTextBlockStyle}"
+                                    Text="{Binding SubtitleText, Mode=OneWay}" />
+
+                                <Border
+                                    x:Name="mAlbumDividerBorder"
+                                    Grid.Row="2"
+                                    Height="{StaticResource ExtraSmallThicknessValue}"
+                                    Margin="{StaticResource CommonTopBottomThickness}"
+                                    Background="{DynamicResource OnSurfaceDividerOnDarkBrush}" />
+
+                                <controls:ProjectImageCarouselControl
+                                    x:Name="mAlbumImageCarouselControl"
+                                    Grid.Row="3"
+                                    Margin="{StaticResource SmallThickness}"
+                                    Images="{Binding Images}"
+                                    IsOpenOnClickEnabled="True"
+                                    PlaceholderText="{Binding DataContext.ResourcesService[LabelProjectNoImagesYet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

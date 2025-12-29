@@ -58,6 +58,24 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AlbumEventsSubtitle" xml:space="preserve">
+    <value>Behind-the-scenes and highlights from live events.</value>
+</data>
+  <data name="AlbumEventsTitle" xml:space="preserve">
+    <value>Events</value>
+</data>
+  <data name="AlbumPortraitsSubtitle" xml:space="preserve">
+    <value>Studio and on-location portraits with a clean, cinematic look.</value>
+</data>
+  <data name="AlbumPortraitsTitle" xml:space="preserve">
+    <value>Portraits</value>
+</data>
+  <data name="AlbumVolleyballSubtitle" xml:space="preserve">
+    <value>Game action, emotions, and decisive moments.</value>
+</data>
+  <data name="AlbumVolleyballTitle" xml:space="preserve">
+    <value>Volleyball</value>
+</data>
   <data name="AppSubtitle" xml:space="preserve">
     <value>UI-focused WPF Front-End Profile</value>
   </data>
@@ -583,6 +601,9 @@
   <data name="OverviewContactOpenUrlButtonText" xml:space="preserve">
     <value>Open</value>
   </data>
+  <data name="PhotographyPageSubtitle" xml:space="preserve">
+    <value>A selection of my work, organized in albums.</value>
+</data>
   <data name="Project1Bullet1" xml:space="preserve">
     <value>Migrated the UI to WPF and refreshed styling and visual consistency across the product.</value>
   </data>
@@ -691,6 +712,9 @@
   <data name="SectionHeaderHighlights" xml:space="preserve">
     <value>UI/UX highlights</value>
   </data>
+  <data name="SectionHeaderPhotography" xml:space="preserve">
+    <value>Photography</value>
+</data>
   <data name="SectionHeaderProjects" xml:space="preserve">
     <value>Projects</value>
   </data>
@@ -805,6 +829,9 @@
   <data name="TabExperienceTitle" xml:space="preserve">
     <value>Experience</value>
   </data>
+  <data name="TabPhotographyTitle" xml:space="preserve">
+    <value>Photography</value>
+</data>
   <data name="TabProjectsTitle" xml:space="preserve">
     <value>Projects</value>
   </data>

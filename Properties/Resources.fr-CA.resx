@@ -58,6 +58,24 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AlbumEventsSubtitle" xml:space="preserve">
+    <value>Coulisses et moments forts d’événements.</value>
+</data>
+  <data name="AlbumEventsTitle" xml:space="preserve">
+    <value>Événements</value>
+</data>
+  <data name="AlbumPortraitsSubtitle" xml:space="preserve">
+    <value>Portraits en studio et en extérieur, avec un look propre et cinématographique.</value>
+</data>
+  <data name="AlbumPortraitsTitle" xml:space="preserve">
+    <value>Portraits</value>
+</data>
+  <data name="AlbumVolleyballSubtitle" xml:space="preserve">
+    <value>Action de jeu, émotions, et moments décisifs.</value>
+</data>
+  <data name="AlbumVolleyballTitle" xml:space="preserve">
+    <value>Volleyball</value>
+</data>
   <data name="AppSubtitle" xml:space="preserve">
     <value>Profil WPF front-end orienté UI</value>
   </data>
@@ -583,6 +601,9 @@
   <data name="OverviewContactOpenUrlButtonText" xml:space="preserve">
     <value>Ouvrir</value>
   </data>
+  <data name="PhotographyPageSubtitle" xml:space="preserve">
+    <value>Une sélection de mon travail, organisée en albums.</value>
+</data>
   <data name="Project1Bullet1" xml:space="preserve">
     <value>Migration UI vers WPF et amélioration de la cohérence visuelle à travers le produit.</value>
   </data>
@@ -691,6 +712,9 @@
   <data name="SectionHeaderHighlights" xml:space="preserve">
     <value>Faits saillants UI/UX</value>
   </data>
+  <data name="SectionHeaderPhotography" xml:space="preserve">
+    <value>Photographie</value>
+</data>
   <data name="SectionHeaderProjects" xml:space="preserve">
     <value>Projets</value>
   </data>
@@ -805,6 +829,9 @@
   <data name="TabExperienceTitle" xml:space="preserve">
     <value>Expérience</value>
   </data>
+  <data name="TabPhotographyTitle" xml:space="preserve">
+    <value>Photographie</value>
+</data>
   <data name="TabProjectsTitle" xml:space="preserve">
     <value>Projets</value>
   </data>
