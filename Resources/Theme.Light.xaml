@@ -13,14 +13,14 @@
     <Color x:Key="CommonPinkColor">#EC4899</Color>
     <Color x:Key="CommonRedColor">#f70452</Color>
 
-    <Color x:Key="CommonBlueStrongColor">#0057D6</Color>
-    <Color x:Key="CommonGreenStrongColor">#067A4C</Color>
-    <Color x:Key="CommonYellowStrongColor">#8A6A00</Color>
-    <Color x:Key="CommonPurpleStrongColor">#6D28D9</Color>
-    <Color x:Key="CommonOrangeStrongColor">#C2410C</Color>
-    <Color x:Key="CommonCyanStrongColor">#0E7490</Color>
-    <Color x:Key="CommonPinkStrongColor">#BE185D</Color>
-    <Color x:Key="CommonRedStrongColor">#BE123C</Color>
+    <Color x:Key="CommonBlueStrongColor">#BFDBFE</Color>
+    <Color x:Key="CommonGreenStrongColor">#BBF7D0</Color>
+    <Color x:Key="CommonYellowStrongColor">#FEF08A</Color>
+    <Color x:Key="CommonPurpleStrongColor">#DDD6FE</Color>
+    <Color x:Key="CommonOrangeStrongColor">#FED7AA</Color>
+    <Color x:Key="CommonCyanStrongColor">#A5F3FC</Color>
+    <Color x:Key="CommonPinkStrongColor">#FBCFE8</Color>
+    <Color x:Key="CommonRedStrongColor">#FECACA</Color>
 
     <Color x:Key="CommonBlackColor">#F2F2F2</Color>
     <Color x:Key="CommonDarkerGrayColor">#FAFAFA</Color>
