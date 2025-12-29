@@ -455,7 +455,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\Projects\Photography\Volleyball\2025 - Ligue des Nations de Volleyball %28VNL%29 - Jour 5 - Québec 00837.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Projects\Creaform.OS\Creaform.OS_1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -484,6 +488,11 @@
     <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_7.png" />
     <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_8.png" />
     <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Projects\Photography\Volleyball\2025 - Ligue des Nations de Volleyball %28VNL%29 - Jour 3 - Québec 04794.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
