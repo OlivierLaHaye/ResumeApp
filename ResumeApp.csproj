@@ -494,6 +494,20 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Projects\Photography\Volleyball\2025 - Dimanche - Elite16 Montreal CAN 2025 - Beach Pro Tour 17288.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Photography\Volleyball\2025 - Jeudi - Elite16 Montreal CAN 2025 - Beach Pro Tour 14645.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Photography\Volleyball\2025 - Ligue des Nations de Volleyball %28VNL%29 - Jour 2 - Québec 12871.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Photography\Volleyball\2025 - Vendredi - Elite16 Montreal CAN 2025 - Beach Pro Tour 21591.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>REM Pre-build event in Project Properties → Build Events
