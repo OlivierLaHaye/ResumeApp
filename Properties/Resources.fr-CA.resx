@@ -511,6 +511,12 @@
   <data name="HighlightBullet5" xml:space="preserve">
     <value>Développé un outil personnel WPF pour accélérer le workflow de retouche photo, utilisé comme terrain de jeu UI (theming, localisation, contrôles interactifs), incluant l’import en batch, le renommage guidé, et des actions rapides orientées productivité.</value>
   </data>
+  <data name="HintProjectImageCarouselDragOnly" xml:space="preserve">
+    <value>Glissez vers la gauche ou vers la droite pour changer d’image.</value>
+</data>
+  <data name="HintProjectImageCarouselExpandAndDrag" xml:space="preserve">
+    <value>Double-cliquez pour agrandir, puis glissez vers la gauche ou vers la droite pour changer d’image.</value>
+</data>
   <data name="LabelAccomplishments" xml:space="preserve">
     <value>Réalisations</value>
   </data>

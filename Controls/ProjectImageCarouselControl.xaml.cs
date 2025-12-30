@@ -8,7 +8,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Resources;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -26,7 +30,8 @@ namespace ResumeApp.Controls
 		private const double DragThresholdRatio = 0.085;
 		private const double DragDeltaScale = 0.65;
 
-		private const double ClickCancelThresholdPixels = 10.0;
+		private const string HintProjectImageCarouselExpandAndDragResourceKey = "HintProjectImageCarouselExpandAndDrag";
+		private const string HintProjectImageCarouselDragOnlyResourceKey = "HintProjectImageCarouselDragOnly";
 
 		public static readonly DependencyProperty sImagesProperty =
 			DependencyProperty.Register(
@@ -67,6 +72,8 @@ namespace ResumeApp.Controls
 
 		private static readonly TimeSpan sTransitionDuration = TimeSpan.FromMilliseconds( 240 );
 
+		private static readonly ResourceManager sFallbackResourceManager = CreateFallbackResourceManager();
+
 		private readonly IEasingFunction mCarouselEasingFunction;
 		private readonly ProjectImageCarouselAdjacentImagesVisualService mAdjacentImagesVisualService;
 
@@ -77,16 +84,15 @@ namespace ResumeApp.Controls
 		private double mDragThresholdPixels;
 		private double mDragAccumulatedHorizontalDelta;
 		private bool mHasNavigatedDuringDrag;
-
-		private bool mIsClickArmed;
-		private Point mClickStartPosition;
-		private bool mHasCancelledClick;
+		private bool mHasViewerOpenSuppressedDueToDragNavigation;
 
 		private readonly Cursor mDefaultCursor;
 		private Cursor mPreviousCursor;
 
 		private INotifyCollectionChanged mImagesCollectionChangedNotifier;
 		private bool mHasPendingImagesCollectionRefresh;
+
+		private ResourcesService mResourcesServiceForHint;
 
 		public IList Images
 		{
@@ -129,7 +135,52 @@ namespace ResumeApp.Controls
 
 			Loaded += OnControlLoaded;
 			Unloaded += OnControlUnloaded;
+			DataContextChanged += OnControlDataContextChanged;
 			MouseLeave += OnRootMouseLeave;
+		}
+
+		private static ResourceManager CreateFallbackResourceManager()
+		{
+			Assembly lAssembly = typeof( ProjectImageCarouselControl ).Assembly;
+			string lAssemblyName = lAssembly.GetName().Name ?? "ResumeApp";
+
+			string[] lCandidateBaseNames =
+			{
+				$"{lAssemblyName}.Properties.Resources",
+				$"{lAssemblyName}.Resources",
+				"ResumeApp.Properties.Resources",
+				"ResumeApp.Resources"
+			};
+
+			foreach ( string lBaseName in lCandidateBaseNames )
+			{
+				ResourceManager lCandidate = CreateResourceManagerIfValid( lAssembly, lBaseName );
+				if ( lCandidate != null )
+				{
+					return lCandidate;
+				}
+			}
+
+			return new ResourceManager( $"{lAssemblyName}.Properties.Resources", lAssembly );
+		}
+
+		private static ResourceManager CreateResourceManagerIfValid( Assembly pAssembly, string pBaseName )
+		{
+			if ( string.IsNullOrWhiteSpace( pBaseName ) )
+			{
+				return null;
+			}
+
+			try
+			{
+				var lManager = new ResourceManager( pBaseName, pAssembly );
+				lManager.GetResourceSet( CultureInfo.InvariantCulture, true, false );
+				return lManager;
+			}
+			catch ( MissingManifestResourceException )
+			{
+				return null;
+			}
 		}
 
 		private static void OnImagesChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
@@ -405,9 +456,127 @@ namespace ResumeApp.Controls
 			StopAndSet( lTransforms.Item2, TranslateTransform.XProperty, 0 );
 		}
 
+		private void OnControlLoaded( object pSender, RoutedEventArgs pEventArgs )
+		{
+			AttachToImagesCollectionChanged();
+			AttachToResourcesService();
+
+			UpdateAllVisuals( false );
+			UpdateHoverCursorFromMouse();
+		}
+
 		private void OnControlUnloaded( object pSender, RoutedEventArgs pEventArgs )
 		{
 			DetachFromImagesCollectionChanged();
+			DetachFromResourcesService();
+		}
+
+		private void OnControlDataContextChanged( object pSender, DependencyPropertyChangedEventArgs pEventArgs )
+		{
+			AttachToResourcesService();
+			UpdateHintText();
+		}
+
+		private void AttachToResourcesService()
+		{
+			DetachFromResourcesService();
+
+			ResourcesService lResolvedResourcesService = TryResolveResourcesService();
+			if ( lResolvedResourcesService == null )
+			{
+				return;
+			}
+
+			mResourcesServiceForHint = lResolvedResourcesService;
+			mResourcesServiceForHint.PropertyChanged += OnResourcesServicePropertyChanged;
+		}
+
+		private void DetachFromResourcesService()
+		{
+			if ( mResourcesServiceForHint == null )
+			{
+				return;
+			}
+
+			mResourcesServiceForHint.PropertyChanged -= OnResourcesServicePropertyChanged;
+			mResourcesServiceForHint = null;
+		}
+
+		private void OnResourcesServicePropertyChanged( object pSender, PropertyChangedEventArgs pEventArgs )
+		{
+			if ( pEventArgs == null )
+			{
+				return;
+			}
+
+			if ( !string.Equals( pEventArgs.PropertyName, "Item[]", StringComparison.Ordinal ) )
+			{
+				return;
+			}
+
+			UpdateHintText();
+		}
+
+		private ResourcesService TryResolveResourcesService()
+		{
+			ResourcesService lFromSelf = ExtractResourcesServiceFromDataContext( DataContext );
+			if ( lFromSelf != null )
+			{
+				return lFromSelf;
+			}
+
+			DependencyObject lCurrentElement = GetParentDependencyObject( this );
+			while ( lCurrentElement != null )
+			{
+				if ( lCurrentElement is FrameworkElement lFrameworkElement )
+				{
+					ResourcesService lFromAncestor = ExtractResourcesServiceFromDataContext( lFrameworkElement.DataContext );
+					if ( lFromAncestor != null )
+					{
+						return lFromAncestor;
+					}
+				}
+
+				lCurrentElement = GetParentDependencyObject( lCurrentElement );
+			}
+
+			return null;
+		}
+
+		private static ResourcesService ExtractResourcesServiceFromDataContext( object pDataContext )
+		{
+			if ( pDataContext == null )
+			{
+				return null;
+			}
+
+			if ( pDataContext is ResourcesService lResourcesService )
+			{
+				return lResourcesService;
+			}
+
+			PropertyInfo lResourcesServicePropertyInfo = pDataContext.GetType().GetProperty( "ResourcesService", BindingFlags.Instance | BindingFlags.Public );
+			if ( lResourcesServicePropertyInfo == null )
+			{
+				return null;
+			}
+
+			if ( !typeof( ResourcesService ).IsAssignableFrom( lResourcesServicePropertyInfo.PropertyType ) )
+			{
+				return null;
+			}
+
+			try
+			{
+				object lValue = lResourcesServicePropertyInfo.GetValue( pDataContext, null );
+				return lValue is ResourcesService lResolvedResourcesService ? lResolvedResourcesService : null;
+			}
+			catch ( Exception )
+			{
+				// ignored
+			}
+
+			return null;
 		}
 
 		private void AttachToImagesCollectionChanged()
@@ -471,14 +640,6 @@ namespace ResumeApp.Controls
 			return null;
 		}
 
-		private void OnControlLoaded( object pSender, RoutedEventArgs pEventArgs )
-		{
-			AttachToImagesCollectionChanged();
-
-			UpdateAllVisuals( false );
-			UpdateHoverCursorFromMouse();
-		}
-
 		private void OnRootMouseLeave( object pSender, MouseEventArgs pEventArgs )
 		{
 			if ( mIsDragInProgress )
@@ -529,13 +690,68 @@ namespace ResumeApp.Controls
 			mPlaceholderGrid.Visibility = lHasAnyImage ? Visibility.Collapsed : Visibility.Visible;
 
 			mNavigationOverlayGrid.Visibility = lHasMultipleImages ? Visibility.Visible : Visibility.Collapsed;
+			mDotsBackgroundBorder.Visibility = lHasMultipleImages ? Visibility.Visible : Visibility.Collapsed;
 
 			mPreviousButton.IsEnabled = lHasMultipleImages;
 			mNextButton.IsEnabled = lHasMultipleImages;
 
-			mExpandButton.Visibility = ( lHasAnyImage && !IsFullscreen ) ? Visibility.Visible : Visibility.Collapsed;
-
+			UpdateHintText();
 			UpdateCarouselVisualState( pIsAnimated );
+		}
+
+		private void UpdateHintText()
+		{
+			if ( mHintTextBlock == null || mHintStackPanel == null )
+			{
+				return;
+			}
+
+			if ( GetImageCount() <= 0 )
+			{
+				mHintTextBlock.Text = string.Empty;
+				mHintStackPanel.Visibility = Visibility.Collapsed;
+				return;
+			}
+
+			string lResourceKey = IsFullscreen
+				? HintProjectImageCarouselDragOnlyResourceKey
+				: HintProjectImageCarouselExpandAndDragResourceKey;
+
+			string lHintText = GetTextFromResources( lResourceKey );
+			if ( string.IsNullOrWhiteSpace( lHintText ) )
+			{
+				mHintTextBlock.Text = string.Empty;
+				mHintStackPanel.Visibility = Visibility.Collapsed;
+				return;
+			}
+
+			mHintTextBlock.Text = lHintText;
+			mHintStackPanel.Visibility = Visibility.Visible;
+		}
+
+		private string GetTextFromResources( string pResourceKey )
+		{
+			if ( string.IsNullOrWhiteSpace( pResourceKey ) )
+			{
+				return string.Empty;
+			}
+
+			ResourcesService lResourcesService = mResourcesServiceForHint;
+			if ( lResourcesService != null )
+			{
+				return lResourcesService[ pResourceKey ] ?? string.Empty;
+			}
+
+			try
+			{
+				return sFallbackResourceManager.GetString( pResourceKey, CultureInfo.CurrentUICulture ) ?? string.Empty;
+			}
+			catch ( Exception )
+			{
+				// ignored
+			}
+
+			return string.Empty;
 		}
 
 		private void UpdateCarouselVisualState( bool pIsAnimated )
@@ -701,22 +917,6 @@ namespace ResumeApp.Controls
 			lViewerWindow.Show();
 		}
 
-		private void OnExpandButtonClick( object pSender, RoutedEventArgs pEventArgs )
-		{
-			if ( IsFullscreen )
-			{
-				return;
-			}
-
-			int lImageCount = GetImageCount();
-			if ( lImageCount <= 0 )
-			{
-				return;
-			}
-
-			OpenViewerWindow();
-		}
-
 		private void OnMediaRootGridSizeChanged( object pSender, SizeChangedEventArgs pEventArgs )
 		{
 			UpdateCarouselVisualState( false );
@@ -734,77 +934,35 @@ namespace ResumeApp.Controls
 			pMouseWheelEventArgs.Handled = true;
 		}
 
-		private void ArmClickIfAllowed( DependencyObject pOriginalSource, MouseButtonEventArgs pMouseButtonEventArgs )
+		private bool TryOpenViewerOnDoubleClick( DependencyObject pOriginalSource, MouseButtonEventArgs pMouseButtonEventArgs )
 		{
-			mIsClickArmed = false;
-			mHasCancelledClick = false;
-
-			if ( !IsOpenOnClickEnabled )
+			if ( pMouseButtonEventArgs == null || pMouseButtonEventArgs.ChangedButton != MouseButton.Left )
 			{
-				return;
+				return false;
 			}
 
 			if ( IsFullscreen )
 			{
-				return;
-			}
-
-			if ( pMouseButtonEventArgs == null || pMouseButtonEventArgs.ChangedButton != MouseButton.Left )
-			{
-				return;
+				return false;
 			}
 
 			if ( GetImageCount() <= 0 )
 			{
-				return;
+				return false;
+			}
+
+			if ( mIsDragInProgress || mHasViewerOpenSuppressedDueToDragNavigation || mHasNavigatedDuringDrag )
+			{
+				return false;
 			}
 
 			if ( !IsValidDragStartSource( pOriginalSource ) )
 			{
-				return;
-			}
-
-			mIsClickArmed = true;
-			mClickStartPosition = pMouseButtonEventArgs.GetPosition( mMediaRootGrid );
-		}
-
-		private void CancelClickIfMovedTooMuch( MouseEventArgs pMouseEventArgs )
-		{
-			if ( !mIsClickArmed || mHasCancelledClick || pMouseEventArgs == null )
-			{
-				return;
-			}
-
-			Point lCurrentPosition = pMouseEventArgs.GetPosition( mMediaRootGrid );
-
-			double lDeltaX = lCurrentPosition.X - mClickStartPosition.X;
-			double lDeltaY = lCurrentPosition.Y - mClickStartPosition.Y;
-
-			if ( Math.Abs( lDeltaX ) >= ClickCancelThresholdPixels || Math.Abs( lDeltaY ) >= ClickCancelThresholdPixels )
-			{
-				mHasCancelledClick = true;
-			}
-		}
-
-		private void TryOpenViewerOnClick()
-		{
-			bool lShouldOpenViewer = IsOpenOnClickEnabled
-				&& !IsFullscreen
-				&& mIsClickArmed
-				&& !mHasCancelledClick
-				&& !mHasNavigatedDuringDrag
-				&& GetImageCount() > 0;
-
-			mIsClickArmed = false;
-			mHasCancelledClick = false;
-			mHasNavigatedDuringDrag = false;
-
-			if ( !lShouldOpenViewer )
-			{
-				return;
+				return false;
 			}
 
 			OpenViewerWindow();
+			return true;
 		}
 
 		private void OnRootPreviewMouseLeftButtonDown( object pSender, MouseButtonEventArgs pMouseButtonEventArgs )
@@ -812,7 +970,27 @@ namespace ResumeApp.Controls
 			Focus();
 
 			DependencyObject lOriginalSource = pMouseButtonEventArgs.OriginalSource as DependencyObject;
-			ArmClickIfAllowed( lOriginalSource, pMouseButtonEventArgs );
+
+			if ( pMouseButtonEventArgs.ChangedButton == MouseButton.Left && pMouseButtonEventArgs.ClickCount == 1 )
+			{
+				mHasNavigatedDuringDrag = false;
+				mHasViewerOpenSuppressedDueToDragNavigation = false;
+			}
+
+			if ( pMouseButtonEventArgs.ChangedButton == MouseButton.Left && pMouseButtonEventArgs.ClickCount == 2 )
+			{
+				bool lHasOpenedViewer = TryOpenViewerOnDoubleClick( lOriginalSource, pMouseButtonEventArgs );
+
+				mHasNavigatedDuringDrag = false;
+				mHasViewerOpenSuppressedDueToDragNavigation = false;
+
+				if ( lHasOpenedViewer )
+				{
+					pMouseButtonEventArgs.Handled = true;
+				}
+
+				return;
+			}
 
 			if ( pMouseButtonEventArgs.ChangedButton != MouseButton.Left || GetImageCount() <= 1 )
 			{
@@ -847,8 +1025,6 @@ namespace ResumeApp.Controls
 
 		private void OnRootPreviewMouseMove( object pSender, MouseEventArgs pMouseEventArgs )
 		{
-			CancelClickIfMovedTooMuch( pMouseEventArgs );
-
 			if ( !mIsDragInProgress )
 			{
 				UpdateHoverCursor( pMouseEventArgs.OriginalSource as DependencyObject );
@@ -879,6 +1055,7 @@ namespace ResumeApp.Controls
 			}
 
 			mHasNavigatedDuringDrag = true;
+			mHasViewerOpenSuppressedDueToDragNavigation = true;
 
 			for ( int lNavigationIndex = 0; lNavigationIndex < lNavigationCount; lNavigationIndex++ )
 			{
@@ -903,8 +1080,6 @@ namespace ResumeApp.Controls
 				EndDrag();
 				pMouseButtonEventArgs.Handled = true;
 			}
-
-			TryOpenViewerOnClick();
 		}
 
 		private void OnRootLostMouseCapture( object pSender, MouseEventArgs pMouseEventArgs )

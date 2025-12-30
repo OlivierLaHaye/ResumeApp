@@ -511,6 +511,12 @@
   <data name="HighlightBullet5" xml:space="preserve">
     <value>Built a personal WPF productivity app to accelerate professional photo editing workflows, using it as a UI playground for theming, localization, and interactive controls, including batch import, guided renaming, and productivity-focused quick actions.</value>
   </data>
+  <data name="HintProjectImageCarouselDragOnly" xml:space="preserve">
+    <value>Drag left or right to switch images.</value>
+</data>
+  <data name="HintProjectImageCarouselExpandAndDrag" xml:space="preserve">
+    <value>Double-click to expand, then drag left or right to switch images.</value>
+</data>
   <data name="LabelAccomplishments" xml:space="preserve">
     <value>Accomplishments</value>
   </data>
