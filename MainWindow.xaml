@@ -261,7 +261,7 @@
                                                     <Grid x:Name="mTopBarCollapseIconGrid">
                                                         <Path
                                                             x:Name="mTopBarCollapseIconPath"
-                                                            Fill="{StaticResource CommonWhiteBrush}"
+                                                            Fill="{DynamicResource CommonWhiteBrush}"
                                                             Data="M17.920015,8.074995 H11.690015 H6.079985 C5.119985,8.074995 4.639985,9.234995 5.319985,9.915005 L10.500015,15.095005 C11.330015,15.925005 12.680015,15.925005 13.510015,15.095005 L15.480015,13.125005 L18.690015,9.915005 C19.360015,9.234995 18.880015,8.074995 17.920015,8.074995 Z"
                                                             RenderTransformOrigin="0.5,0.5">
                                                             <Path.RenderTransform>
