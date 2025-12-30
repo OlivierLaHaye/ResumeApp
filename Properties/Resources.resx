@@ -515,7 +515,7 @@
     <value>Drag left or right to switch images.</value>
 </data>
   <data name="HintProjectImageCarouselExpandAndDrag" xml:space="preserve">
-    <value>Double-click to expand, then drag left or right to switch images.</value>
+    <value>Double-click to expand, or drag left or right to switch images.</value>
 </data>
   <data name="LabelAccomplishments" xml:space="preserve">
     <value>Accomplishments</value>

@@ -12,10 +12,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Resources;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Resources;
+using System.Windows.Threading;
 
 namespace ResumeApp.ViewModels.Pages
 {
@@ -38,6 +39,10 @@ namespace ResumeApp.ViewModels.Pages
 		private static readonly object sRandomLock = new object();
 		private static readonly Random sRandom = new Random();
 
+		private static readonly object sAllResourcePathsLock = new object();
+		private static bool sHasAttemptedAllResourcePathsBuild;
+		private static IReadOnlyList<string> sAllImageResourceRelativePaths;
+
 		private readonly ResourcesService mResourcesService;
 
 		private readonly string mTitleResourceKey;
@@ -45,12 +50,22 @@ namespace ResumeApp.ViewModels.Pages
 		private readonly string mAlbumImagesBasePath;
 
 		private bool mHasInitializedImages;
+		private bool mHasQueuedImageInitialization;
+		private bool mIsInitializingImages;
 
 		public string TitleText => mResourcesService[ mTitleResourceKey ];
 
 		public string SubtitleText => mResourcesService[ mSubtitleResourceKey ];
 
-		public ObservableCollection<ImageSource> Images { get; }
+		private readonly ObservableCollection<ImageSource> mImages;
+		public ObservableCollection<ImageSource> Images
+		{
+			get
+			{
+				EnsureImagesInitializationQueuedIfNeeded( DispatcherPriority.Background );
+				return mImages;
+			}
+		}
 
 		public PhotographyAlbumCardViewModel(
 			ResourcesService pResourcesService,
@@ -65,11 +80,45 @@ namespace ResumeApp.ViewModels.Pages
 
 			mAlbumImagesBasePath = NormalizeFolderPath( pAlbumImagesBasePath );
 
-			Images = new ObservableCollection<ImageSource>();
-
-			InitializeImagesIfNeeded();
+			mImages = new ObservableCollection<ImageSource>();
 
 			mResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
+		}
+
+		private static async Task ReplaceObservableImagesIncrementallyAsync( ObservableCollection<ImageSource> pTarget, IList<ImageSource> pImages, int pBatchSize )
+		{
+			if ( pTarget == null )
+			{
+				return;
+			}
+
+			pTarget.Clear();
+
+			if ( pImages == null || pImages.Count <= 0 )
+			{
+				return;
+			}
+
+			int lBatchSize = pBatchSize <= 0 ? 4 : pBatchSize;
+
+			for ( int lStartIndex = 0; lStartIndex < pImages.Count; lStartIndex += lBatchSize )
+			{
+				int lEndIndexExclusive = Math.Min( lStartIndex + lBatchSize, pImages.Count );
+
+				for ( int lCurrentIndex = lStartIndex; lCurrentIndex < lEndIndexExclusive; lCurrentIndex++ )
+				{
+					ImageSource lImage = pImages[ lCurrentIndex ];
+
+					if ( lImage == null )
+					{
+						continue;
+					}
+
+					pTarget.Add( lImage );
+				}
+
+				await Task.Delay( 1 );
+			}
 		}
 
 		private static string NormalizeFolderPath( string pFolderPath )
@@ -114,26 +163,6 @@ namespace ResumeApp.ViewModels.Pages
 			}
 
 			return NormalizeRelativePath( lUnescapedPath );
-		}
-
-		private static void ReplaceObservableImages( ICollection<ImageSource> pTarget, IEnumerable<ImageSource> pImages )
-		{
-			if ( pTarget == null )
-			{
-				return;
-			}
-
-			pTarget.Clear();
-
-			foreach ( ImageSource lImage in pImages ?? Enumerable.Empty<ImageSource>() )
-			{
-				if ( lImage == null )
-				{
-					continue;
-				}
-
-				pTarget.Add( lImage );
-			}
 		}
 
 		private static Assembly GetResourcesAssembly() => Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
@@ -202,29 +231,23 @@ namespace ResumeApp.ViewModels.Pages
 				return null;
 			}
 
-			ImageSource lImageSource = null;
-
 			try
 			{
-				var lPackUri = new Uri( lUriText, UriKind.Absolute );
-				StreamResourceInfo lResourceInfo = Application.GetResourceStream( lPackUri );
+				var lBitmapImage = new BitmapImage();
+				lBitmapImage.BeginInit();
+				lBitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+				lBitmapImage.UriSource = new Uri( lUriText, UriKind.Absolute );
+				lBitmapImage.EndInit();
+				lBitmapImage.Freeze();
 
-				if ( lResourceInfo == null )
-				{
-					return null;
-				}
-
-				using ( Stream lStream = lResourceInfo.Stream )
-				{
-					lImageSource = TryCreateBitmapImageFromStream( lStream );
-				}
+				return lBitmapImage;
 			}
 			catch ( Exception )
 			{
 				// ignored
 			}
 
-			return lImageSource;
+			return null;
 		}
 
 		private static ImageSource TryCreateFileImageSource( string pFilePath )
@@ -361,10 +384,82 @@ namespace ResumeApp.ViewModels.Pages
 			return Array.Empty<string>();
 		}
 
+		private static IReadOnlyList<string> GetAllImageResourceRelativePathsOrNull()
+		{
+			lock ( sAllResourcePathsLock )
+			{
+				if ( sHasAttemptedAllResourcePathsBuild )
+				{
+					return sAllImageResourceRelativePaths;
+				}
+
+				sHasAttemptedAllResourcePathsBuild = true;
+
+				List<string> lPaths = null;
+
+				try
+				{
+					Assembly lAssembly = GetResourcesAssembly();
+					string lAssemblyName = lAssembly?.GetName()?.Name ?? "ResumeApp";
+					string lGResourcesName = $"{lAssemblyName}.g.resources";
+
+					using ( Stream lGResourcesStream = lAssembly?.GetManifestResourceStream( lGResourcesName ) )
+					{
+						if ( lGResourcesStream == null )
+						{
+							sAllImageResourceRelativePaths = null;
+							return null;
+						}
+
+						using ( var lResourceReader = new ResourceReader( lGResourcesStream ) )
+						{
+							lPaths = new List<string>();
+
+							IDictionaryEnumerator lEnumerator = lResourceReader.GetEnumerator();
+
+							while ( lEnumerator.MoveNext() )
+							{
+								if ( !( lEnumerator.Key is string lResourceKey ) )
+								{
+									continue;
+								}
+
+								if ( !HasSupportedImageExtension( lResourceKey ) )
+								{
+									continue;
+								}
+
+								string lNormalized = NormalizeRelativePath( lResourceKey );
+
+								if ( string.IsNullOrWhiteSpace( lNormalized ) )
+								{
+									continue;
+								}
+
+								lPaths.Add( lNormalized.Replace( "\\", "/" ) );
+							}
+						}
+					}
+				}
+				catch ( Exception )
+				{
+					// ignored
+				}
+
+				sAllImageResourceRelativePaths = lPaths;
+				return sAllImageResourceRelativePaths;
+			}
+		}
+
 		private static IReadOnlyList<string> ComputeImageRelativePaths( string pFolderRelativePath )
 		{
-			List<string> lResourcePaths = EnumerateResourceRelativePathsInFolder( pFolderRelativePath )
+			string lFolderRelativePath = NormalizeFolderPath( pFolderRelativePath );
+
+			IReadOnlyList<string> lAllResourcePaths = GetAllImageResourceRelativePathsOrNull();
+
+			List<string> lResourcePaths = ( lAllResourcePaths ?? EnumerateResourceRelativePathsInFolderLegacy( lFolderRelativePath ) )
 				.Where( pRelativePath => !string.IsNullOrWhiteSpace( pRelativePath ) )
+				.Where( pRelativePath => pRelativePath.StartsWith( lFolderRelativePath, StringComparison.OrdinalIgnoreCase ) )
 				.Distinct( StringComparer.OrdinalIgnoreCase )
 				.OrderBy( GetFileNameFromRelativePath, StringComparer.OrdinalIgnoreCase )
 				.ThenBy( pRelativePath => pRelativePath, StringComparer.OrdinalIgnoreCase )
@@ -375,7 +470,7 @@ namespace ResumeApp.ViewModels.Pages
 				return lResourcePaths;
 			}
 
-			List<string> lFilePaths = EnumerateFilePathsInFolderNearExecutableOrProject( pFolderRelativePath )
+			List<string> lFilePaths = EnumerateFilePathsInFolderNearExecutableOrProject( lFolderRelativePath )
 				.Where( pFilePath => !string.IsNullOrWhiteSpace( pFilePath ) )
 				.Distinct( StringComparer.OrdinalIgnoreCase )
 				.OrderBy( Path.GetFileName, StringComparer.OrdinalIgnoreCase )
@@ -385,7 +480,7 @@ namespace ResumeApp.ViewModels.Pages
 			return lFilePaths;
 		}
 
-		private static IEnumerable<string> EnumerateResourceRelativePathsInFolder( string pFolderRelativePath )
+		private static IEnumerable<string> EnumerateResourceRelativePathsInFolderLegacy( string pFolderRelativePath )
 		{
 			string lFolderRelativePath = NormalizeFolderPath( pFolderRelativePath );
 
@@ -631,6 +726,21 @@ namespace ResumeApp.ViewModels.Pages
 			return string.Empty;
 		}
 
+		private static bool HasResourceRelativePath( string pRelativePath )
+		{
+			IReadOnlyList<string> lAllResourcePaths = GetAllImageResourceRelativePathsOrNull();
+
+			if ( lAllResourcePaths == null )
+			{
+				return false;
+			}
+
+			string lNormalized = NormalizeRelativePath( pRelativePath );
+
+			return !string.IsNullOrWhiteSpace( lNormalized )
+				&& lAllResourcePaths.Contains( lNormalized, StringComparer.OrdinalIgnoreCase );
+		}
+
 		private static ImageSource TryCreateImageSource( string pPath )
 		{
 			string lPath = ( pPath ?? string.Empty ).Trim();
@@ -643,6 +753,11 @@ namespace ResumeApp.ViewModels.Pages
 			if ( Path.IsPathRooted( lPath ) )
 			{
 				return TryCreateFileImageSource( lPath );
+			}
+
+			if ( HasResourceRelativePath( lPath ) )
+			{
+				return TryCreatePackImageSource( lPath );
 			}
 
 			string lResolvedFilePath = TryResolveFilePathFromRelativePath( lPath );
@@ -698,23 +813,70 @@ namespace ResumeApp.ViewModels.Pages
 			pImages.Insert( 0, lRandomImage );
 		}
 
-		private void InitializeImagesIfNeeded()
+		internal void QueueImagesPreload()
 		{
-			if ( mHasInitializedImages )
+			EnsureImagesInitializationQueuedIfNeeded( DispatcherPriority.ContextIdle );
+		}
+
+		private void EnsureImagesInitializationQueuedIfNeeded( DispatcherPriority pPriority )
+		{
+			if ( mHasInitializedImages || mHasQueuedImageInitialization )
 			{
 				return;
 			}
 
-			IEnumerable<string> lImagePaths = GetCachedImageRelativePaths( mAlbumImagesBasePath );
+			Dispatcher lDispatcher = Application.Current?.Dispatcher;
 
-			List<ImageSource> lImages = CreateImageSources( lImagePaths )
-				.ToList();
+			if ( lDispatcher == null )
+			{
+				return;
+			}
 
-			MoveRandomImageToFront( lImages );
+			mHasQueuedImageInitialization = true;
 
-			ReplaceObservableImages( Images, lImages );
+			lDispatcher.BeginInvoke( new Action( InitializeImagesAsync ), pPriority );
+		}
 
-			mHasInitializedImages = true;
+		private async void InitializeImagesAsync()
+		{
+			if ( mHasInitializedImages || mIsInitializingImages )
+			{
+				return;
+			}
+
+			mIsInitializingImages = true;
+
+			try
+			{
+				List<ImageSource> lImages = null;
+
+				try
+				{
+					lImages = await Task.Run( () =>
+					{
+						IEnumerable<string> lImagePaths = GetCachedImageRelativePaths( mAlbumImagesBasePath );
+
+						List<ImageSource> lCreatedImages = CreateImageSources( lImagePaths )
+							.ToList();
+
+						MoveRandomImageToFront( lCreatedImages );
+
+						return lCreatedImages;
+					} );
+				}
+				catch ( Exception )
+				{
+					// ignored
+				}
+
+				await ReplaceObservableImagesIncrementallyAsync( mImages, lImages ?? new List<ImageSource>(), pBatchSize: 4 );
+
+				mHasInitializedImages = true;
+			}
+			finally
+			{
+				mIsInitializingImages = false;
+			}
 		}
 
 		private void OnResourcesServicePropertyChanged( object pSender, PropertyChangedEventArgs pArgs )

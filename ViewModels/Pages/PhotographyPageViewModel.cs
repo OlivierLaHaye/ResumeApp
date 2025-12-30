@@ -34,5 +34,13 @@ namespace ResumeApp.ViewModels.Pages
 					pAlbumImagesBasePath: "Resources/Photography/Portraits/" ),
 			} );
 		}
+
+		internal void QueueImagesPreloadForAll()
+		{
+			foreach ( PhotographyAlbumCardViewModel lAlbumCardViewModel in Albums )
+			{
+				lAlbumCardViewModel?.QueueImagesPreload();
+			}
+		}
 	}
 }

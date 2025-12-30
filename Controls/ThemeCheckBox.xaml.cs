@@ -3,7 +3,6 @@
 
 using ResumeApp.Services;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace ResumeApp.Controls

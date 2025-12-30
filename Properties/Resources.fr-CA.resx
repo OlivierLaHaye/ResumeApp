@@ -515,7 +515,7 @@
     <value>Glissez vers la gauche ou vers la droite pour changer d’image.</value>
 </data>
   <data name="HintProjectImageCarouselExpandAndDrag" xml:space="preserve">
-    <value>Double-cliquez pour agrandir, puis glissez vers la gauche ou vers la droite pour changer d’image.</value>
+    <value>Double-cliquez pour agrandir, ou glissez vers la gauche ou la droite pour changer d’image.</value>
 </data>
   <data name="LabelAccomplishments" xml:space="preserve">
     <value>Réalisations</value>

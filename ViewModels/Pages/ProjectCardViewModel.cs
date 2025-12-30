@@ -4,16 +4,21 @@
 using ResumeApp.Infrastructure;
 using ResumeApp.Services;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Resources;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace ResumeApp.ViewModels.Pages
 {
@@ -21,7 +26,8 @@ namespace ResumeApp.ViewModels.Pages
 	{
 		private const int MaximumIndexedImageProbeCount = 100;
 
-		private static readonly string[] sSupportedImageExtensions = {
+		private static readonly string[] sSupportedImageExtensions =
+		{
 			"png",
 			"jpg",
 			"jpeg",
@@ -30,6 +36,10 @@ namespace ResumeApp.ViewModels.Pages
 			"tif",
 			"tiff"
 		};
+
+		private static readonly object sResourceIndexLock = new object();
+		private static bool sHasAttemptedBuildResourceIndex;
+		private static HashSet<string> sAvailableResourceRelativePaths;
 
 		private readonly ResourcesService mResourcesService;
 
@@ -43,6 +53,8 @@ namespace ResumeApp.ViewModels.Pages
 		private readonly string mProjectLinkUriText;
 
 		private bool mHasInitializedImages;
+		private bool mHasQueuedImageInitialization;
+		private bool mIsInitializingImages;
 
 		public string TitleText => mResourcesService[ mTitleResourceKey ];
 
@@ -71,7 +83,15 @@ namespace ResumeApp.ViewModels.Pages
 
 		public ObservableCollection<string> TechItems { get; }
 
-		public ObservableCollection<ImageSource> Images { get; }
+		private readonly ObservableCollection<ImageSource> mImages;
+		public ObservableCollection<ImageSource> Images
+		{
+			get
+			{
+				EnsureImagesInitializationQueuedIfNeeded( DispatcherPriority.Background );
+				return mImages;
+			}
+		}
 
 		public bool IsProjectLinkButtonVisible => !string.IsNullOrWhiteSpace( mProjectLinkUriText );
 
@@ -106,30 +126,47 @@ namespace ResumeApp.ViewModels.Pages
 				.Select( pKey => new LocalizedResourceItemViewModel( mResourcesService, pKey ) ) );
 
 			TechItems = new ObservableCollection<string>();
-			Images = new ObservableCollection<ImageSource>();
+			mImages = new ObservableCollection<ImageSource>();
 
-			InitializeImagesIfNeeded();
 			RefreshFromResources();
 
 			mResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
 		}
 
-		private void InitializeImagesIfNeeded()
+		private static async Task ReplaceObservableImagesIncrementallyAsync( ICollection<ImageSource> pTarget, IList<ImageSource> pImages, int pBatchSize )
 		{
-			if ( mHasInitializedImages )
+			if ( pTarget == null )
 			{
 				return;
 			}
 
-			string lImagesBasePath = BuildProjectImagesBasePath( mProjectImagesBaseName );
+			pTarget.Clear();
 
-			List<ImageSource> lImages = BuildImageSourcesFromBasePathOrDescriptor( lImagesBasePath )
-				.Where( pImageSource => pImageSource != null )
-				.ToList();
+			if ( pImages == null || pImages.Count <= 0 )
+			{
+				return;
+			}
 
-			ReplaceObservableImages( Images, lImages );
+			int lBatchSize = pBatchSize <= 0 ? 4 : pBatchSize;
 
-			mHasInitializedImages = true;
+			for ( int lStartIndex = 0; lStartIndex < pImages.Count; lStartIndex += lBatchSize )
+			{
+				int lEndIndexExclusive = Math.Min( lStartIndex + lBatchSize, pImages.Count );
+
+				for ( int lCurrentIndex = lStartIndex; lCurrentIndex < lEndIndexExclusive; lCurrentIndex++ )
+				{
+					ImageSource lImage = pImages[ lCurrentIndex ];
+
+					if ( lImage == null )
+					{
+						continue;
+					}
+
+					pTarget.Add( lImage );
+				}
+
+				await Task.Delay( 1 );
+			}
 		}
 
 		private static string ExtractValueAfterFirstColon( string pText )
@@ -192,26 +229,6 @@ namespace ResumeApp.ViewModels.Pages
 			}
 		}
 
-		private static void ReplaceObservableImages( ICollection<ImageSource> pTarget, IEnumerable<ImageSource> pImages )
-		{
-			if ( pTarget == null )
-			{
-				return;
-			}
-
-			pTarget.Clear();
-
-			foreach ( ImageSource lImage in pImages ?? Enumerable.Empty<ImageSource>() )
-			{
-				if ( lImage == null )
-				{
-					continue;
-				}
-
-				pTarget.Add( lImage );
-			}
-		}
-
 		private static string GetEntryAssemblyName()
 		{
 			Assembly lEntryAssembly = Assembly.GetEntryAssembly();
@@ -220,9 +237,118 @@ namespace ResumeApp.ViewModels.Pages
 			return string.IsNullOrWhiteSpace( lAssemblyName ) ? "ResumeApp" : lAssemblyName;
 		}
 
+		private static string NormalizeRelativePath( string pRelativePath )
+		{
+			string lRelativePath = ( pRelativePath ?? string.Empty ).Trim();
+
+			if ( string.IsNullOrWhiteSpace( lRelativePath ) )
+			{
+				return string.Empty;
+			}
+
+			lRelativePath = lRelativePath.TrimStart( '/', '\\' ).Replace( "\\", "/" );
+
+			if ( string.IsNullOrWhiteSpace( lRelativePath ) )
+			{
+				return string.Empty;
+			}
+
+			try
+			{
+				lRelativePath = Uri.UnescapeDataString( lRelativePath );
+			}
+			catch ( Exception )
+			{
+				// ignored
+			}
+
+			return ( lRelativePath ?? string.Empty ).Trim().TrimStart( '/', '\\' ).Replace( "\\", "/" );
+		}
+
+		private static HashSet<string> GetAvailableResourceRelativePathsOrNull()
+		{
+			lock ( sResourceIndexLock )
+			{
+				if ( sHasAttemptedBuildResourceIndex )
+				{
+					return sAvailableResourceRelativePaths;
+				}
+
+				sHasAttemptedBuildResourceIndex = true;
+
+				HashSet<string> lPaths = null;
+
+				try
+				{
+					Assembly lAssembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+					string lAssemblyName = lAssembly?.GetName()?.Name ?? "ResumeApp";
+					string lGResourcesName = $"{lAssemblyName}.g.resources";
+
+					using ( Stream lGResourcesStream = lAssembly.GetManifestResourceStream( lGResourcesName ) )
+					{
+						if ( lGResourcesStream == null )
+						{
+							sAvailableResourceRelativePaths = null;
+							return null;
+						}
+
+						using ( var lResourceReader = new ResourceReader( lGResourcesStream ) )
+						{
+							lPaths = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
+
+							IDictionaryEnumerator lEnumerator = lResourceReader.GetEnumerator();
+
+							while ( lEnumerator.MoveNext() )
+							{
+								if ( !( lEnumerator.Key is string lResourceKey ) )
+								{
+									continue;
+								}
+
+								if ( !IsKnownImageExtension( lResourceKey ) )
+								{
+									continue;
+								}
+
+								string lNormalized = NormalizeRelativePath( lResourceKey );
+
+								if ( string.IsNullOrWhiteSpace( lNormalized ) )
+								{
+									continue;
+								}
+
+								lPaths.Add( lNormalized );
+							}
+						}
+					}
+				}
+				catch ( Exception )
+				{
+					// ignored
+				}
+
+				sAvailableResourceRelativePaths = lPaths;
+				return sAvailableResourceRelativePaths;
+			}
+		}
+
+		private static bool HasResourceRelativePath( string pRelativePath )
+		{
+			HashSet<string> lAvailablePaths = GetAvailableResourceRelativePathsOrNull();
+
+			if ( lAvailablePaths == null )
+			{
+				return true;
+			}
+
+			string lNormalized = NormalizeRelativePath( pRelativePath );
+
+			return !string.IsNullOrWhiteSpace( lNormalized ) && lAvailablePaths.Contains( lNormalized );
+		}
+
 		private static string BuildPackUriText( string pRelativePath )
 		{
-			string lNormalizedPath = ( pRelativePath ?? string.Empty ).Trim().TrimStart( '/' );
+			string lNormalizedPath = NormalizeRelativePath( pRelativePath );
 
 			if ( string.IsNullOrWhiteSpace( lNormalizedPath ) )
 			{
@@ -248,7 +374,21 @@ namespace ResumeApp.ViewModels.Pages
 
 		private static ImageSource TryCreateImageSource( string pPackOrRelativePath )
 		{
-			string lUriText = BuildImageUriText( pPackOrRelativePath );
+			string lValue = ( pPackOrRelativePath ?? string.Empty ).Trim();
+
+			if ( string.IsNullOrWhiteSpace( lValue ) )
+			{
+				return null;
+			}
+
+			bool lIsPackUri = lValue.StartsWith( "pack://", StringComparison.OrdinalIgnoreCase );
+
+			if ( !lIsPackUri && !HasResourceRelativePath( lValue ) )
+			{
+				return null;
+			}
+
+			string lUriText = BuildImageUriText( lValue );
 
 			if ( string.IsNullOrWhiteSpace( lUriText ) )
 			{
@@ -370,12 +510,70 @@ namespace ResumeApp.ViewModels.Pages
 		{
 			string lIndexedPrefix = ( pIndexedPrefix ?? string.Empty ).Trim();
 
-			return string.IsNullOrWhiteSpace( lIndexedPrefix )
-				? null
-				: sSupportedImageExtensions
-					.Select( pExtension => $"{lIndexedPrefix}{pImageIndex}.{pExtension}" )
-					.Select( TryCreateImageSource )
-					.FirstOrDefault( pImageSource => pImageSource != null );
+			return string.IsNullOrWhiteSpace( lIndexedPrefix ) ? null : sSupportedImageExtensions.Select( pExtension => $"{lIndexedPrefix}{pImageIndex}.{pExtension}" ).Select( pCandidateRelativePath => TryCreateImageSource( pCandidateRelativePath ) ).FirstOrDefault( pImageSource => pImageSource != null );
+		}
+
+		internal void QueueImagesPreload()
+		{
+			EnsureImagesInitializationQueuedIfNeeded( DispatcherPriority.ContextIdle );
+		}
+
+		private void EnsureImagesInitializationQueuedIfNeeded( DispatcherPriority pPriority )
+		{
+			if ( mHasInitializedImages || mHasQueuedImageInitialization )
+			{
+				return;
+			}
+
+			Dispatcher lDispatcher = Application.Current?.Dispatcher;
+
+			if ( lDispatcher == null )
+			{
+				return;
+			}
+
+			mHasQueuedImageInitialization = true;
+
+			lDispatcher.BeginInvoke( new Action( InitializeImagesAsync ), pPriority );
+		}
+
+		private async void InitializeImagesAsync()
+		{
+			if ( mHasInitializedImages || mIsInitializingImages )
+			{
+				return;
+			}
+
+			mIsInitializingImages = true;
+
+			try
+			{
+				List<ImageSource> lImages = null;
+
+				try
+				{
+					lImages = await Task.Run( () =>
+					{
+						string lImagesBasePath = BuildProjectImagesBasePath( mProjectImagesBaseName );
+
+						return BuildImageSourcesFromBasePathOrDescriptor( lImagesBasePath )
+							.Where( pImageSource => pImageSource != null )
+							.ToList();
+					} );
+				}
+				catch ( Exception )
+				{
+					// ignored
+				}
+
+				await ReplaceObservableImagesIncrementallyAsync( mImages, lImages ?? new List<ImageSource>(), pBatchSize: 4 );
+
+				mHasInitializedImages = true;
+			}
+			finally
+			{
+				mIsInitializingImages = false;
+			}
 		}
 
 		private void ExecuteOpenProjectLink()

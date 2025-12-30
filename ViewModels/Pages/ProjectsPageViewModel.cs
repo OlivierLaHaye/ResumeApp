@@ -60,5 +60,13 @@ namespace ResumeApp.ViewModels.Pages
 					pProjectLinkUriText: "https://store.peel-3d.com/software/peel-os/" )
 			} );
 		}
+
+		internal void QueueImagesPreloadForAll()
+		{
+			foreach ( ProjectCardViewModel lProjectCardViewModel in Projects )
+			{
+				lProjectCardViewModel?.QueueImagesPreload();
+			}
+		}
 	}
 }
