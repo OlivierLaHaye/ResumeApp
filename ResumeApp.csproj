@@ -508,6 +508,41 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\Projects\Photography\Portraits\2024 - Shooting Hermès Exécutif 0511.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Photography\Portraits\2024 - Shooting ORAMA 0344.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Photography\Portraits\2025 - Shooting AGERIUL 013.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Photography\Portraits\2025 - Shooting Hermès Exécutif 099.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Photography\Portraits\2025 - Shooting Podcast Santé Sport 057.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Projects\Photography\Events\2024 - INSOLITE - 20e édition du Défilé CML 1451-CR2.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Photography\Events\2024 - soie - 27e édition du FSA Fashion Show 4056-CR2.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Photography\Events\2025 - Intégrations FSA 3030.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Photography\Events\2025 - RENAISSANCE - 21e édition du Défilé CML 2230.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Projects\Photography\Events\2025 - À la Une - 28e édition du FSA Fashion Show 10893.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>REM Pre-build event in Project Properties → Build Events

@@ -35,6 +35,9 @@ namespace ResumeApp.ViewModels.Pages
 		private static readonly object sCacheLock = new object();
 		private static readonly Dictionary<string, IReadOnlyList<string>> sImageRelativePathsByFolderPath = new Dictionary<string, IReadOnlyList<string>>( StringComparer.OrdinalIgnoreCase );
 
+		private static readonly object sRandomLock = new object();
+		private static readonly Random sRandom = new Random();
+
 		private readonly ResourcesService mResourcesService;
 
 		private readonly string mTitleResourceKey;
@@ -656,6 +659,45 @@ namespace ResumeApp.ViewModels.Pages
 				.Where( pImageSource => pImageSource != null );
 		}
 
+		private static int GetRandomIndex( int pUpperBoundExclusive )
+		{
+			if ( pUpperBoundExclusive <= 1 )
+			{
+				return 0;
+			}
+
+			lock ( sRandomLock )
+			{
+				return sRandom.Next( pUpperBoundExclusive );
+			}
+		}
+
+		private static void MoveRandomImageToFront( IList<ImageSource> pImages )
+		{
+			if ( pImages == null )
+			{
+				return;
+			}
+
+			int lImageCount = pImages.Count;
+
+			if ( lImageCount <= 1 )
+			{
+				return;
+			}
+
+			int lRandomIndex = GetRandomIndex( lImageCount );
+
+			if ( lRandomIndex <= 0 )
+			{
+				return;
+			}
+
+			ImageSource lRandomImage = pImages[ lRandomIndex ];
+			pImages.RemoveAt( lRandomIndex );
+			pImages.Insert( 0, lRandomImage );
+		}
+
 		private void InitializeImagesIfNeeded()
 		{
 			if ( mHasInitializedImages )
@@ -667,6 +709,8 @@ namespace ResumeApp.ViewModels.Pages
 
 			List<ImageSource> lImages = CreateImageSources( lImagePaths )
 				.ToList();
+
+			MoveRandomImageToFront( lImages );
 
 			ReplaceObservableImages( Images, lImages );
 

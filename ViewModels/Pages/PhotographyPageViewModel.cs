@@ -23,15 +23,15 @@ namespace ResumeApp.ViewModels.Pages
 
 				new PhotographyAlbumCardViewModel(
 					pResourcesService: ResourcesService,
-					pTitleResourceKey: "AlbumPortraitsTitle",
-					pSubtitleResourceKey: "AlbumPortraitsSubtitle",
-					pAlbumImagesBasePath: "Resources/Photography/Portraits/" ),
+					pTitleResourceKey: "AlbumEventsTitle",
+					pSubtitleResourceKey: "AlbumEventsSubtitle",
+					pAlbumImagesBasePath: "Resources/Photography/Events/" ),
 
 				new PhotographyAlbumCardViewModel(
 					pResourcesService: ResourcesService,
-					pTitleResourceKey: "AlbumEventsTitle",
-					pSubtitleResourceKey: "AlbumEventsSubtitle",
-					pAlbumImagesBasePath: "Resources/Photography/Events/" )
+					pTitleResourceKey: "AlbumPortraitsTitle",
+					pSubtitleResourceKey: "AlbumPortraitsSubtitle",
+					pAlbumImagesBasePath: "Resources/Photography/Portraits/" ),
 			} );
 		}
 	}
