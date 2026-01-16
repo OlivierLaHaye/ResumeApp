@@ -15,110 +15,70 @@ namespace ResumeApp.Controls
 {
 	public sealed class TimelineControl : Control
 	{
-		private sealed class TimeFrameHitInfo
+		private sealed class TimeFrameHitInfo( TimelineTimeFrameItem pItem, Rect pHitRect )
 		{
-			public TimelineTimeFrameItem Item { get; }
+			public TimelineTimeFrameItem Item { get; } = pItem;
 
-			public Rect HitRect { get; }
-
-			public TimeFrameHitInfo( TimelineTimeFrameItem pItem, Rect pHitRect )
-			{
-				Item = pItem;
-				HitRect = pHitRect;
-			}
+			public Rect HitRect { get; } = pHitRect;
 		}
 
-		private sealed class VisibleTimeFrame
+		private sealed class VisibleTimeFrame(
+			TimelineTimeFrameItem pItem,
+			DateTime pStartDate,
+			DateTime pEndDate,
+			double pStartX,
+			double pEndX,
+			int pLaneIndex )
 		{
-			public TimelineTimeFrameItem Item { get; }
+			public TimelineTimeFrameItem Item { get; } = pItem;
 
-			public DateTime StartDate { get; }
+			public DateTime StartDate { get; } = pStartDate;
 
-			public DateTime EndDate { get; }
+			public DateTime EndDate { get; } = pEndDate;
 
-			public double StartX { get; }
+			public double StartX { get; } = pStartX;
 
-			public double EndX { get; }
+			public double EndX { get; } = pEndX;
 
-			public int LaneIndex { get; }
-
-			public VisibleTimeFrame( TimelineTimeFrameItem pItem, DateTime pStartDate, DateTime pEndDate, double pStartX, double pEndX, int pLaneIndex )
-			{
-				Item = pItem;
-				StartDate = pStartDate;
-				EndDate = pEndDate;
-				StartX = pStartX;
-				EndX = pEndX;
-				LaneIndex = pLaneIndex;
-			}
+			public int LaneIndex { get; } = pLaneIndex;
 		}
 
-		private sealed class TimeFrameTitleDrawInfo
+		private sealed class TimeFrameTitleDrawInfo( TimelineTimeFrameItem pItem, FormattedText pText, Rect pRect )
 		{
-			public TimelineTimeFrameItem Item { get; }
+			public TimelineTimeFrameItem Item { get; } = pItem;
 
-			public FormattedText Text { get; }
+			public FormattedText Text { get; } = pText;
 
-			public Rect Rect { get; }
-
-			public TimeFrameTitleDrawInfo( TimelineTimeFrameItem pItem, FormattedText pText, Rect pRect )
-			{
-				Item = pItem;
-				Text = pText;
-				Rect = pRect;
-			}
+			public Rect Rect { get; } = pRect;
 		}
 
-		private readonly struct PanSample
+		private readonly struct PanSample( DateTime pTimestampUtc, double pPointerX )
 		{
-			public PanSample( DateTime pTimestampUtc, double pPointerX )
-			{
-				TimestampUtc = pTimestampUtc;
-				PointerX = pPointerX;
-			}
+			public DateTime TimestampUtc { get; } = pTimestampUtc;
 
-			public DateTime TimestampUtc { get; }
-
-			public double PointerX { get; }
+			public double PointerX { get; } = pPointerX;
 		}
 
-		private readonly struct RadiusXy
+		private readonly struct RadiusXy( double pX, double pY )
 		{
-			public RadiusXy( double pX, double pY )
-			{
-				X = pX;
-				Y = pY;
-			}
+			public double X { get; } = pX;
 
-			public double X { get; }
-
-			public double Y { get; }
+			public double Y { get; } = pY;
 		}
 
-		private readonly struct TickLabelSchedule
+		private readonly struct TickLabelSchedule( TickGranularity pGranularity, int pStep )
 		{
-			public TickGranularity Granularity { get; }
+			public TickGranularity Granularity { get; } = pGranularity;
 
-			public int Step { get; }
-
-			public TickLabelSchedule( TickGranularity pGranularity, int pStep )
-			{
-				Granularity = pGranularity;
-				Step = Math.Max( 1, pStep );
-			}
+			public int Step { get; } = Math.Max( 1, pStep );
 		}
 
-		private readonly struct FormattedTextCacheKey : IEquatable<FormattedTextCacheKey>
+		private readonly struct FormattedTextCacheKey( string pText, double pFontSize )
+			: IEquatable<FormattedTextCacheKey>
 		{
-			public string Text { get; }
+			public string Text { get; } = pText ?? string.Empty;
 
-			public double FontSize { get; }
-
-			public FormattedTextCacheKey( string pText, double pFontSize )
-			{
-				Text = pText ?? string.Empty;
-				FontSize = pFontSize;
-			}
+			public double FontSize { get; } = pFontSize;
 
 			public bool Equals( FormattedTextCacheKey pOther )
 			{

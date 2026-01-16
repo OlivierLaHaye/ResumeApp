@@ -25,17 +25,10 @@ namespace ResumeApp.Services
 		}
 	}
 
-	public struct ProjectImageCarouselSlotVisualTargets
+	public struct ProjectImageCarouselSlotVisualTargets( double pScale, double pOpacity, double pTranslateX )
 	{
-		public double Scale { get; }
-		public double Opacity { get; }
-		public double TranslateX { get; }
-
-		public ProjectImageCarouselSlotVisualTargets( double pScale, double pOpacity, double pTranslateX )
-		{
-			Scale = pScale;
-			Opacity = pOpacity;
-			TranslateX = pTranslateX;
-		}
+		public double Scale { get; } = pScale;
+		public double Opacity { get; } = pOpacity;
+		public double TranslateX { get; } = pTranslateX;
 	}
 }

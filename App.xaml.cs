@@ -7,160 +7,211 @@ using ResumeApp.ViewModels.Pages;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace ResumeApp
+namespace ResumeApp;
+
+public partial class App
 {
-	public partial class App
+	private ThemeService? mThemeService;
+
+	private bool mHasQueuedMainWindowInitialization;
+
+	private static void QueueBackgroundImagePreload( ProjectsPageViewModel pProjectsPageViewModel, PhotographyPageViewModel pPhotographyPageViewModel )
 	{
-		private ThemeService mThemeService;
-		private ResourcesService mResourcesService;
-
-		private bool mHasQueuedMainWindowInitialization;
-
-		private static void QueueBackgroundImagePreload( ProjectsPageViewModel pProjectsPageViewModel, PhotographyPageViewModel pPhotographyPageViewModel )
+		if ( Current?.Dispatcher is not Dispatcher lDispatcher )
 		{
-			Dispatcher lDispatcher = Current?.Dispatcher;
-
-			lDispatcher?.BeginInvoke( new Action( () =>
-			{
-				pProjectsPageViewModel?.QueueImagesPreloadForAll();
-				pPhotographyPageViewModel?.QueueImagesPreloadForAll();
-			} ), DispatcherPriority.ContextIdle );
+			return;
 		}
 
-		protected override void OnStartup( StartupEventArgs pStartupEventArgs )
+		lDispatcher.BeginInvoke( new Action( () =>
 		{
-			base.OnStartup( pStartupEventArgs );
+			pProjectsPageViewModel.QueueImagesPreloadForAll();
+			pPhotographyPageViewModel.QueueImagesPreloadForAll();
+		} ), DispatcherPriority.ContextIdle );
+	}
 
-			mThemeService = new ThemeService();
+	private static async Task<ResourcesService> CreateInitializedResourcesServiceAsync()
+	{
+		var lResourcesService = new ResourcesService();
 
-			try
-			{
-				mThemeService.Initialize( this );
-			}
-			catch ( Exception )
-			{
-				// ignored
-			}
-
-			var lMainWindow = new MainWindow();
-			MainWindow = lMainWindow;
-
-			lMainWindow.ContentRendered += OnMainWindowContentRendered;
-			lMainWindow.Show();
+		if ( await TryRunAsync( () => Task.Run( () => lResourcesService.Initialize() ) ) )
+		{
+			return lResourcesService;
 		}
 
-		private async void OnMainWindowContentRendered( object pSender, EventArgs pArgs )
+		TryRun( () => lResourcesService.Initialize() );
+		return lResourcesService;
+	}
+
+	private static bool TryCreatePageViewModels(
+		ResourcesService pResourcesService,
+		ThemeService pThemeService,
+		out PageViewModels pPageViewModels )
+	{
+		return TryCreateValue(
+			() => new PageViewModels(
+				new OverviewPageViewModel( pResourcesService, pThemeService ),
+				new ExperiencePageViewModel( pResourcesService, pThemeService ),
+				new SkillsPageViewModel( pResourcesService, pThemeService ),
+				new ProjectsPageViewModel( pResourcesService, pThemeService ),
+				new PhotographyPageViewModel( pResourcesService, pThemeService ),
+				new EducationPageViewModel( pResourcesService, pThemeService ) ),
+			out pPageViewModels );
+	}
+
+	private static bool TryCreateMainViewModel(
+		ResourcesService pResourcesService,
+		ThemeService pThemeService,
+		PageViewModels pPageViewModels,
+		out MainViewModel pMainViewModel )
+	{
+		return TryCreateReference(
+			() => new MainViewModel(
+				pResourcesService,
+				pThemeService,
+				pPageViewModels.OverviewPageViewModel,
+				pPageViewModels.ExperiencePageViewModel,
+				pPageViewModels.SkillsPageViewModel,
+				pPageViewModels.ProjectsPageViewModel,
+				pPageViewModels.PhotographyPageViewModel,
+				pPageViewModels.EducationPageViewModel ),
+			out pMainViewModel );
+	}
+
+	private static bool TryRun( Action pAction )
+	{
+		try
 		{
-			if ( mHasQueuedMainWindowInitialization )
+			pAction();
+			return true;
+		}
+		catch ( Exception )
+		{
+			// ignored
+		}
+
+		return false;
+	}
+
+	private static async Task<bool> TryRunAsync( Func<Task> pActionAsync )
+	{
+		try
+		{
+			await pActionAsync();
+			return true;
+		}
+		catch ( Exception )
+		{
+			// ignored
+		}
+
+		return false;
+	}
+
+	private static bool TryCreateValue<T>( Func<T> pFactory, out T pValue )
+	{
+		try
+		{
+			pValue = pFactory();
+			return true;
+		}
+		catch ( Exception )
+		{
+			// ignored
+		}
+
+		pValue = default!;
+		return false;
+	}
+
+	private static bool TryCreateReference<T>( Func<T> pFactory, out T pValue ) where T : class
+	{
+		try
+		{
+			pValue = pFactory();
+			return true;
+		}
+		catch ( Exception )
+		{
+			// ignored
+		}
+
+		pValue = null!;
+		return false;
+	}
+
+	protected override void OnStartup( StartupEventArgs pStartupEventArgs )
+	{
+		base.OnStartup( pStartupEventArgs );
+
+		InitializeThemeService();
+
+		var lMainWindow = new MainWindow();
+		MainWindow = lMainWindow;
+
+		lMainWindow.ContentRendered += OnMainWindowContentRenderedAsync;
+		lMainWindow.Show();
+	}
+
+	private async void OnMainWindowContentRenderedAsync( object? pSender, EventArgs pArgs )
+	{
+		try
+		{
+			if ( mHasQueuedMainWindowInitialization || pSender is not MainWindow lMainWindow )
 			{
 				return;
 			}
 
 			mHasQueuedMainWindowInitialization = true;
 
-			if ( pSender is not MainWindow lMainWindow )
-			{
-				return;
-			}
-
-			lMainWindow.ContentRendered -= OnMainWindowContentRendered;
+			lMainWindow.ContentRendered -= OnMainWindowContentRenderedAsync;
 
 			await InitializeMainWindowAsync( lMainWindow );
 		}
-
-		private async Task InitializeMainWindowAsync( FrameworkElement pMainWindow )
+		catch ( Exception )
 		{
-			if ( pMainWindow == null )
-			{
-				return;
-			}
-
-			var lResourcesService = new ResourcesService();
-
-			bool lHasInitializedResourcesInBackground = false;
-
-			try
-			{
-				await Task.Run( () => lResourcesService.Initialize() );
-				lHasInitializedResourcesInBackground = true;
-			}
-			catch ( Exception )
-			{
-				// ignored
-			}
-
-			if ( !lHasInitializedResourcesInBackground )
-			{
-				try
-				{
-					lResourcesService.Initialize();
-				}
-				catch ( Exception )
-				{
-					// ignored
-				}
-			}
-
-			mResourcesService = lResourcesService;
-
-			OverviewPageViewModel lOverviewPageViewModel = null;
-			ExperiencePageViewModel lExperiencePageViewModel = null;
-			SkillsPageViewModel lSkillsPageViewModel = null;
-			ProjectsPageViewModel lProjectsPageViewModel = null;
-			PhotographyPageViewModel lPhotographyPageViewModel = null;
-			EducationPageViewModel lEducationPageViewModel = null;
-
-			try
-			{
-				lOverviewPageViewModel = new OverviewPageViewModel( mResourcesService, mThemeService );
-				lExperiencePageViewModel = new ExperiencePageViewModel( mResourcesService, mThemeService );
-				lSkillsPageViewModel = new SkillsPageViewModel( mResourcesService, mThemeService );
-				lProjectsPageViewModel = new ProjectsPageViewModel( mResourcesService, mThemeService );
-				lPhotographyPageViewModel = new PhotographyPageViewModel( mResourcesService, mThemeService );
-				lEducationPageViewModel = new EducationPageViewModel( mResourcesService, mThemeService );
-			}
-			catch ( Exception )
-			{
-				// ignored
-			}
-
-			if ( lOverviewPageViewModel == null
-				|| lExperiencePageViewModel == null
-				|| lSkillsPageViewModel == null
-				|| lProjectsPageViewModel == null
-				|| lPhotographyPageViewModel == null
-				|| lEducationPageViewModel == null )
-			{
-				return;
-			}
-
-			MainViewModel lMainViewModel = null;
-
-			try
-			{
-				lMainViewModel = new MainViewModel(
-					mResourcesService,
-					mThemeService,
-					lOverviewPageViewModel,
-					lExperiencePageViewModel,
-					lSkillsPageViewModel,
-					lProjectsPageViewModel,
-					lPhotographyPageViewModel,
-					lEducationPageViewModel );
-			}
-			catch ( Exception )
-			{
-				// ignored
-			}
-
-			if ( lMainViewModel == null )
-			{
-				return;
-			}
-
-			pMainWindow.DataContext = lMainViewModel;
-
-			QueueBackgroundImagePreload( lProjectsPageViewModel, lPhotographyPageViewModel );
+			// ignored
 		}
 	}
+
+	private void InitializeThemeService()
+	{
+		mThemeService = new ThemeService();
+
+		try
+		{
+			mThemeService.Initialize( this );
+		}
+		catch ( Exception )
+		{
+			// ignored
+		}
+	}
+
+	private async Task InitializeMainWindowAsync( FrameworkElement pMainWindow )
+	{
+		if ( mThemeService is not ThemeService lThemeService )
+		{
+			return;
+		}
+
+		ResourcesService lResourcesService = await CreateInitializedResourcesServiceAsync();
+
+		if ( !TryCreatePageViewModels( lResourcesService, lThemeService, out PageViewModels lPageViewModels )
+		     || !TryCreateMainViewModel( lResourcesService, lThemeService, lPageViewModels, out MainViewModel lMainViewModel ) )
+		{
+			return;
+		}
+
+		pMainWindow.DataContext = lMainViewModel;
+
+		QueueBackgroundImagePreload( lPageViewModels.ProjectsPageViewModel, lPageViewModels.PhotographyPageViewModel );
+	}
+
+	private readonly record struct PageViewModels(
+		OverviewPageViewModel OverviewPageViewModel,
+		ExperiencePageViewModel ExperiencePageViewModel,
+		SkillsPageViewModel SkillsPageViewModel,
+		ProjectsPageViewModel ProjectsPageViewModel,
+		PhotographyPageViewModel PhotographyPageViewModel,
+		EducationPageViewModel EducationPageViewModel );
 }

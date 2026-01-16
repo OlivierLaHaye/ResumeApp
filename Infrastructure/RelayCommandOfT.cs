@@ -5,7 +5,8 @@ using System.Windows.Input;
 
 namespace ResumeApp.Infrastructure
 {
-	public sealed class RelayCommand<T> : ICommand
+	public sealed class RelayCommand<T>( Action<T> pExecuteAction, Func<T, bool> pCanExecuteFunc = null )
+		: ICommand
 	{
 		public event EventHandler CanExecuteChanged
 		{
@@ -13,18 +14,11 @@ namespace ResumeApp.Infrastructure
 			remove => CommandManager.RequerySuggested -= value;
 		}
 
-		private readonly Action<T> mExecuteAction;
-		private readonly Func<T, bool> mCanExecuteFunc;
-
-		public RelayCommand( Action<T> pExecuteAction, Func<T, bool> pCanExecuteFunc = null )
-		{
-			mExecuteAction = pExecuteAction ?? throw new ArgumentNullException( nameof( pExecuteAction ) );
-			mCanExecuteFunc = pCanExecuteFunc;
-		}
+		private readonly Action<T> mExecuteAction = pExecuteAction ?? throw new ArgumentNullException( nameof( pExecuteAction ) );
 
 		public bool CanExecute( object pParameter )
 		{
-			if ( mCanExecuteFunc == null )
+			if ( pCanExecuteFunc == null )
 			{
 				return true;
 			}
@@ -33,11 +27,11 @@ namespace ResumeApp.Infrastructure
 			{
 				case null:
 					{
-						return mCanExecuteFunc( default );
+						return pCanExecuteFunc( default );
 					}
 				case T lTypedParameter:
 					{
-						return mCanExecuteFunc( lTypedParameter );
+						return pCanExecuteFunc( lTypedParameter );
 					}
 				default:
 					{

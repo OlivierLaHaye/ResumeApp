@@ -11,7 +11,8 @@ namespace ResumeApp.ViewModels.Pages
 {
 	public sealed class OverviewPageViewModel : ViewModelBase
 	{
-		private sealed class DelegateCommand : ICommand
+		private sealed class DelegateCommand( Action<object> pExecuteAction, Func<object, bool> pCanExecuteFunc )
+			: ICommand
 		{
 			public event EventHandler CanExecuteChanged
 			{
@@ -25,23 +26,14 @@ namespace ResumeApp.ViewModels.Pages
 				}
 			}
 
-			private readonly Action<object> mExecuteAction;
-			private readonly Func<object, bool> mCanExecuteFunc;
-
-			public DelegateCommand( Action<object> pExecuteAction, Func<object, bool> pCanExecuteFunc )
-			{
-				mExecuteAction = pExecuteAction;
-				mCanExecuteFunc = pCanExecuteFunc;
-			}
-
 			public bool CanExecute( object pParameter )
 			{
-				return mCanExecuteFunc == null || mCanExecuteFunc( pParameter );
+				return pCanExecuteFunc == null || pCanExecuteFunc( pParameter );
 			}
 
 			public void Execute( object pParameter )
 			{
-				mExecuteAction?.Invoke( pParameter );
+				pExecuteAction?.Invoke( pParameter );
 			}
 		}
 

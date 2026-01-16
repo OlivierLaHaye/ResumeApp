@@ -10,50 +10,28 @@ namespace ResumeApp.Helpers
 {
 	public static class ColorHelper
 	{
-		public class CmykColor
+		public class CmykColor( double pC, double pM, double pY, double pK )
 		{
-			public double C { get; set; }
-			public double M { get; set; }
-			public double Y { get; set; }
-			public double K { get; set; }
-
-			public CmykColor( double pC, double pM, double pY, double pK )
-			{
-				C = pC;
-				M = pM;
-				Y = pY;
-				K = pK;
-			}
+			public double C { get; set; } = pC;
+			public double M { get; set; } = pM;
+			public double Y { get; set; } = pY;
+			public double K { get; set; } = pK;
 		}
 
-		public class HslColor
+		public class HslColor( double pHue, double pSaturation, double pLightness )
 		{
-			public double Hue { get; set; }
+			public double Hue { get; set; } = pHue;
 
-			public double Saturation { get; set; }
+			public double Saturation { get; set; } = pSaturation;
 
-			public double Lightness { get; set; }
-
-			public HslColor( double pHue, double pSaturation, double pLightness )
-			{
-				Hue = pHue;
-				Saturation = pSaturation;
-				Lightness = pLightness;
-			}
+			public double Lightness { get; set; } = pLightness;
 		}
 
-		public class LabColor
+		public class LabColor( double pLightness, double pGreenRed, double pBlueYellow )
 		{
-			public double L { get; set; }
-			public double A { get; set; }
-			public double B { get; set; }
-
-			public LabColor( double pLightness, double pGreenRed, double pBlueYellow )
-			{
-				L = pLightness;
-				A = pGreenRed;
-				B = pBlueYellow;
-			}
+			public double L { get; set; } = pLightness;
+			public double A { get; set; } = pGreenRed;
+			public double B { get; set; } = pBlueYellow;
 		}
 
 		public static readonly string[] sAccentBrushKeys =

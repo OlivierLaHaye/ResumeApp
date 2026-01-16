@@ -10,14 +10,8 @@ namespace ResumeApp.Converters
 {
 	public abstract class BaseVisibilityConverter : IValueConverter
 	{
-		public Visibility TrueValue { get; set; }
-		public Visibility FalseValue { get; set; }
-
-		protected BaseVisibilityConverter()
-		{
-			TrueValue = Visibility.Visible;
-			FalseValue = Visibility.Collapsed;
-		}
+		public Visibility TrueValue { get; set; } = Visibility.Visible;
+		public Visibility FalseValue { get; set; } = Visibility.Collapsed;
 
 		public abstract object Convert( object pValue, Type pTargetType, object pParameter, CultureInfo pCulture );
 
@@ -33,14 +27,8 @@ namespace ResumeApp.Converters
 
 	public abstract class BaseMultiVisibilityConverter : IMultiValueConverter
 	{
-		public Visibility TrueValue { get; set; }
-		public Visibility FalseValue { get; set; }
-
-		protected BaseMultiVisibilityConverter()
-		{
-			TrueValue = Visibility.Visible;
-			FalseValue = Visibility.Collapsed;
-		}
+		public Visibility TrueValue { get; set; } = Visibility.Visible;
+		public Visibility FalseValue { get; set; } = Visibility.Collapsed;
 
 		public abstract object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture );
 

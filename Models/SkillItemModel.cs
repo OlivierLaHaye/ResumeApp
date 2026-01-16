@@ -3,13 +3,8 @@
 
 namespace ResumeApp.Models
 {
-	public sealed class SkillItemModel
+	public sealed class SkillItemModel( string pSkillNameResourceKey )
 	{
-		public string SkillNameResourceKey { get; }
-
-		public SkillItemModel( string pSkillNameResourceKey )
-		{
-			SkillNameResourceKey = pSkillNameResourceKey ?? string.Empty;
-		}
+		public string SkillNameResourceKey { get; } = pSkillNameResourceKey ?? string.Empty;
 	}
 }
