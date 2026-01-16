@@ -2,105 +2,102 @@
 // All rights reserved.
 
 using Microsoft.Win32;
+using System.Runtime.Versioning;
 
-namespace ResumeApp.Services
+namespace ResumeApp.Services;
+
+public static class RegistrySettingsService
 {
-	public sealed class RegistrySettingsService
+	private const string CompanyKeyName = "ResumeApp";
+	private const string ThemeValueName = "Theme";
+	private const string LanguageValueName = "Language";
+
+	public static bool TryLoadTheme( out AppTheme pTheme ) => TryLoadEnumValue( ThemeValueName, AppTheme.Light, out pTheme );
+
+	public static bool TryLoadLanguage( out AppLanguage pLanguage ) => TryLoadEnumValue( LanguageValueName, AppLanguage.EnglishCanada, out pLanguage );
+
+	public static void SaveTheme( AppTheme pTheme ) => SaveEnumValue( ThemeValueName, pTheme );
+
+	public static void SaveLanguage( AppLanguage pLanguage ) => SaveEnumValue( LanguageValueName, pLanguage );
+
+	private static bool TryLoadEnumValue<TEnum>( string pValueName, TEnum pDefaultValue, out TEnum pValue )
+		where TEnum : struct, Enum
 	{
-		private const string CompanyKeyName = "ResumeApp";
-		private const string ThemeValueName = "Theme";
-		private const string LanguageValueName = "Language";
+		pValue = pDefaultValue;
 
-		public static bool TryLoadTheme( out AppTheme pTheme )
+		string lText = LoadStringValue( pValueName );
+		if ( string.IsNullOrWhiteSpace( lText ) )
 		{
-			pTheme = AppTheme.Light;
-
-			string lThemeValue = LoadStringValue( ThemeValueName );
-
-			if ( string.Equals( lThemeValue, AppTheme.Dark.ToString(), StringComparison.OrdinalIgnoreCase ) )
-			{
-				pTheme = AppTheme.Dark;
-				return true;
-			}
-
-			if ( !string.Equals( lThemeValue, AppTheme.Light.ToString(), StringComparison.OrdinalIgnoreCase ) )
-			{
-				return false;
-			}
-
-			pTheme = AppTheme.Light;
-			return true;
-
+			return false;
 		}
 
-		public static bool TryLoadLanguage( out AppLanguage pLanguage )
+		if ( !Enum.TryParse( lText, ignoreCase: true, out TEnum lParsedValue ) )
 		{
-			pLanguage = AppLanguage.EnglishCanada;
-
-			string lLanguageValue = LoadStringValue( LanguageValueName );
-
-			if ( string.Equals( lLanguageValue, AppLanguage.FrenchCanada.ToString(), StringComparison.OrdinalIgnoreCase ) )
-			{
-				pLanguage = AppLanguage.FrenchCanada;
-				return true;
-			}
-
-			if ( !string.Equals( lLanguageValue, AppLanguage.EnglishCanada.ToString(),
-				    StringComparison.OrdinalIgnoreCase ) )
-			{
-				return false;
-			}
-
-			pLanguage = AppLanguage.EnglishCanada;
-			return true;
-
+			return false;
 		}
 
-		public static void SaveTheme( AppTheme pTheme )
+		if ( !Enum.IsDefined( typeof( TEnum ), lParsedValue ) )
 		{
-			SaveStringValue( ThemeValueName, pTheme.ToString() );
+			return false;
 		}
 
-		public static void SaveLanguage( AppLanguage pLanguage )
+		pValue = lParsedValue;
+		return true;
+	}
+
+	private static void SaveEnumValue<TEnum>( string pValueName, TEnum pValue )
+		where TEnum : struct, Enum
+	{
+		SaveStringValue( pValueName, pValue.ToString() );
+	}
+
+	private static string LoadStringValue( string pValueName )
+	{
+		if ( !OperatingSystem.IsWindows() )
 		{
-			SaveStringValue( LanguageValueName, pLanguage.ToString() );
+			return string.Empty;
 		}
 
-		private static string LoadStringValue( string pValueName )
+		try
 		{
-			try
-			{
-				using ( RegistryKey lKey = Registry.CurrentUser.CreateSubKey( GetRootKeyPath() ) )
-				{
-					return lKey?.GetValue( pValueName ) as string;
-				}
-			}
-			catch ( Exception )
-			{
-				// ignored
-			}
-
-			return null;
+			return LoadStringValueOnWindows( pValueName );
 		}
-
-		private static void SaveStringValue( string pValueName, string pValue )
+		catch ( Exception )
 		{
-			try
-			{
-				using ( RegistryKey lKey = Registry.CurrentUser.CreateSubKey( GetRootKeyPath() ) )
-				{
-					lKey?.SetValue( pValueName, pValue, RegistryValueKind.String );
-				}
-			}
-			catch ( Exception )
-			{
-				// ignored
-			}
-		}
-
-		private static string GetRootKeyPath()
-		{
-			return @"Software\" + CompanyKeyName;
+			return string.Empty;
 		}
 	}
+
+	private static void SaveStringValue( string pValueName, string pValue )
+	{
+		if ( !OperatingSystem.IsWindows() )
+		{
+			return;
+		}
+
+		try
+		{
+			SaveStringValueOnWindows( pValueName, pValue );
+		}
+		catch ( Exception )
+		{
+			// ignored
+		}
+	}
+
+	[SupportedOSPlatform( "windows" )]
+	private static string LoadStringValueOnWindows( string pValueName )
+	{
+		using RegistryKey? lKey = Registry.CurrentUser.CreateSubKey( GetRootKeyPath() );
+		return lKey.GetValue( pValueName ) as string ?? string.Empty;
+	}
+
+	[SupportedOSPlatform( "windows" )]
+	private static void SaveStringValueOnWindows( string pValueName, string pValue )
+	{
+		using RegistryKey? lKey = Registry.CurrentUser.CreateSubKey( GetRootKeyPath() );
+		lKey.SetValue( pValueName, pValue, RegistryValueKind.String );
+	}
+
+	private static string GetRootKeyPath() => @"Software\" + CompanyKeyName;
 }

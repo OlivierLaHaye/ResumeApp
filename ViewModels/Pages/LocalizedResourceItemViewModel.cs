@@ -14,12 +14,12 @@ namespace ResumeApp.ViewModels.Pages
 
 		public string DisplayText => mResourcesService[ ResourceKey ];
 
-		public LocalizedResourceItemViewModel( ResourcesService pResourcesService, string pResourceKey )
+		public LocalizedResourceItemViewModel( ResourcesService pResourcesService, string? pResourceKey )
 		{
 			mResourcesService = pResourcesService ?? throw new ArgumentNullException( nameof( pResourcesService ) );
 			ResourceKey = pResourceKey ?? string.Empty;
 
-			mResourcesService.PropertyChanged += ( pSender, pArgs ) => RaisePropertyChanged( nameof( DisplayText ) );
+			mResourcesService.PropertyChanged += ( _, _ ) => RaisePropertyChanged( nameof( DisplayText ) );
 		}
 	}
 }

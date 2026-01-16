@@ -7,67 +7,50 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace ResumeApp.Services
+namespace ResumeApp.Services;
+
+public static class ScrollViewerScrollService
 {
-	public static class ScrollViewerScrollService
+	private static ICommand? sScrollToTopCommand;
+	public static ICommand ScrollToTopCommand => sScrollToTopCommand ??= new RelayCommand( ExecuteScrollToTop );
+
+	private static ICommand? sScrollToBottomCommand;
+	public static ICommand ScrollToBottomCommand => sScrollToBottomCommand ??= new RelayCommand( ExecuteScrollToBottom );
+
+	private static void ExecuteScrollToTop()
 	{
+		ExecuteScrollToTop( GetDefaultScrollSource() );
+	}
 
-		private static ICommand sScrollToTopCommand;
-		public static ICommand ScrollToTopCommand =>
-									sScrollToTopCommand ??
-									( sScrollToTopCommand = new RelayCommand( ExecuteScrollToTop ) );
+	private static void ExecuteScrollToBottom()
+	{
+		ExecuteScrollToBottom( GetDefaultScrollSource() );
+	}
 
-		private static ICommand sScrollToBottomCommand;
-		public static ICommand ScrollToBottomCommand =>
-									sScrollToBottomCommand ??
-									( sScrollToBottomCommand = new RelayCommand( ExecuteScrollToBottom ) );
+	private static object? GetDefaultScrollSource() => Keyboard.FocusedElement ?? Mouse.DirectlyOver;
 
-		private static void ExecuteScrollToTop()
+	private static void ExecuteScrollToTop( object? pSource ) => ExtractScrollViewer( pSource )?.ScrollToTop();
+
+	private static void ExecuteScrollToBottom( object? pSource ) => ExtractScrollViewer( pSource )?.ScrollToBottom();
+
+	private static ScrollViewer? ExtractScrollViewer( object? pCandidate )
+	{
+		if ( pCandidate is ScrollViewer lViewer )
 		{
-			ExecuteScrollToTop( GetDefaultScrollSource() );
+			return lViewer;
 		}
 
-		private static void ExecuteScrollToBottom()
+		if ( pCandidate is not DependencyObject lDependencyObject )
 		{
-			ExecuteScrollToBottom( GetDefaultScrollSource() );
+			return null;
 		}
 
-		private static object GetDefaultScrollSource()
+		DependencyObject? lCurrent = lDependencyObject;
+		while ( lCurrent is not null and not ScrollViewer )
 		{
-			var lFocusedElement = Keyboard.FocusedElement;
-			return lFocusedElement ?? Mouse.DirectlyOver;
+			lCurrent = VisualTreeHelper.GetParent( lCurrent );
 		}
 
-		private static void ExecuteScrollToTop( object pSource )
-		{
-			var lScrollViewer = ExtractScrollViewer( pSource );
-			lScrollViewer?.ScrollToTop();
-		}
-
-		private static void ExecuteScrollToBottom( object pSource )
-		{
-			var lScrollViewer = ExtractScrollViewer( pSource );
-			lScrollViewer?.ScrollToBottom();
-		}
-
-		private static ScrollViewer ExtractScrollViewer( object pCandidate )
-		{
-			if ( pCandidate is ScrollViewer lViewer )
-			{
-				return lViewer;
-			}
-
-			if ( pCandidate is not DependencyObject lCurrent )
-			{
-				return null;
-			}
-
-			while ( lCurrent != null && lCurrent is not ScrollViewer )
-			{
-				lCurrent = VisualTreeHelper.GetParent( lCurrent );
-			}
-
-			return ( ScrollViewer )lCurrent;
-		}
+		return lCurrent as ScrollViewer;
 	}
 }

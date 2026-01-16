@@ -12,12 +12,11 @@ namespace ResumeApp.Services
 	{
 		private static readonly ResourceManager sResourceManager = CreateResourceManager();
 
-		private CultureInfo mActiveCulture;
 		public CultureInfo ActiveCulture
 		{
-			get => mActiveCulture;
-			private set => SetProperty( ref mActiveCulture, value );
-		}
+			get;
+			private set => SetProperty( ref field, value );
+		} = CultureInfo.GetCultureInfo( "en-CA" );
 
 		public string ActiveLanguageDisplayName
 		{
@@ -42,9 +41,21 @@ namespace ResumeApp.Services
 			}
 		}
 
-		public ResourcesService()
+		public void Initialize()
 		{
-			ActiveCulture = CultureInfo.GetCultureInfo( "en-CA" );
+			if ( RegistrySettingsService.TryLoadLanguage( out AppLanguage lSavedLanguage ) )
+			{
+				SetLanguageInternal( lSavedLanguage, true );
+				return;
+			}
+
+			AppLanguage lDetectedLanguage = DetectWindowsLanguage();
+			SetLanguageInternal( lDetectedLanguage, true );
+		}
+
+		public void SetLanguage( AppLanguage pLanguage )
+		{
+			SetLanguageInternal( pLanguage, false );
 		}
 
 		private static ResourceManager CreateResourceManager()
@@ -62,15 +73,13 @@ namespace ResumeApp.Services
 
 			foreach ( string lBaseName in lCandidateBaseNames )
 			{
-				ResourceManager lCandidate = CreateIfValid( lAssembly, lBaseName );
-
-				if ( lCandidate != null )
+				if ( TryCreateResourceManager( lAssembly, lBaseName, out ResourceManager lCandidate ) )
 				{
 					return lCandidate;
 				}
 			}
 
-			string lManifestBaseName = lAssembly
+			string? lManifestBaseName = lAssembly
 				.GetManifestResourceNames()
 				.Where( pItem => pItem.EndsWith( ".resources", StringComparison.OrdinalIgnoreCase ) )
 				.Where( pItem => !pItem.EndsWith( ".g.resources", StringComparison.OrdinalIgnoreCase ) )
@@ -82,35 +91,34 @@ namespace ResumeApp.Services
 				return new ResourceManager( $"{lAssemblyName}.Properties.Resources", lAssembly );
 			}
 
+			string lBaseNameFromManifest = lManifestBaseName[ ..^".resources".Length ];
+			if ( TryCreateResourceManager( lAssembly, lBaseNameFromManifest, out ResourceManager lFromManifest ) )
 			{
-				string lBaseName = lManifestBaseName.Substring( 0, lManifestBaseName.Length - ".resources".Length );
-				ResourceManager lFromManifest = CreateIfValid( lAssembly, lBaseName );
-
-				if ( lFromManifest != null )
-				{
-					return lFromManifest;
-				}
+				return lFromManifest;
 			}
 
 			return new ResourceManager( $"{lAssemblyName}.Properties.Resources", lAssembly );
 		}
 
-		private static ResourceManager CreateIfValid( Assembly pAssembly, string pBaseName )
+		private static bool TryCreateResourceManager( Assembly pAssembly, string pBaseName, out ResourceManager pResourceManager )
 		{
+			pResourceManager = null!;
+
 			if ( string.IsNullOrWhiteSpace( pBaseName ) )
 			{
-				return null;
+				return false;
 			}
 
 			try
 			{
 				ResourceManager lManager = new ResourceManager( pBaseName, pAssembly );
 				lManager.GetResourceSet( CultureInfo.InvariantCulture, true, false );
-				return lManager;
+				pResourceManager = lManager;
+				return true;
 			}
 			catch ( MissingManifestResourceException )
 			{
-				return null;
+				return false;
 			}
 		}
 
@@ -139,23 +147,6 @@ namespace ResumeApp.Services
 			}
 
 			return AppLanguage.EnglishCanada;
-		}
-
-		public void Initialize()
-		{
-			if ( RegistrySettingsService.TryLoadLanguage( out AppLanguage lSavedLanguage ) )
-			{
-				SetLanguageInternal( lSavedLanguage, true );
-				return;
-			}
-
-			AppLanguage lDetectedLanguage = DetectWindowsLanguage();
-			SetLanguageInternal( lDetectedLanguage, true );
-		}
-
-		public void SetLanguage( AppLanguage pLanguage )
-		{
-			SetLanguageInternal( pLanguage, false );
 		}
 
 		private void SetLanguageInternal( AppLanguage pLanguage, bool pIsInitialization )

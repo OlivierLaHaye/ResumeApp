@@ -166,17 +166,11 @@
   <data name="EducationItem1LocationDates" xml:space="preserve">
     <value>Québec, QC, Canada | 2014 à 2018</value>
   </data>
-  <data name="EducationItem1Notes" xml:space="preserve">
-    <value></value>
-  </data>
   <data name="EducationItem1Title" xml:space="preserve">
     <value>Université Laval | Baccalauréat en informatique</value>
   </data>
   <data name="EducationItem2LocationDates" xml:space="preserve">
     <value>Québec, QC, Canada | 2008 à 2011</value>
-  </data>
-  <data name="EducationItem2Notes" xml:space="preserve">
-    <value></value>
   </data>
   <data name="EducationItem2Title" xml:space="preserve">
     <value>Cégep Limoilou | DEC, Animation 3D et synthèse d’images</value>
@@ -352,9 +346,6 @@
   <data name="ExperienceCreaformUiUxExpertCompany" xml:space="preserve">
     <value>Creaform</value>
   </data>
-  <data name="ExperienceCreaformUiUxExpertEndIso" xml:space="preserve">
-    <value></value>
-  </data>
   <data name="ExperienceCreaformUiUxExpertLocation" xml:space="preserve">
     <value>Lévis, QC, Canada (Hybrid)</value>
   </data>
@@ -432,9 +423,6 @@
   </data>
   <data name="ExperienceOlhPhotographieCompany" xml:space="preserve">
     <value>OLH PHOTOGRAPHIE</value>
-  </data>
-  <data name="ExperienceOlhPhotographieEndIso" xml:space="preserve">
-    <value></value>
   </data>
   <data name="ExperienceOlhPhotographieLocation" xml:space="preserve">
     <value>Québec, Canada</value>

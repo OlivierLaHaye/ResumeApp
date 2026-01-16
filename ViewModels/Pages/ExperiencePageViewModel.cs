@@ -6,6 +6,7 @@ using ResumeApp.Infrastructure;
 using ResumeApp.Models;
 using ResumeApp.Services;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Windows.Input;
 
@@ -15,49 +16,47 @@ namespace ResumeApp.ViewModels.Pages
 	{
 		private bool mIsSelectionSynchronizationActive;
 
+		private TimelineTimeFrameItem? mSelectedTimeFrame;
+
+		private ExperienceTimelineEntryViewModel? mSelectedTimelineEntry;
+
+		private DateTime mSelectedDate;
+
 		public ObservableCollection<ExperienceTimelineEntryViewModel> TimelineEntries { get; }
 
 		public ObservableCollection<TimelineTimeFrameItem> ExperienceTimeFrames { get; }
 
 		public string TimelineControlInteractionsHelpText => ResourcesService[ "TimelineControlInteractionsHelpText" ];
 
-		private DateTime mTimelineMinDate;
 		public DateTime TimelineMinDate
 		{
-			get => mTimelineMinDate;
-			private set => SetProperty( ref mTimelineMinDate, value );
+			get;
+			private set => SetProperty( ref field, value );
 		}
 
-		private DateTime mSelectedDate;
 		public DateTime SelectedDate
 		{
 			get => mSelectedDate;
 			set => SetSelectedDate( value );
 		}
 
-		private TimelineTimeFrameItem mSelectedTimeFrame;
-		public TimelineTimeFrameItem SelectedTimeFrame
+		public TimelineTimeFrameItem? SelectedTimeFrame
 		{
 			get => mSelectedTimeFrame;
 			set => SetSelectedTimeFrame( value );
 		}
 
-		private ExperienceTimelineEntryViewModel mSelectedTimelineEntry;
-		public ExperienceTimelineEntryViewModel SelectedTimelineEntry
+		public ExperienceTimelineEntryViewModel? SelectedTimelineEntry
 		{
 			get => mSelectedTimelineEntry;
 			set => SetSelectedTimelineEntry( value );
 		}
 
-		private ICommand mSelectExperienceCommand;
-		public ICommand SelectExperienceCommand =>
-							mSelectExperienceCommand ??
-							( mSelectExperienceCommand = new ParameterRelayCommand( ExecuteSelectExperience ) );
+		[field: AllowNull, MaybeNull]
+		public ICommand SelectExperienceCommand => field ??= new ParameterRelayCommand( ExecuteSelectExperience );
 
-		private ICommand mSelectDateCommand;
-		public ICommand SelectDateCommand =>
-							mSelectDateCommand ??
-							( mSelectDateCommand = new ParameterRelayCommand( ExecuteSelectDate ) );
+		[field: AllowNull, MaybeNull]
+		public ICommand SelectDateCommand => field ??= new ParameterRelayCommand( ExecuteSelectDate );
 
 		public ExperiencePageViewModel( ResourcesService pResourcesService, ThemeService pThemeService )
 			: base( pResourcesService, pThemeService )
@@ -65,7 +64,7 @@ namespace ResumeApp.ViewModels.Pages
 			TimelineEntries = [ ];
 			ExperienceTimeFrames = [ ];
 
-			ResourcesService.PropertyChanged += ( pSender, pArgs ) =>
+			ResourcesService.PropertyChanged += ( _, _ ) =>
 			{
 				RaisePropertyChanged( nameof( TimelineControlInteractionsHelpText ) );
 				RebuildEntries();
@@ -74,7 +73,7 @@ namespace ResumeApp.ViewModels.Pages
 			RebuildEntries();
 		}
 
-		private static DateTime ParseIsoDateOrDefault( string pIsoText )
+		private static DateTime ParseIsoDateOrDefault( string? pIsoText )
 		{
 			return DateTime.TryParseExact(
 				pIsoText ?? string.Empty,
@@ -91,17 +90,12 @@ namespace ResumeApp.ViewModels.Pages
 				return null;
 			}
 
-			if ( DateTime.TryParseExact(
+			return DateTime.TryParseExact(
 				pIsoText,
 				"yyyy-MM-dd",
 				CultureInfo.InvariantCulture,
 				DateTimeStyles.AssumeLocal,
-				out DateTime lParsedDate ) )
-			{
-				return lParsedDate;
-			}
-
-			return null;
+				out DateTime lParsedDate ) ? lParsedDate : null;
 		}
 
 		private static TimelineTimeFrameItem CreateTimeFrameForEntry( ExperienceTimelineEntryViewModel pEntry )
@@ -118,7 +112,7 @@ namespace ResumeApp.ViewModels.Pages
 
 		private static string GetAccentKeyForPaletteIndex( int pPaletteIndex )
 		{
-			if ( ColorHelper.sAccentBrushKeys == null || ColorHelper.sAccentBrushKeys.Length == 0 )
+			if ( ColorHelper.sAccentBrushKeys.Length == 0 )
 			{
 				return "CommonBlueBrush";
 			}
@@ -127,7 +121,7 @@ namespace ResumeApp.ViewModels.Pages
 			return ColorHelper.sAccentBrushKeys[ lNormalizedIndex % ColorHelper.sAccentBrushKeys.Length ];
 		}
 
-		private static void AssignLanes( ICollection<ExperienceTimelineEntryViewModel> pEntries )
+		private static void AssignLanes( ICollection<ExperienceTimelineEntryViewModel>? pEntries )
 		{
 			if ( pEntries == null || pEntries.Count == 0 )
 			{
@@ -135,7 +129,6 @@ namespace ResumeApp.ViewModels.Pages
 			}
 
 			List<ExperienceTimelineEntryViewModel> lValidEntries = pEntries
-				.Where( pItem => pItem != null )
 				.Distinct()
 				.ToList();
 
@@ -170,7 +163,7 @@ namespace ResumeApp.ViewModels.Pages
 			}
 		}
 
-		private void ExecuteSelectExperience( object pParameter )
+		private void ExecuteSelectExperience( object? pParameter )
 		{
 			if ( pParameter is not ExperienceTimelineEntryViewModel lEntry )
 			{
@@ -181,7 +174,7 @@ namespace ResumeApp.ViewModels.Pages
 			SelectedDate = lEntry.StartDate;
 		}
 
-		private void ExecuteSelectDate( object pParameter )
+		private void ExecuteSelectDate( object? pParameter )
 		{
 			switch ( pParameter )
 			{
@@ -193,7 +186,7 @@ namespace ResumeApp.ViewModels.Pages
 				case string lText when DateTime.TryParse( lText, CultureInfo.CurrentCulture, DateTimeStyles.AssumeLocal, out DateTime lParsedDate ):
 					{
 						SelectedDate = lParsedDate;
-						break;
+						return;
 					}
 			}
 		}
@@ -202,14 +195,7 @@ namespace ResumeApp.ViewModels.Pages
 		{
 			DateTime lClampedDate = ClampToTimelineRange( pSelectedDate.Date );
 
-			if ( lClampedDate == mSelectedDate )
-			{
-				return;
-			}
-
-			bool lHasChanged = SetProperty( ref mSelectedDate, lClampedDate );
-
-			if ( !lHasChanged )
+			if ( lClampedDate == mSelectedDate || !SetProperty( ref mSelectedDate, lClampedDate ) )
 			{
 				return;
 			}
@@ -217,26 +203,12 @@ namespace ResumeApp.ViewModels.Pages
 			SynchronizeSelectionFromSelectedDate();
 		}
 
-		private void SetSelectedTimeFrame( TimelineTimeFrameItem pSelectedTimeFrame )
+		private void SetSelectedTimeFrame( TimelineTimeFrameItem? pSelectedTimeFrame )
 		{
-			if ( ReferenceEquals( mSelectedTimeFrame, pSelectedTimeFrame ) )
-			{
-				return;
-			}
-
-			bool lHasChanged = SetProperty( ref mSelectedTimeFrame, pSelectedTimeFrame );
-
-			if ( !lHasChanged )
-			{
-				return;
-			}
-
-			if ( pSelectedTimeFrame == null )
-			{
-				return;
-			}
-
-			if ( mIsSelectionSynchronizationActive )
+			if ( ReferenceEquals( mSelectedTimeFrame, pSelectedTimeFrame )
+				 || !SetProperty( ref mSelectedTimeFrame, pSelectedTimeFrame )
+				 || pSelectedTimeFrame == null
+				 || mIsSelectionSynchronizationActive )
 			{
 				return;
 			}
@@ -244,26 +216,12 @@ namespace ResumeApp.ViewModels.Pages
 			SelectedDate = pSelectedTimeFrame.StartDate;
 		}
 
-		private void SetSelectedTimelineEntry( ExperienceTimelineEntryViewModel pSelectedTimelineEntry )
+		private void SetSelectedTimelineEntry( ExperienceTimelineEntryViewModel? pSelectedTimelineEntry )
 		{
-			if ( ReferenceEquals( mSelectedTimelineEntry, pSelectedTimelineEntry ) )
-			{
-				return;
-			}
-
-			bool lHasChanged = SetProperty( ref mSelectedTimelineEntry, pSelectedTimelineEntry );
-
-			if ( !lHasChanged )
-			{
-				return;
-			}
-
-			if ( pSelectedTimelineEntry == null )
-			{
-				return;
-			}
-
-			if ( mIsSelectionSynchronizationActive )
+			if ( ReferenceEquals( mSelectedTimelineEntry, pSelectedTimelineEntry )
+				 || !SetProperty( ref mSelectedTimelineEntry, pSelectedTimelineEntry )
+				 || pSelectedTimelineEntry == null
+				 || mIsSelectionSynchronizationActive )
 			{
 				return;
 			}
@@ -282,13 +240,14 @@ namespace ResumeApp.ViewModels.Pages
 
 			try
 			{
-				ExperienceTimelineEntryViewModel lEntry = FindEntryClosestAtOrBefore( mSelectedDate );
+				ExperienceTimelineEntryViewModel? lEntry = FindEntryClosestAtOrBefore( mSelectedDate );
 				if ( lEntry != null && !ReferenceEquals( mSelectedTimelineEntry, lEntry ) )
 				{
 					SetProperty( ref mSelectedTimelineEntry, lEntry, nameof( SelectedTimelineEntry ) );
 				}
 
-				TimelineTimeFrameItem lTimeFrame = FindTimeFrameByStartDate( lEntry?.StartDate ?? mSelectedDate );
+				DateTime lStartDate = lEntry?.StartDate ?? mSelectedDate;
+				TimelineTimeFrameItem? lTimeFrame = FindTimeFrameByStartDate( lStartDate );
 				if ( lTimeFrame != null && !ReferenceEquals( mSelectedTimeFrame, lTimeFrame ) )
 				{
 					SetProperty( ref mSelectedTimeFrame, lTimeFrame, nameof( SelectedTimeFrame ) );
@@ -309,15 +268,10 @@ namespace ResumeApp.ViewModels.Pages
 				return TimelineMinDate;
 			}
 
-			if ( pDate > lToday )
-			{
-				return lToday;
-			}
-
-			return pDate;
+			return pDate > lToday ? lToday : pDate;
 		}
 
-		private ExperienceTimelineEntryViewModel FindEntryClosestAtOrBefore( DateTime pDate )
+		private ExperienceTimelineEntryViewModel? FindEntryClosestAtOrBefore( DateTime pDate )
 		{
 			if ( TimelineEntries.Count == 0 )
 			{
@@ -325,23 +279,17 @@ namespace ResumeApp.ViewModels.Pages
 			}
 
 			List<ExperienceTimelineEntryViewModel> lOrdered = TimelineEntries
-				.Where( pItem => pItem != null )
 				.OrderBy( pItem => pItem.StartDate )
 				.ThenBy( pItem => pItem.CompanyText )
 				.ThenBy( pItem => pItem.RoleText )
 				.ToList();
 
-			ExperienceTimelineEntryViewModel lMatch = lOrdered
-				.LastOrDefault( pItem => pItem.StartDate.Date <= pDate.Date );
-
-			return lMatch ?? lOrdered.FirstOrDefault();
+			return lOrdered.LastOrDefault( pItem => pItem.StartDate.Date <= pDate.Date ) ?? lOrdered.FirstOrDefault();
 		}
 
-		private TimelineTimeFrameItem FindTimeFrameByStartDate( DateTime pStartDate )
+		private TimelineTimeFrameItem? FindTimeFrameByStartDate( DateTime pStartDate )
 		{
-			return ExperienceTimeFrames
-				.Where( pItem => pItem != null )
-				.FirstOrDefault( pItem => pItem.StartDate.Date == pStartDate.Date );
+			return ExperienceTimeFrames.FirstOrDefault( pItem => pItem.StartDate.Date == pStartDate.Date );
 		}
 
 		private void RebuildEntries()
@@ -349,8 +297,8 @@ namespace ResumeApp.ViewModels.Pages
 			TimelineEntries.Clear();
 			ExperienceTimeFrames.Clear();
 
-			var lEntries = new[]
-			{
+			List<ExperienceTimelineEntryViewModel> lEntries =
+			[
 				CreateEntry(
 					pCompanyKey: "ExperienceCreaformUiUxExpertCompany",
 					pRoleKey: "ExperienceCreaformUiUxExpertRole",
@@ -429,7 +377,7 @@ namespace ResumeApp.ViewModels.Pages
 						"ExperienceOlhPhotographieAcc6",
 						"ExperienceOlhPhotographieAcc7"
 					] )
-			}.Where( pItem => pItem != null ).ToList();
+			];
 
 			AssignLanes( lEntries );
 
@@ -439,24 +387,27 @@ namespace ResumeApp.ViewModels.Pages
 				ExperienceTimeFrames.Add( CreateTimeFrameForEntry( lEntry ) );
 			}
 
-			DateTime lMinDate = lEntries.Count > 0 ? lEntries.Min( pItem => pItem.StartDate ).Date : DateTime.Today;
-			TimelineMinDate = lMinDate;
+			TimelineMinDate = lEntries.Count > 0 ? lEntries.Min( pItem => pItem.StartDate ).Date : DateTime.Today;
 
 			if ( TimelineEntries.Count > 0 )
 			{
+				ExperienceTimelineEntryViewModel lFirstEntry = TimelineEntries[ 0 ];
 				if ( SelectedTimelineEntry == null )
 				{
-					SelectedTimelineEntry = TimelineEntries[ 0 ];
+					SelectedTimelineEntry = lFirstEntry;
 				}
 
-				SelectedDate = mSelectedDate == default ? SelectedTimelineEntry.StartDate : ClampToTimelineRange( mSelectedDate );
+				ExperienceTimelineEntryViewModel? lSelectedEntry = SelectedTimelineEntry;
+				SelectedDate = mSelectedDate == default
+					? ( lSelectedEntry?.StartDate ?? lFirstEntry.StartDate )
+					: ClampToTimelineRange( mSelectedDate );
+
+				return;
 			}
-			else
-			{
-				SelectedTimelineEntry = null;
-				SelectedTimeFrame = null;
-				SelectedDate = DateTime.Today;
-			}
+
+			SelectedTimelineEntry = null;
+			SelectedTimeFrame = null;
+			SelectedDate = DateTime.Today;
 		}
 
 		private ExperienceTimelineEntryViewModel CreateEntry(
@@ -467,7 +418,7 @@ namespace ResumeApp.ViewModels.Pages
 			string pTechKey,
 			string pStartIsoKey,
 			string pEndIsoKey,
-			string[] pAccomplishmentKeys )
+			string[]? pAccomplishmentKeys )
 		{
 			string lCompany = ResourcesService[ pCompanyKey ];
 			string lRole = ResourcesService[ pRoleKey ];

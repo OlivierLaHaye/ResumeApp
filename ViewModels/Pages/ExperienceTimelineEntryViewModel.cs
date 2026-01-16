@@ -25,40 +25,45 @@ namespace ResumeApp.ViewModels.Pages
 
 		public ObservableCollection<string> Accomplishments { get; }
 
-		public string DateRangeText { get; private set; }
+		public string DateRangeText
+		{
+			get;
+			private set => SetProperty( ref field, value );
+		}
 
-		private int mPaletteIndex;
 		public int PaletteIndex
 		{
-			get => mPaletteIndex;
-			private set => SetProperty( ref mPaletteIndex, value );
+			get;
+			private set => SetProperty( ref field, value );
 		}
 
-		private int mLaneIndex;
 		public int LaneIndex
 		{
-			get => mLaneIndex;
-			private set => SetProperty( ref mLaneIndex, value );
+			get;
+			private set => SetProperty( ref field, value );
 		}
 
-		private Thickness mLaneLeftMargin;
 		public Thickness LaneLeftMargin
 		{
-			get => mLaneLeftMargin;
-			private set => SetProperty( ref mLaneLeftMargin, value );
+			get;
+			private set => SetProperty( ref field, value );
 		}
 
-		public string MarkerGlyph { get; private set; }
+		public string MarkerGlyph
+		{
+			get;
+			private set => SetProperty( ref field, value );
+		}
 
 		public ExperienceTimelineEntryViewModel(
-			string pCompanyText,
-			string pRoleText,
-			string pLocationText,
-			string pScopeText,
-			string pTechText,
+			string? pCompanyText,
+			string? pRoleText,
+			string? pLocationText,
+			string? pScopeText,
+			string? pTechText,
 			DateTime pStartDate,
 			DateTime? pEndDate,
-			ObservableCollection<string> pAccomplishments,
+			ObservableCollection<string>? pAccomplishments,
 			ResourcesService pResourcesService )
 		{
 			mResourcesService = pResourcesService ?? throw new ArgumentNullException( nameof( pResourcesService ) );
@@ -74,12 +79,15 @@ namespace ResumeApp.ViewModels.Pages
 			StartDate = pStartDate;
 			EndDate = pEndDate;
 
-			Accomplishments = pAccomplishments ?? [ ];
+			Accomplishments = pAccomplishments ?? [];
+
+			DateRangeText = string.Empty;
+			MarkerGlyph = string.Empty;
+			LaneLeftMargin = new Thickness( 0 );
 
 			UpdateDateRangeText();
 			SetLaneIndex( 0 );
 			SetPaletteIndex( 0 );
-			MarkerGlyph = ResolveMarkerGlyph( 0 );
 		}
 
 		private static IEnumerable<string> SplitTechTextToItems( string pTechText )
@@ -109,31 +117,19 @@ namespace ResumeApp.ViewModels.Pages
 
 		private static double GetDoubleResourceOrDefault( string pKey, double pDefault )
 		{
-			if ( Application.Current == null )
-			{
-				return pDefault;
-			}
-
-			if ( Application.Current.Resources[ pKey ] is double lValue )
-			{
-				return lValue;
-			}
-
-			return pDefault;
+			return Application.Current?.Resources[ pKey ] is double lValue ? lValue : pDefault;
 		}
 
 		public void SetLaneIndex( int pLaneIndex )
 		{
 			LaneIndex = Math.Max( 0, pLaneIndex );
 			MarkerGlyph = ResolveMarkerGlyph( LaneIndex );
-			RaisePropertyChanged( nameof( MarkerGlyph ) );
-
 			UpdateLaneMargin();
 		}
 
 		public void SetPaletteIndex( int pPaletteIndex )
 		{
-			int lNormalizedPaletteIndex = pPaletteIndex < 0 ? 0 : pPaletteIndex;
+			int lNormalizedPaletteIndex = Math.Max( 0, pPaletteIndex );
 
 			if ( lNormalizedPaletteIndex == PaletteIndex )
 			{
@@ -153,7 +149,6 @@ namespace ResumeApp.ViewModels.Pages
 				: mResourcesService[ "LabelPresent" ];
 
 			DateRangeText = string.Concat( lStartText, lSeparator, lEndText );
-			RaisePropertyChanged( nameof( DateRangeText ) );
 		}
 
 		private void UpdateLaneMargin()
@@ -170,25 +165,13 @@ namespace ResumeApp.ViewModels.Pages
 		{
 			int lIndex = Math.Abs( pLaneIndex ) % 4;
 
-			switch ( lIndex )
+			return lIndex switch
 			{
-				case 1:
-					{
-						return mResourcesService[ "GlyphMarkerSquare" ];
-					}
-				case 2:
-					{
-						return mResourcesService[ "GlyphMarkerDiamond" ];
-					}
-				case 3:
-					{
-						return mResourcesService[ "GlyphMarkerTriangle" ];
-					}
-				default:
-					{
-						return mResourcesService[ "GlyphMarkerCircle" ];
-					}
-			}
+				1 => mResourcesService[ "GlyphMarkerSquare" ],
+				2 => mResourcesService[ "GlyphMarkerDiamond" ],
+				3 => mResourcesService[ "GlyphMarkerTriangle" ],
+				_ => mResourcesService[ "GlyphMarkerCircle" ]
+			};
 		}
 	}
 }

@@ -54,7 +54,7 @@ namespace ResumeApp.ViewModels.Pages
 			return pCount <= 0 ? [] : Enumerable.Range( 1, pCount ).Select( pIndex => pPrefix + pIndex ).ToArray();
 		}
 
-		private void OnResourcesServicePropertyChanged( object pSender, PropertyChangedEventArgs pArgs )
+		private void OnResourcesServicePropertyChanged( object? pSender, PropertyChangedEventArgs pArgs )
 		{
 			RaisePropertyChanged( nameof( PageTitleText ) );
 			RaisePropertyChanged( nameof( PageSubtitleText ) );

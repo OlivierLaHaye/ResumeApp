@@ -9,7 +9,7 @@ namespace ResumeApp.Models
 
 		public string CaptionResourceKey { get; }
 
-		public ProjectImageModel( string pFileName, string pCaptionResourceKey )
+		public ProjectImageModel( string pFileName, string? pCaptionResourceKey )
 		{
 			if ( string.IsNullOrWhiteSpace( pFileName ) )
 			{

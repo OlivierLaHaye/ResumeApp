@@ -18,7 +18,7 @@ namespace ResumeApp.Behaviors
 
 		public static void SetAnimatedVerticalOffset( DependencyObject pElement, double pValue ) => pElement.SetValue( sAnimatedVerticalOffsetProperty, pValue );
 
-		public static void AnimateVerticalOffset( ScrollViewer pScrollViewer, double pTargetVerticalOffset, int pDurationMilliseconds )
+		public static void AnimateVerticalOffset( ScrollViewer? pScrollViewer, double pTargetVerticalOffset, int pDurationMilliseconds )
 		{
 			if ( pScrollViewer == null )
 			{
@@ -52,7 +52,7 @@ namespace ResumeApp.Behaviors
 				FillBehavior = FillBehavior.Stop
 			};
 
-			lAnimation.Completed += ( pSender, pEventArgs ) =>
+			lAnimation.Completed += ( _, _ ) =>
 			{
 				SetAnimatedVerticalOffset( pScrollViewer, lClampedTargetOffset );
 			};

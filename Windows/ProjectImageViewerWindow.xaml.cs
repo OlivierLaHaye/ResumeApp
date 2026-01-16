@@ -70,19 +70,30 @@ namespace ResumeApp.Windows
 				typeof( ProjectImageViewerWindow ),
 				new FrameworkPropertyMetadata( -1, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault ) );
 
-		private WindowChrome mWindowChrome;
-		private HwndSource mHwndSource;
+		private WindowChrome? mWindowChrome;
+		private HwndSource? mHwndSource;
 		private bool mHasAppliedInitialNormalBounds;
 
 		public ObservableCollection<ImageSource> Images
 		{
-			get => ( ObservableCollection<ImageSource> )GetValue( sImagesProperty );
+			get
+			{
+				if ( GetValue( sImagesProperty ) is ObservableCollection<ImageSource> lImages )
+				{
+					return lImages;
+				}
+
+				var lNewImages = new ObservableCollection<ImageSource>();
+				SetValue( sImagesProperty, lNewImages );
+
+				return lNewImages;
+			}
 			set => SetValue( sImagesProperty, value );
 		}
 
 		public int SelectedIndex
 		{
-			get => ( int )GetValue( sSelectedIndexProperty );
+			get => GetValue( sSelectedIndexProperty ) is int lSelectedIndex ? lSelectedIndex : -1;
 			set => SetValue( sSelectedIndexProperty, value );
 		}
 
@@ -101,39 +112,43 @@ namespace ResumeApp.Windows
 
 		private static Matrix GetTransformFromDeviceOrIdentity( IntPtr pWindowHandle )
 		{
-			HwndSource lHwndSource = HwndSource.FromHwnd( pWindowHandle );
+			HwndSource? lHwndSource = HwndSource.FromHwnd( pWindowHandle );
 
-			CompositionTarget lCompositionTarget = lHwndSource?.CompositionTarget;
+			CompositionTarget? lCompositionTarget = lHwndSource?.CompositionTarget;
 			return lCompositionTarget?.TransformFromDevice ?? Matrix.Identity;
 		}
 
 		private static Matrix GetTransformToDeviceOrIdentity( IntPtr pWindowHandle )
 		{
-			HwndSource lHwndSource = HwndSource.FromHwnd( pWindowHandle );
+			HwndSource? lHwndSource = HwndSource.FromHwnd( pWindowHandle );
 
-			CompositionTarget lCompositionTarget = lHwndSource?.CompositionTarget;
+			CompositionTarget? lCompositionTarget = lHwndSource?.CompositionTarget;
 			return lCompositionTarget?.TransformToDevice ?? Matrix.Identity;
 		}
 
 		private static System.Windows.Rect ConvertRectFromPixelsToDip( Rect pRectPixels, Matrix pTransformFromDevice )
 		{
-			System.Windows.Point lTopLeftDip = pTransformFromDevice.Transform( new System.Windows.Point( pRectPixels.left, pRectPixels.top ) );
-			System.Windows.Point lBottomRightDip = pTransformFromDevice.Transform( new System.Windows.Point( pRectPixels.right, pRectPixels.bottom ) );
+			System.Windows.Point lTopLeftDip =
+				pTransformFromDevice.Transform( new System.Windows.Point( pRectPixels.left, pRectPixels.top ) );
+
+			System.Windows.Point lBottomRightDip =
+				pTransformFromDevice.Transform( new System.Windows.Point( pRectPixels.right, pRectPixels.bottom ) );
 
 			return new System.Windows.Rect( lTopLeftDip, lBottomRightDip );
 		}
 
 		private static IntPtr GetTargetMonitorHandle( IntPtr pWindowHandle )
 		{
-			bool lHasCursorPos = GetCursorPos( out Point lCursorPoint );
-			if ( !lHasCursorPos )
+			if ( !GetCursorPos( out Point lCursorPoint ) )
 			{
 				return MonitorFromWindow( pWindowHandle, MonitorDefaultToNearest );
 			}
 
 			IntPtr lMonitorFromCursor = MonitorFromPoint( lCursorPoint, MonitorDefaultToNearest );
 
-			return lMonitorFromCursor != IntPtr.Zero ? lMonitorFromCursor : MonitorFromWindow( pWindowHandle, MonitorDefaultToNearest );
+			return lMonitorFromCursor != IntPtr.Zero
+				? lMonitorFromCursor
+				: MonitorFromWindow( pWindowHandle, MonitorDefaultToNearest );
 		}
 
 		private static bool TryGetWorkAreaRectPixels( IntPtr pMonitorHandle, out Rect pWorkAreaRectPixels )
@@ -185,7 +200,7 @@ namespace ResumeApp.Windows
 			pMinWidthDip = 0.0;
 			pMinHeightDip = 0.0;
 
-			HwndSource lHwndSource = HwndSource.FromHwnd( pHwnd );
+			HwndSource? lHwndSource = HwndSource.FromHwnd( pHwnd );
 			if ( lHwndSource?.RootVisual is not Window lWindow )
 			{
 				return false;
@@ -215,7 +230,12 @@ namespace ResumeApp.Windows
 
 		private static void ApplyWorkingAreaMaximizeBounds( IntPtr pHwnd, IntPtr pLParam )
 		{
-			MinMaxInfo lMinMaxInfo = ( MinMaxInfo )Marshal.PtrToStructure( pLParam, typeof( MinMaxInfo ) );
+			if ( pLParam == IntPtr.Zero )
+			{
+				return;
+			}
+
+			MinMaxInfo lMinMaxInfo = Marshal.PtrToStructure<MinMaxInfo>( pLParam );
 
 			IntPtr lMonitorHandle = MonitorFromWindow( pHwnd, MonitorDefaultToNearest );
 			if ( lMonitorHandle == IntPtr.Zero )
@@ -248,9 +268,16 @@ namespace ResumeApp.Windows
 
 		private static void ApplyMinimumTrackSizeBounds( IntPtr pHwnd, IntPtr pLParam )
 		{
-			MinMaxInfo lMinMaxInfo = ( MinMaxInfo )Marshal.PtrToStructure( pLParam, typeof( MinMaxInfo ) );
+			if ( pLParam == IntPtr.Zero )
+			{
+				return;
+			}
 
-			bool lHasRequestedMinSize = TryGetRequestedMinSizeDip( pHwnd, out double lRequestedMinWidthDip, out double lRequestedMinHeightDip );
+			MinMaxInfo lMinMaxInfo = Marshal.PtrToStructure<MinMaxInfo>( pLParam );
+
+			bool lHasRequestedMinSize =
+				TryGetRequestedMinSizeDip( pHwnd, out double lRequestedMinWidthDip, out double lRequestedMinHeightDip );
+
 			if ( !lHasRequestedMinSize )
 			{
 				lRequestedMinWidthDip = MinimumWindowWidth;
@@ -362,12 +389,7 @@ namespace ResumeApp.Windows
 
 		private void ApplyInitialNormalBoundsIfNeeded()
 		{
-			if ( mHasAppliedInitialNormalBounds )
-			{
-				return;
-			}
-
-			if ( WindowState != WindowState.Normal )
+			if ( mHasAppliedInitialNormalBounds || WindowState != WindowState.Normal )
 			{
 				return;
 			}
@@ -420,7 +442,7 @@ namespace ResumeApp.Windows
 			mHasAppliedInitialNormalBounds = true;
 		}
 
-		private void OnWindowClosed( object pSender, EventArgs pEventArgs )
+		private void OnWindowClosed( object? pSender, EventArgs pEventArgs )
 		{
 			if ( mHwndSource == null )
 			{
@@ -431,19 +453,14 @@ namespace ResumeApp.Windows
 			mHwndSource = null;
 		}
 
-		private void OnWindowStateChanged( object pSender, EventArgs pEventArgs )
+		private void OnWindowStateChanged( object? pSender, EventArgs pEventArgs )
 		{
 			UpdateWindowChromeForCurrentState();
 		}
 
 		private void UpdateWindowChromeForCurrentState()
 		{
-			if ( mWindowChrome == null )
-			{
-				return;
-			}
-
-			mWindowChrome.CornerRadius = WindowState == WindowState.Maximized
+			mWindowChrome?.CornerRadius = WindowState == WindowState.Maximized
 				? new CornerRadius( 0 )
 				: new CornerRadius( NormalCornerRadius );
 		}
@@ -465,19 +482,9 @@ namespace ResumeApp.Windows
 			Close();
 		}
 
-		private void OnCustomTitleBarDragSurfaceBorderMouseLeftButtonDown( object pSender, MouseButtonEventArgs pMouseButtonEventArgs )
+		private void OnCustomTitleBarDragSurfaceBorderMouseLeftButtonDown( object pSender, MouseButtonEventArgs? pMouseButtonEventArgs )
 		{
-			if ( pMouseButtonEventArgs == null )
-			{
-				return;
-			}
-
-			if ( pMouseButtonEventArgs.ButtonState != MouseButtonState.Pressed )
-			{
-				return;
-			}
-
-			if ( pMouseButtonEventArgs.ClickCount != 1 )
+			if ( pMouseButtonEventArgs is not { ButtonState: MouseButtonState.Pressed, ClickCount: 1 } )
 			{
 				return;
 			}
@@ -508,7 +515,8 @@ namespace ResumeApp.Windows
 			lHorizontalRatio = Clamp( lHorizontalRatio, 0.0, 1.0 );
 
 			double lCursorOffsetXInRestoredWindow = lRestoreBounds.Width * lHorizontalRatio;
-			double lCursorOffsetYInRestoredWindow = Math.Min( lCursorPositionInWindowDip.Y, Math.Max( 0.0, TitleBarHeight - 1.0 ) );
+			double lCursorOffsetYInRestoredWindow =
+				Math.Min( lCursorPositionInWindowDip.Y, Math.Max( 0.0, TitleBarHeight - 1.0 ) );
 
 			System.Windows.Point lCursorPositionOnScreenDip = GetCursorScreenPositionDip( lCursorPositionInWindowDip );
 

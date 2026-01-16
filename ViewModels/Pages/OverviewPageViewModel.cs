@@ -11,27 +11,21 @@ namespace ResumeApp.ViewModels.Pages
 {
 	public sealed class OverviewPageViewModel : ViewModelBase
 	{
-		private sealed class DelegateCommand( Action<object> pExecuteAction, Func<object, bool> pCanExecuteFunc )
+		private sealed class DelegateCommand( Action<object?>? pExecuteAction, Func<object?, bool>? pCanExecuteFunc )
 			: ICommand
 		{
-			public event EventHandler CanExecuteChanged
+			public event EventHandler? CanExecuteChanged
 			{
-				add
-				{
-					CommandManager.RequerySuggested += value;
-				}
-				remove
-				{
-					CommandManager.RequerySuggested -= value;
-				}
+				add => CommandManager.RequerySuggested += value;
+				remove => CommandManager.RequerySuggested -= value;
 			}
 
-			public bool CanExecute( object pParameter )
+			public bool CanExecute( object? pParameter )
 			{
 				return pCanExecuteFunc == null || pCanExecuteFunc( pParameter );
 			}
 
-			public void Execute( object pParameter )
+			public void Execute( object? pParameter )
 			{
 				pExecuteAction?.Invoke( pParameter );
 			}
@@ -103,35 +97,30 @@ namespace ResumeApp.ViewModels.Pages
 			return pCount <= 0 ? [] : Enumerable.Range( 1, pCount ).Select( pIndex => pPrefix + pIndex ).ToArray();
 		}
 
-		private static bool CanExecuteNonEmptyString( object pParameter )
+		private static bool CanExecuteNonEmptyString( object? pParameter )
 		{
-			if ( pParameter is string lText )
-			{
-				return !string.IsNullOrWhiteSpace( lText );
-			}
-
-			return false;
+			return pParameter is string lText && !string.IsNullOrWhiteSpace( lText );
 		}
 
-		private static void ExecuteComposeEmail( object pParameter )
+		private static void ExecuteComposeEmail( object? pParameter )
 		{
 			if ( pParameter is not string lEmailAddress )
 			{
 				return;
 			}
 
-			var lMailtoUri = BuildMailtoUri( lEmailAddress );
+			string lMailtoUri = BuildMailtoUri( lEmailAddress );
 			OpenUri( lMailtoUri );
 		}
 
-		private static void ExecuteOpenUrl( object pParameter )
+		private static void ExecuteOpenUrl( object? pParameter )
 		{
 			if ( pParameter is not string lUrl )
 			{
 				return;
 			}
 
-			var lNormalizedUrl = NormalizeUrl( lUrl );
+			string lNormalizedUrl = NormalizeUrl( lUrl );
 			OpenUri( lNormalizedUrl );
 		}
 
@@ -154,13 +143,13 @@ namespace ResumeApp.ViewModels.Pages
 				return string.Empty;
 			}
 
-			if ( Uri.TryCreate( pUrl, UriKind.Absolute, out var lAbsoluteUri ) )
+			if ( Uri.TryCreate( pUrl, UriKind.Absolute, out Uri? lAbsoluteUri ) )
 			{
 				return lAbsoluteUri.AbsoluteUri;
 			}
 
-			var lPrefixedUrl = HttpsSchemePrefix + pUrl.Trim();
-			return Uri.TryCreate( lPrefixedUrl, UriKind.Absolute, out var lPrefixedUri ) ? lPrefixedUri.AbsoluteUri : pUrl;
+			string lPrefixedUrl = HttpsSchemePrefix + pUrl.Trim();
+			return Uri.TryCreate( lPrefixedUrl, UriKind.Absolute, out Uri? lPrefixedUri ) ? lPrefixedUri.AbsoluteUri : pUrl;
 		}
 
 		private static void OpenUri( string pUri )
@@ -186,7 +175,7 @@ namespace ResumeApp.ViewModels.Pages
 			}
 		}
 
-		private void OnResourcesServicePropertyChanged( object pSender, PropertyChangedEventArgs pArgs )
+		private void OnResourcesServicePropertyChanged( object? pSender, PropertyChangedEventArgs pArgs )
 		{
 			RaisePropertyChanged( nameof( ComposeEmailButtonText ) );
 			RaisePropertyChanged( nameof( OpenUrlButtonText ) );

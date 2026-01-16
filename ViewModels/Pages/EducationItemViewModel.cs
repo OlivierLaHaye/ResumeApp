@@ -19,12 +19,12 @@ namespace ResumeApp.ViewModels.Pages
 
 		public bool HasNotes => !string.IsNullOrWhiteSpace( NotesText );
 
-		public EducationItemViewModel( ResourcesService pResourcesService, string pPrefix )
+		public EducationItemViewModel( ResourcesService pResourcesService, string? pPrefix )
 		{
 			mResourcesService = pResourcesService ?? throw new ArgumentNullException( nameof( pResourcesService ) );
 			mPrefix = pPrefix ?? string.Empty;
 
-			mResourcesService.PropertyChanged += ( pSender, pArgs ) => RefreshFromResources();
+			mResourcesService.PropertyChanged += ( _, _ ) => RefreshFromResources();
 		}
 
 		public void RefreshFromResources()

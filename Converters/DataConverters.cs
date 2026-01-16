@@ -16,7 +16,7 @@ namespace ResumeApp.Converters
 	{
 		public object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
-			if ( pValues is [not null, not null] )
+			if ( pValues is [ not null, not null ] )
 			{
 				return pValues[ 0 ].Equals( pValues[ 1 ] );
 			}
@@ -204,49 +204,47 @@ namespace ResumeApp.Converters
 
 			StreamGeometry lGeometry = new StreamGeometry { FillRule = FillRule.Nonzero };
 
-			using ( StreamGeometryContext lCtx = lGeometry.Open() )
+			using StreamGeometryContext lCtx = lGeometry.Open();
+			lCtx.BeginFigure( lLeftMid, true, false );
+
+			if ( lIsTopLeft )
 			{
-				lCtx.BeginFigure( lLeftMid, true, false );
+				lCtx.BezierTo( new Point( 0.0, lC ), new Point( lC, 0.0 ), lTopMid, true, true );
+			}
+			else
+			{
+				lCtx.LineTo( new Point( 0.0, 0.0 ), true, true );
+				lCtx.LineTo( lTopMid, true, true );
+			}
 
-				if ( lIsTopLeft )
-				{
-					lCtx.BezierTo( new Point( 0.0, lC ), new Point( lC, 0.0 ), lTopMid, true, true );
-				}
-				else
-				{
-					lCtx.LineTo( new Point( 0.0, 0.0 ), true, true );
-					lCtx.LineTo( lTopMid, true, true );
-				}
+			if ( lIsTopRight )
+			{
+				lCtx.BezierTo( new Point( CanvasSize - lC, 0.0 ), new Point( CanvasSize, lC ), lRightMid, true, true );
+			}
+			else
+			{
+				lCtx.LineTo( new Point( CanvasSize, 0.0 ), true, true );
+				lCtx.LineTo( lRightMid, true, true );
+			}
 
-				if ( lIsTopRight )
-				{
-					lCtx.BezierTo( new Point( CanvasSize - lC, 0.0 ), new Point( CanvasSize, lC ), lRightMid, true, true );
-				}
-				else
-				{
-					lCtx.LineTo( new Point( CanvasSize, 0.0 ), true, true );
-					lCtx.LineTo( lRightMid, true, true );
-				}
+			if ( lIsBottomRight )
+			{
+				lCtx.BezierTo( new Point( CanvasSize, CanvasSize - lC ), new Point( CanvasSize - lC, CanvasSize ), lBottomMid, true, true );
+			}
+			else
+			{
+				lCtx.LineTo( new Point( CanvasSize, CanvasSize ), true, true );
+				lCtx.LineTo( lBottomMid, true, true );
+			}
 
-				if ( lIsBottomRight )
-				{
-					lCtx.BezierTo( new Point( CanvasSize, CanvasSize - lC ), new Point( CanvasSize - lC, CanvasSize ), lBottomMid, true, true );
-				}
-				else
-				{
-					lCtx.LineTo( new Point( CanvasSize, CanvasSize ), true, true );
-					lCtx.LineTo( lBottomMid, true, true );
-				}
-
-				if ( lIsBottomLeft )
-				{
-					lCtx.BezierTo( new Point( lC, CanvasSize ), new Point( 0.0, CanvasSize - lC ), lLeftMid, true, true );
-				}
-				else
-				{
-					lCtx.LineTo( new Point( 0.0, CanvasSize ), true, true );
-					lCtx.LineTo( lLeftMid, true, true );
-				}
+			if ( lIsBottomLeft )
+			{
+				lCtx.BezierTo( new Point( lC, CanvasSize ), new Point( 0.0, CanvasSize - lC ), lLeftMid, true, true );
+			}
+			else
+			{
+				lCtx.LineTo( new Point( 0.0, CanvasSize ), true, true );
+				lCtx.LineTo( lLeftMid, true, true );
 			}
 
 			return lGeometry;
@@ -263,7 +261,7 @@ namespace ResumeApp.Converters
 				lGeometry.Freeze();
 			}
 
-			return lGeometry ?? Geometry.Empty;
+			return lGeometry;
 		}
 
 		public object ConvertBack( object pInput, Type pTargetType, object pParameter, CultureInfo pCulture )
@@ -274,7 +272,7 @@ namespace ResumeApp.Converters
 
 	public class TopOffsetConverter : IMultiValueConverter
 	{
-		public object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
+		public object Convert( object[]? pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
 			if ( pValues == null || pValues.Length < 2 || pValues[ 0 ] is not Grid lParentGrid || pValues[ 1 ] is not Path lCurrentPath )
 			{
@@ -311,7 +309,7 @@ namespace ResumeApp.Converters
 
 	public class BottomOffsetConverter : IMultiValueConverter
 	{
-		public object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
+		public object Convert( object[]? pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
 			if ( pValues == null || pValues.Length < 2 || pValues[ 0 ] is not Grid lParentGrid || pValues[ 1 ] is not Path lCurrentPath )
 			{
@@ -344,7 +342,7 @@ namespace ResumeApp.Converters
 
 	public class LeftOffsetConverter : IMultiValueConverter
 	{
-		public object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
+		public object Convert( object[]? pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
 			if ( pValues == null || pValues.Length < 2 || pValues[ 0 ] is not Grid lParentGrid || pValues[ 1 ] is not Path lCurrentPath )
 			{
@@ -381,7 +379,7 @@ namespace ResumeApp.Converters
 
 	public class RightOffsetConverter : IMultiValueConverter
 	{
-		public object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
+		public object Convert( object[]? pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
 			if ( pValues == null || pValues.Length < 2 || pValues[ 0 ] is not Grid lParentGrid || pValues[ 1 ] is not Path lCurrentPath )
 			{
@@ -437,8 +435,7 @@ namespace ResumeApp.Converters
 			}
 
 			double lCurrentScrollPositionPercentage = lHorizontalOffset / lActualWidth;
-			double lOffset = GradientAccelerationFactor * lOffsetPixels * lCurrentScrollPositionPercentage /
-							 lActualWidth;
+			double lOffset = GradientAccelerationFactor * lOffsetPixels * lCurrentScrollPositionPercentage / lActualWidth;
 
 			double lLeftOffset = Math.Min( lOffset, lOffsetPixels / lActualWidth );
 
@@ -461,8 +458,7 @@ namespace ResumeApp.Converters
 
 			double lRemainingScrollableWidth = lScrollableWidth - lHorizontalOffset;
 			double lCurrentScrollPositionPercentage = lRemainingScrollableWidth / lActualWidth;
-			double lOffset = GradientAccelerationFactor * lOffsetPixels * lCurrentScrollPositionPercentage /
-							 lActualWidth;
+			double lOffset = GradientAccelerationFactor * lOffsetPixels * lCurrentScrollPositionPercentage / lActualWidth;
 
 			double lRightOffset = Math.Max( 1 - lOffset, 1 - lOffsetPixels / lActualWidth );
 
@@ -483,8 +479,7 @@ namespace ResumeApp.Converters
 			}
 
 			double lCurrentScrollPositionPercentage = lVerticalOffset / lActualHeight;
-			double lOffset = GradientAccelerationFactor * lOffsetPixels * lCurrentScrollPositionPercentage /
-							 lActualHeight;
+			double lOffset = GradientAccelerationFactor * lOffsetPixels * lCurrentScrollPositionPercentage / lActualHeight;
 
 			double lTopOffset = Math.Min( lOffset, lOffsetPixels / lActualHeight );
 
@@ -507,15 +502,13 @@ namespace ResumeApp.Converters
 
 			double lRemainingScrollableHeight = lScrollableHeight - lVerticalOffset;
 			double lCurrentScrollPositionPercentage = lRemainingScrollableHeight / lActualHeight;
-			double lOffset = GradientAccelerationFactor * lOffsetPixels * lCurrentScrollPositionPercentage /
-							 lActualHeight;
+			double lOffset = GradientAccelerationFactor * lOffsetPixels * lCurrentScrollPositionPercentage / lActualHeight;
 
 			double lBottomOffset = Math.Max( 1 - lOffset, 1 - lOffsetPixels / lActualHeight );
 
 			return lBottomOffset;
 		}
 	}
-
 
 	[ValueConversion( typeof( object[] ), typeof( object ) )]
 	public class MathOperationConverter : IMultiValueConverter
@@ -529,9 +522,9 @@ namespace ResumeApp.Converters
 				.ToArray();
 		}
 
-		private static bool TryParseParameter( object pParameter, out MathOperation pOperation, out bool pIsInverted )
+		private static bool TryParseParameter( object? pParameter, out MathOperation pOperation, out bool pIsInverted )
 		{
-			string lRaw = pParameter.ToString();
+			string lRaw = pParameter?.ToString() ?? string.Empty;
 			string lNormalized = lRaw.Trim().ToLowerInvariant();
 
 			string[] lTokens = lNormalized
@@ -554,23 +547,11 @@ namespace ResumeApp.Converters
 
 		private static bool IsInvertToken( string pToken )
 		{
-			switch ( pToken )
+			return pToken switch
 			{
-				case "inverse":
-				case "invert":
-				case "inversey":
-				case "revers":
-				case "reverse":
-				case "negate":
-				case "opposite":
-					{
-						return true;
-					}
-				default:
-					{
-						return false;
-					}
-			}
+				"inverse" or "invert" or "inversey" or "revers" or "reverse" or "negate" or "opposite" => true,
+				_ => false
+			};
 		}
 
 		private static bool TryParseOperationToken( string pToken, out MathOperation pOperation )
@@ -734,7 +715,6 @@ namespace ResumeApp.Converters
 				}
 				catch ( Exception )
 				{
-					// ignored
 				}
 			}
 
@@ -755,8 +735,7 @@ namespace ResumeApp.Converters
 					{
 						try
 						{
-							object lConverted = sThicknessConverter.ConvertFromString( lString );
-							if ( lConverted is Thickness lParsed )
+							if ( sThicknessConverter.ConvertFromString( lString ) is Thickness lParsed )
 							{
 								pResult = lParsed;
 								return true;
@@ -764,7 +743,6 @@ namespace ResumeApp.Converters
 						}
 						catch ( Exception )
 						{
-							// ignored
 						}
 
 						break;
@@ -787,33 +765,15 @@ namespace ResumeApp.Converters
 
 		private static double ApplyBinaryOperation( double pLeft, double pRight, MathOperation pOperation )
 		{
-			switch ( pOperation )
+			return pOperation switch
 			{
-				case MathOperation.Addition:
-					{
-						return pLeft + pRight;
-					}
-				case MathOperation.Subtraction:
-					{
-						return pLeft - pRight;
-					}
-				case MathOperation.Multiply:
-					{
-						return pLeft * pRight;
-					}
-				case MathOperation.Division:
-					{
-						return Math.Abs( pRight ) > double.Epsilon ? pLeft / pRight : 0.0;
-					}
-				case MathOperation.Modulo:
-					{
-						return Math.Abs( pRight ) > double.Epsilon ? pLeft % pRight : 0.0;
-					}
-				default:
-					{
-						return 0.0;
-					}
-			}
+				MathOperation.Addition => pLeft + pRight,
+				MathOperation.Subtraction => pLeft - pRight,
+				MathOperation.Multiply => pLeft * pRight,
+				MathOperation.Division => Math.Abs( pRight ) > double.Epsilon ? pLeft / pRight : 0.0,
+				MathOperation.Modulo => Math.Abs( pRight ) > double.Epsilon ? pLeft % pRight : 0.0,
+				_ => 0.0
+			};
 		}
 
 		private static Thickness ApplyOperation( Thickness pLeft, double pRight, MathOperation pOperation )
@@ -838,7 +798,7 @@ namespace ResumeApp.Converters
 			);
 		}
 
-		public object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
+		public object Convert( object[]? pValues, Type pTargetType, object? pParameter, CultureInfo pCulture )
 		{
 			if ( pValues == null || pValues.Length == 0 || pParameter == null )
 			{

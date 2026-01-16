@@ -180,7 +180,7 @@ public static class ExperienceTimelineScrollSyncBehavior
 
 	private static ExperienceTimelineScrollSyncState GetOrCreateState( ScrollViewer pScrollViewer )
 	{
-		return sStateByScrollViewer.GetValue( pScrollViewer, pViewer => new ExperienceTimelineScrollSyncState() );
+		return sStateByScrollViewer.GetValue( pScrollViewer, _ => new ExperienceTimelineScrollSyncState() );
 	}
 
 	private static void Attach( ScrollViewer pScrollViewer, ExperienceTimelineScrollSyncState pState )

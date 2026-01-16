@@ -52,6 +52,33 @@ namespace ResumeApp.Controls
 			public Rect Rect { get; } = pRect;
 		}
 
+		private sealed class TimeFrameTitleCandidate(
+			TimelineTimeFrameItem pItem,
+			int pLaneIndex,
+			FormattedText pText,
+			Rect pBarRect,
+			double pGroupWidth,
+			double pGroupHeight,
+			double pCenterX,
+			string pTitle )
+		{
+			public TimelineTimeFrameItem Item { get; } = pItem;
+
+			public int LaneIndex { get; } = pLaneIndex;
+
+			public FormattedText Text { get; } = pText;
+
+			public Rect BarRect { get; } = pBarRect;
+
+			public double GroupWidth { get; } = pGroupWidth;
+
+			public double GroupHeight { get; } = pGroupHeight;
+
+			public double CenterX { get; } = pCenterX;
+
+			public string Title { get; } = pTitle;
+		}
+
 		private readonly struct PanSample( DateTime pTimestampUtc, double pPointerX )
 		{
 			public DateTime TimestampUtc { get; } = pTimestampUtc;
@@ -73,7 +100,7 @@ namespace ResumeApp.Controls
 			public int Step { get; } = Math.Max( 1, pStep );
 		}
 
-		private readonly struct FormattedTextCacheKey( string pText, double pFontSize )
+		private readonly struct FormattedTextCacheKey( string? pText, double pFontSize )
 			: IEquatable<FormattedTextCacheKey>
 		{
 			public string Text { get; } = pText ?? string.Empty;
@@ -86,7 +113,7 @@ namespace ResumeApp.Controls
 					   && Math.Abs( FontSize - pOther.FontSize ) < 0.000001;
 			}
 
-			public override bool Equals( object pObject )
+			public override bool Equals( object? pObject )
 			{
 				return pObject is FormattedTextCacheKey lOther && Equals( lOther );
 			}
@@ -221,7 +248,7 @@ namespace ResumeApp.Controls
 		private double mViewportStartTicksAtPointerDown;
 
 		private DateTime mPointerDownTimestampUtc;
-		private TimelineTimeFrameItem mPointerDownTimeFrameItem;
+		private TimelineTimeFrameItem? mPointerDownTimeFrameItem;
 
 		private bool mIsInertiaActive;
 		private double mInertiaVelocityTicksPerSecond;
@@ -246,13 +273,13 @@ namespace ResumeApp.Controls
 
 		private bool mIsHandCursorActive;
 
-		private string mTextCacheCultureName;
-		private FontFamily mTextCacheFontFamily;
+		private string? mTextCacheCultureName;
+		private FontFamily? mTextCacheFontFamily;
 		private FontStyle mTextCacheFontStyle;
 		private FontWeight mTextCacheFontWeight;
 		private FontStretch mTextCacheFontStretch;
 		private double mTextCachePixelsPerDip;
-		private Brush mTextCacheBrush;
+		private Brush? mTextCacheBrush;
 
 		private bool mHasUserInteracted;
 		private bool mHasAppliedInitialFit;
@@ -272,15 +299,15 @@ namespace ResumeApp.Controls
 			set => SetCurrentValue( sSelectedDateProperty, value );
 		}
 
-		public TimelineTimeFrameItem SelectedTimeFrame
+		public TimelineTimeFrameItem? SelectedTimeFrame
 		{
-			get => ( TimelineTimeFrameItem )GetValue( sSelectedTimeFrameProperty );
+			get => GetValue( sSelectedTimeFrameProperty ) as TimelineTimeFrameItem;
 			set => SetCurrentValue( sSelectedTimeFrameProperty, value );
 		}
 
-		public ObservableCollection<TimelineTimeFrameItem> TimeFrames
+		public ObservableCollection<TimelineTimeFrameItem>? TimeFrames
 		{
-			get => ( ObservableCollection<TimelineTimeFrameItem> )GetValue( sTimeFramesProperty );
+			get => GetValue( sTimeFramesProperty ) as ObservableCollection<TimelineTimeFrameItem>;
 			set => SetCurrentValue( sTimeFramesProperty, value );
 		}
 
@@ -311,8 +338,8 @@ namespace ResumeApp.Controls
 
 		public TimelineControl()
 		{
-			mTimeFrameHitInfos = [ ];
-			mPanSamples = [ ];
+			mTimeFrameHitInfos = [];
+			mPanSamples = [];
 			mFormattedTextCache = new Dictionary<FormattedTextCacheKey, FormattedText>();
 
 			Focusable = true;
@@ -322,9 +349,9 @@ namespace ResumeApp.Controls
 			Unloaded += OnUnloaded;
 		}
 
-		private static void DrawRoundedRect( DrawingContext pDrawingContext, Rect pRect, Brush pBrush, RadiusXy pRadius )
+		private static void DrawRoundedRect( DrawingContext pDrawingContext, Rect pRect, Brush? pBrush, RadiusXy pRadius )
 		{
-			if ( pRect.Width <= 0.0 || pRect.Height <= 0.0 || pBrush == null )
+			if ( pRect.Width <= 0.0 || pRect.Height <= 0.0 || pBrush is null )
 			{
 				return;
 			}
@@ -341,9 +368,9 @@ namespace ResumeApp.Controls
 			return 1.0 - ( lInv * lInv * lInv );
 		}
 
-		private static Brush CreateOpacityBrush( Brush pBrush, double pOpacity )
+		private static Brush? CreateOpacityBrush( Brush? pBrush, double pOpacity )
 		{
-			if ( pBrush == null )
+			if ( pBrush is null )
 			{
 				return null;
 			}
@@ -383,103 +410,50 @@ namespace ResumeApp.Controls
 
 		private static string FormatTickLabel( DateTime pDate, TickGranularity pGranularity )
 		{
-			switch ( pGranularity )
+			return pGranularity switch
 			{
-				case TickGranularity.Years:
-					{
-						return pDate.ToString( "yyyy", CultureInfo.CurrentCulture );
-					}
-				case TickGranularity.Months:
-					{
-						return pDate.ToString( "MMM yyyy", CultureInfo.CurrentCulture );
-					}
-				default:
-					{
-						return pDate.ToString( "MMM d", CultureInfo.CurrentCulture );
-					}
-			}
+				TickGranularity.Years => pDate.ToString( "yyyy", CultureInfo.CurrentCulture ),
+				TickGranularity.Months => pDate.ToString( "MMM yyyy", CultureInfo.CurrentCulture ),
+				_ => pDate.ToString( "MMM d", CultureInfo.CurrentCulture )
+			};
 		}
 
 		private static KeyboardStep GetKeyboardStep( double pZoomLevel, bool pIsControlDown )
 		{
 			var lZoom = Math.Max( MinimumZoomPixelsPerDay, pZoomLevel );
 
-			KeyboardStep lBaseStep;
-			switch (lZoom)
+			KeyboardStep lBaseStep = lZoom switch
 			{
-				case >= 20.0:
-					{
-						lBaseStep = KeyboardStep.Day;
-						break;
-					}
-				case >= 6.0:
-					{
-						lBaseStep = KeyboardStep.Week;
-						break;
-					}
-				case >= 1.5:
-					{
-						lBaseStep = KeyboardStep.Month;
-						break;
-					}
-				default:
-					{
-						lBaseStep = KeyboardStep.Year;
-						break;
-					}
-			}
+				>= 20.0 => KeyboardStep.Day,
+				>= 6.0 => KeyboardStep.Week,
+				>= 1.5 => KeyboardStep.Month,
+				_ => KeyboardStep.Year
+			};
 
 			return pIsControlDown ? PromoteStep( lBaseStep ) : lBaseStep;
 		}
 
 		private static KeyboardStep PromoteStep( KeyboardStep pStep )
 		{
-			switch ( pStep )
+			return pStep switch
 			{
-				case KeyboardStep.Day:
-					{
-						return KeyboardStep.Week;
-					}
-				case KeyboardStep.Week:
-					{
-						return KeyboardStep.Month;
-					}
-				case KeyboardStep.Month:
-					{
-						return KeyboardStep.Year;
-					}
-				default:
-					{
-						return KeyboardStep.Decade;
-					}
-			}
+				KeyboardStep.Day => KeyboardStep.Week,
+				KeyboardStep.Week => KeyboardStep.Month,
+				KeyboardStep.Month => KeyboardStep.Year,
+				_ => KeyboardStep.Decade
+			};
 		}
 
 		private static DateTime AddStep( DateTime pDate, KeyboardStep pStep, int pDirection )
 		{
-			switch ( pStep )
+			return pStep switch
 			{
-				case KeyboardStep.Day:
-					{
-						return pDate.AddDays( 1.0 * pDirection );
-					}
-				case KeyboardStep.Week:
-					{
-						return pDate.AddDays( 7.0 * pDirection );
-					}
-				case KeyboardStep.Month:
-					{
-						return pDate.AddMonths( 1 * pDirection );
-					}
-				case KeyboardStep.Year:
-					{
-						return pDate.AddYears( 1 * pDirection );
-					}
-				default:
-					{
-						return pDate.AddYears( 10 * pDirection );
-					}
-			}
+				KeyboardStep.Day => pDate.AddDays( 1.0 * pDirection ),
+				KeyboardStep.Week => pDate.AddDays( 7.0 * pDirection ),
+				KeyboardStep.Month => pDate.AddMonths( 1 * pDirection ),
+				KeyboardStep.Year => pDate.AddYears( 1 * pDirection ),
+				_ => pDate.AddYears( 10 * pDirection )
+			};
 		}
 
 		private static object CoerceMinDate( DependencyObject pDependencyObject, object pBaseValue )
@@ -526,12 +500,7 @@ namespace ResumeApp.Controls
 
 		private static void OnSelectedDateChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
-			if ( pDependencyObject is not TimelineControl lControl )
-			{
-				return;
-			}
-
-			if ( lControl.mIsInternalSelectedDateUpdate )
+			if ( pDependencyObject is not TimelineControl lControl || lControl.mIsInternalSelectedDateUpdate )
 			{
 				return;
 			}
@@ -563,18 +532,12 @@ namespace ResumeApp.Controls
 
 			lControl.InvalidateVisual();
 
-			if ( lControl.mHasSuppressSelectedTimeFrameToSelectedDateSync )
-			{
-				return;
-			}
-
-			if ( pEventArgs.NewValue is not TimelineTimeFrameItem lNewTimeFrame )
+			if ( lControl.mHasSuppressSelectedTimeFrameToSelectedDateSync || pEventArgs.NewValue is not TimelineTimeFrameItem lNewTimeFrame )
 			{
 				return;
 			}
 
 			var lTargetDate = lNewTimeFrame.StartDate.Date;
-
 			if ( lControl.SelectedDate.Date == lTargetDate )
 			{
 				return;
@@ -1252,56 +1215,24 @@ namespace ResumeApp.Controls
 		}
 
 		private List<TimeFrameTitleDrawInfo> LayoutTimeFrameTitles(
-			IEnumerable<VisibleTimeFrame> pVisibleFrames,
+			IEnumerable<VisibleTimeFrame>? pVisibleFrames,
 			Rect pContentRect,
-			IDictionary<TimelineTimeFrameItem, Rect> pBarRectsByItem,
-			Typeface pTypeface,
-			Brush pTextBrush,
+			IDictionary<TimelineTimeFrameItem, Rect>? pBarRectsByItem,
+			Typeface? pTypeface,
+			Brush? pTextBrush,
 			double pPixelsPerDip )
 		{
-			var lVisibleFrames = pVisibleFrames?.Where( pFrame => pFrame?.Item != null ).ToList() ?? [ ];
-			if ( lVisibleFrames.Count == 0 || pBarRectsByItem == null || pBarRectsByItem.Count == 0 || pTypeface == null || pTextBrush == null )
+			var lVisibleFrames = pVisibleFrames?.Where( pFrame => pFrame?.Item != null ).ToList() ?? [];
+			if ( lVisibleFrames.Count == 0 || pBarRectsByItem == null || pBarRectsByItem.Count == 0 || pTypeface == null || pTextBrush is null )
 			{
-				return [ ];
+				return [];
 			}
 
 			var lCandidates = lVisibleFrames
 				.Where( pFrame => pBarRectsByItem.ContainsKey( pFrame.Item ) )
-				.Select( pFrame =>
-				{
-					var lBarRect = pBarRectsByItem[ pFrame.Item ];
-					var lTitle = pFrame.Item.Title ?? string.Empty;
-
-					var lMaxFontSize = Math.Max( 8.0, lBarRect.Height - 8.0 );
-					var lFontSize = Math.Min( TimeFrameLabelFontSize, lMaxFontSize );
-
-					var lText = CreateFormattedTextCached( lTitle, pTypeface, lFontSize, pTextBrush, pPixelsPerDip );
-					var lTextWidth = lText?.WidthIncludingTrailingWhitespace ?? 0.0;
-					var lTextHeight = lText?.Height ?? 0.0;
-
-					var lDotRadius = Math.Max( 3.0, Math.Min( 5.0, lBarRect.Height * 0.22 ) );
-					var lDotDiameter = lDotRadius * 2.0;
-
-					var lGroupWidth = lDotDiameter + TimeFrameTitleDotToTextGapPixels + lTextWidth;
-					var lGroupHeight = Math.Max( lTextHeight, lDotDiameter );
-
-					var lCenterX = pContentRect.Left + ( ( pFrame.StartX + pFrame.EndX ) * 0.5 );
-
-					return new
-					{
-						pFrame.Item,
-						pFrame.LaneIndex,
-						Text = lText,
-						TextWidth = lTextWidth,
-						TextHeight = lTextHeight,
-						BarRect = lBarRect,
-						GroupWidth = lGroupWidth,
-						GroupHeight = lGroupHeight,
-						CenterX = lCenterX,
-						Title = lTitle
-					};
-				} )
-				.Where( pCandidate => pCandidate.Text != null && pCandidate.TextWidth > 0.0 && pCandidate.GroupWidth > 0.0 )
+				.Select( pFrame => TryCreateTimeFrameTitleCandidate( pFrame, pContentRect, pBarRectsByItem, pTypeface, pTextBrush, pPixelsPerDip ) )
+				.Where( pCandidate => pCandidate != null )
+				.Select( pCandidate => pCandidate! )
 				.OrderBy( pCandidate => pCandidate.LaneIndex )
 				.ThenBy( pCandidate => pCandidate.CenterX )
 				.ThenBy( pCandidate => pCandidate.Title, StringComparer.OrdinalIgnoreCase )
@@ -1309,7 +1240,7 @@ namespace ResumeApp.Controls
 
 			if ( lCandidates.Count == 0 )
 			{
-				return [ ];
+				return [];
 			}
 
 			var lPlacedByLane = new Dictionary<int, List<Rect>>();
@@ -1319,7 +1250,7 @@ namespace ResumeApp.Controls
 			{
 				if ( !lPlacedByLane.TryGetValue( lCandidate.LaneIndex, out var lPlacedRects ) )
 				{
-					lPlacedRects = [ ];
+					lPlacedRects = [];
 					lPlacedByLane[ lCandidate.LaneIndex ] = lPlacedRects;
 				}
 
@@ -1346,6 +1277,49 @@ namespace ResumeApp.Controls
 			return lResults;
 		}
 
+		private TimeFrameTitleCandidate? TryCreateTimeFrameTitleCandidate(
+			VisibleTimeFrame pFrame,
+			Rect pContentRect,
+			IDictionary<TimelineTimeFrameItem, Rect> pBarRectsByItem,
+			Typeface pTypeface,
+			Brush pTextBrush,
+			double pPixelsPerDip )
+		{
+			var lBarRect = pBarRectsByItem[ pFrame.Item ];
+			var lTitle = pFrame.Item.Title ?? string.Empty;
+
+			var lMaxFontSize = Math.Max( 8.0, lBarRect.Height - 8.0 );
+			var lFontSize = Math.Min( TimeFrameLabelFontSize, lMaxFontSize );
+
+			var lText = CreateFormattedTextCached( lTitle, pTypeface, lFontSize, pTextBrush, pPixelsPerDip );
+			if ( lText is null )
+			{
+				return null;
+			}
+
+			var lTextWidth = lText.WidthIncludingTrailingWhitespace;
+			if ( lTextWidth <= 0.0 )
+			{
+				return null;
+			}
+
+			var lTextHeight = lText.Height;
+
+			var lDotRadius = Math.Max( 3.0, Math.Min( 5.0, lBarRect.Height * 0.22 ) );
+			var lDotDiameter = lDotRadius * 2.0;
+
+			var lGroupWidth = lDotDiameter + TimeFrameTitleDotToTextGapPixels + lTextWidth;
+			var lGroupHeight = Math.Max( lTextHeight, lDotDiameter );
+
+			if ( lGroupWidth <= 0.0 )
+			{
+				return null;
+			}
+
+			var lCenterX = pContentRect.Left + ( ( pFrame.StartX + pFrame.EndX ) * 0.5 );
+			return new TimeFrameTitleCandidate( pFrame.Item, pFrame.LaneIndex, lText, lBarRect, lGroupWidth, lGroupHeight, lCenterX, lTitle );
+		}
+
 		private void SetSelectedDateInternal( DateTime pDate )
 		{
 			mIsInternalSelectedDateUpdate = true;
@@ -1366,11 +1340,11 @@ namespace ResumeApp.Controls
 			SetCursorIsHand( lIsClickable );
 		}
 
-		private FormattedText CreateFormattedTextCached(
+		private FormattedText? CreateFormattedTextCached(
 			string pText,
-			Typeface pTypeface,
+			Typeface? pTypeface,
 			double pFontSize,
-			Brush pBrush,
+			Brush? pBrush,
 			double pPixelsPerDip )
 		{
 			if ( string.IsNullOrEmpty( pText ) || pTypeface == null || pBrush == null )
@@ -1550,7 +1524,7 @@ namespace ResumeApp.Controls
 			}
 		}
 
-		private void OnCompositionTargetRendering( object pSender, EventArgs pEventArgs )
+		private void OnCompositionTargetRendering( object? pSender, EventArgs pEventArgs )
 		{
 			ApplyPendingPanIfNeeded();
 			UpdateAnimationFrameIfNeeded();
@@ -1681,11 +1655,8 @@ namespace ResumeApp.Controls
 
 		private void DrawBackground( DrawingContext pDrawingContext, Rect pContentRect )
 		{
-			var lBackgroundBrush = Background ?? TryFindResource( "CommonBlackBrush" ) as Brush;
-			if ( lBackgroundBrush != null )
-			{
-				pDrawingContext.DrawRectangle( lBackgroundBrush, null, new Rect( 0.0, 0.0, ActualWidth, ActualHeight ) );
-			}
+			var lBackgroundBrush = Background ?? ( TryFindResource( "CommonBlackBrush" ) as Brush ) ?? Brushes.Transparent;
+			pDrawingContext.DrawRectangle( lBackgroundBrush, null, new Rect( 0.0, 0.0, ActualWidth, ActualHeight ) );
 		}
 
 		private void DrawTimeline( DrawingContext pDrawingContext, Rect pContentRect )
@@ -1695,8 +1666,8 @@ namespace ResumeApp.Controls
 			var lDpi = VisualTreeHelper.GetDpi( this );
 			var lPixelsPerDip = lDpi.PixelsPerDip;
 
-			var lForegroundBrush = Foreground ?? TryFindResource( "CommonWhiteBrush" ) as Brush;
-			var lDividerBrush = TryFindResource( "OnSurfaceDividerOnDarkBrush" ) as Brush;
+			var lForegroundBrush = Foreground ?? ( TryFindResource( "CommonWhiteBrush" ) as Brush ) ?? Brushes.White;
+			var lDividerBrush = ( TryFindResource( "OnSurfaceDividerOnDarkBrush" ) as Brush ) ?? lForegroundBrush;
 			var lHairlineBrush = TryFindResource( "HairlineTwoToneBrush" ) as Brush;
 			var lAccentBrush = TryFindResource( "CommonBrush" ) as Brush;
 
@@ -1745,7 +1716,7 @@ namespace ResumeApp.Controls
 					Math.Max( 2.0, lFrame.EndX - lFrame.StartX ),
 					lEffectiveBarHeight );
 
-				var lFrameBrush = ResolveTimeFrameBrush( lFrame.Item ) ?? lAccentBrush;
+				var lFrameBrush = ResolveTimeFrameBrush( lFrame.Item ) ?? lAccentBrush ?? lForegroundBrush;
 				var lBarCornerRadius = Math.Min( 10.0, lBarRect.Height * 0.5 );
 				var lBarRadius = new RadiusXy( lBarCornerRadius, lBarCornerRadius );
 
@@ -1795,11 +1766,8 @@ namespace ResumeApp.Controls
 				pDrawingContext.PushClip( new RectangleGeometry( lClipRect, lBarCornerRadius, lBarCornerRadius ) );
 				try
 				{
-					if ( lForegroundBrush != null )
-					{
-						pDrawingContext.DrawEllipse( lForegroundBrush, null, new Point( lDotCenterX, lDotCenterY ), lDotRadius, lDotRadius );
-						pDrawingContext.DrawText( lTitleInfo.Text, new Point( lTextLeft, lTextTop ) );
-					}
+					pDrawingContext.DrawEllipse( lForegroundBrush, null, new Point( lDotCenterX, lDotCenterY ), lDotRadius, lDotRadius );
+					pDrawingContext.DrawText( lTitleInfo.Text, new Point( lTextLeft, lTextTop ) );
 				}
 				finally
 				{
@@ -1816,19 +1784,16 @@ namespace ResumeApp.Controls
 				pDrawingContext.DrawLine( lPen, new Point( pContentRect.Left, lBaselineY ), new Point( pContentRect.Right, lBaselineY ) );
 			}
 
-			if ( lDividerBrush != null )
-			{
-				DrawTicksAndLabels(
-					pDrawingContext,
-					pContentRect,
-					lViewportStart,
-					lViewportEnd,
-					lBaselineY,
-					lTickLabelY,
-					lDividerBrush,
-					lForegroundBrush,
-					lPixelsPerDip );
-			}
+			DrawTicksAndLabels(
+				pDrawingContext,
+				pContentRect,
+				lViewportStart,
+				lViewportEnd,
+				lBaselineY,
+				lTickLabelY,
+				lDividerBrush,
+				lForegroundBrush,
+				lPixelsPerDip );
 
 			DrawSelectedIndicator(
 				pDrawingContext,
@@ -1986,7 +1951,7 @@ namespace ResumeApp.Controls
 			Rect pContentRect,
 			DateTime pViewportStart,
 			double pBaselineY,
-			Brush pAccentBrush,
+			Brush? pAccentBrush,
 			Brush pTextBrush,
 			double pPixelsPerDip )
 		{
@@ -2022,7 +1987,7 @@ namespace ResumeApp.Controls
 
 			var lPillRect = new Rect( lPillX, lPillY, lPillWidth, lPillHeight );
 
-			var lPillBackground = CreateOpacityBrush( pAccentBrush, 0.22 ) ?? TryFindResource( "OnSurfaceCardStrokeOnDarkBrush" ) as Brush;
+			var lPillBackground = CreateOpacityBrush( pAccentBrush, 0.22 ) ?? ( TryFindResource( "OnSurfaceCardStrokeOnDarkBrush" ) as Brush );
 			DrawRoundedRect( pDrawingContext, lPillRect, lPillBackground, new RadiusXy( 12.0, 12.0 ) );
 
 			pDrawingContext.DrawText( lText, new Point( lPillRect.Left + lPillPaddingX, lPillRect.Top + lPillPaddingY ) );
@@ -2159,7 +2124,7 @@ namespace ResumeApp.Controls
 			return lDays * Math.Max( MinimumZoomPixelsPerDay, lZoom );
 		}
 
-		private Brush ResolveTimeFrameBrush( TimelineTimeFrameItem pItem )
+		private Brush? ResolveTimeFrameBrush( TimelineTimeFrameItem? pItem )
 		{
 			if ( pItem == null )
 			{
@@ -2180,7 +2145,7 @@ namespace ResumeApp.Controls
 			return TryFindResource( lKey ) as Brush;
 		}
 
-		private TimeFrameHitInfo GetTimeFrameHitInfoAtPosition( Point pPosition )
+		private TimeFrameHitInfo? GetTimeFrameHitInfoAtPosition( Point pPosition )
 		{
 			if ( mTimeFrameHitInfos.Count == 0 )
 			{
@@ -2253,7 +2218,7 @@ namespace ResumeApp.Controls
 			return lFrames;
 		}
 
-		private void OnTimeFramesCollectionChanged( object pSender, NotifyCollectionChangedEventArgs pEventArgs )
+		private void OnTimeFramesCollectionChanged( object? pSender, NotifyCollectionChangedEventArgs pEventArgs )
 		{
 			CoerceValue( sZoomLevelProperty );
 			CoerceValue( sViewportStartTicksProperty );
@@ -2324,7 +2289,7 @@ namespace ResumeApp.Controls
 			SetCurrentValue( sSelectedDateProperty, pSelectedDate );
 		}
 
-		private void SetSelectedTimeFrameCurrentValue( TimelineTimeFrameItem pSelectedTimeFrame )
+		private void SetSelectedTimeFrameCurrentValue( TimelineTimeFrameItem? pSelectedTimeFrame )
 		{
 			SetCurrentValue( sSelectedTimeFrameProperty, pSelectedTimeFrame );
 		}

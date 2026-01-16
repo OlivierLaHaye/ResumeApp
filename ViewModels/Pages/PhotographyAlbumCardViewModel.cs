@@ -29,15 +29,16 @@ namespace ResumeApp.ViewModels.Pages
 			"tiff"
 		];
 
-		private static readonly object sCacheLock = new();
-		private static readonly Dictionary<string, IReadOnlyList<string>> sImageRelativePathsByFolderPath = new( StringComparer.OrdinalIgnoreCase );
+		private static readonly Lock sCacheLock = new();
+		private static readonly Dictionary<string, IReadOnlyList<string>> sImageRelativePathsByFolderPath =
+			new( StringComparer.OrdinalIgnoreCase );
 
-		private static readonly object sRandomLock = new();
+		private static readonly Lock sRandomLock = new();
 		private static readonly Random sRandom = new();
 
-		private static readonly object sAllResourcePathsLock = new();
+		private static readonly Lock sAllResourcePathsLock = new();
 		private static bool sHasAttemptedAllResourcePathsBuild;
-		private static IReadOnlyList<string> sAllImageResourceRelativePaths;
+		private static IReadOnlyList<string>? sAllImageResourceRelativePaths;
 
 		private readonly ResourcesService mResourcesService;
 
@@ -49,11 +50,12 @@ namespace ResumeApp.ViewModels.Pages
 		private bool mHasQueuedImageInitialization;
 		private bool mIsInitializingImages;
 
+		private readonly ObservableCollection<ImageSource> mImages;
+
 		public string TitleText => mResourcesService[ mTitleResourceKey ];
 
 		public string SubtitleText => mResourcesService[ mSubtitleResourceKey ];
 
-		private readonly ObservableCollection<ImageSource> mImages;
 		public ObservableCollection<ImageSource> Images
 		{
 			get
@@ -65,8 +67,8 @@ namespace ResumeApp.ViewModels.Pages
 
 		public PhotographyAlbumCardViewModel(
 			ResourcesService pResourcesService,
-			string pTitleResourceKey,
-			string pSubtitleResourceKey,
+			string? pTitleResourceKey,
+			string? pSubtitleResourceKey,
 			string pAlbumImagesBasePath )
 		{
 			mResourcesService = pResourcesService ?? throw new ArgumentNullException( nameof( pResourcesService ) );
@@ -75,22 +77,19 @@ namespace ResumeApp.ViewModels.Pages
 			mSubtitleResourceKey = pSubtitleResourceKey ?? string.Empty;
 
 			mAlbumImagesBasePath = NormalizeFolderPath( pAlbumImagesBasePath );
-
-			mImages = [ ];
+			mImages = [];
 
 			mResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
 		}
 
-		private static async Task ReplaceObservableImagesIncrementallyAsync( ObservableCollection<ImageSource> pTarget, IList<ImageSource> pImages, int pBatchSize )
+		private static async Task ReplaceObservableImagesIncrementallyAsync(
+			ObservableCollection<ImageSource> pTarget,
+			IReadOnlyList<ImageSource> pImages,
+			int pBatchSize )
 		{
-			if ( pTarget == null )
-			{
-				return;
-			}
-
 			pTarget.Clear();
 
-			if ( pImages == null || pImages.Count <= 0 )
+			if ( pImages.Count <= 0 )
 			{
 				return;
 			}
@@ -117,7 +116,7 @@ namespace ResumeApp.ViewModels.Pages
 			}
 		}
 
-		private static string NormalizeFolderPath( string pFolderPath )
+		private static string NormalizeFolderPath( string? pFolderPath )
 		{
 			string lFolderPath = ( pFolderPath ?? string.Empty ).Trim();
 
@@ -128,13 +127,12 @@ namespace ResumeApp.ViewModels.Pages
 
 			lFolderPath = lFolderPath.Replace( "\\", "/" ).TrimStart( '/' );
 
-			return lFolderPath.EndsWith( "/", StringComparison.Ordinal ) ? lFolderPath : ( lFolderPath + "/" );
+			return lFolderPath.EndsWith( '/' ) ? lFolderPath : lFolderPath + "/";
 		}
 
-		private static string NormalizeRelativePath( string pRelativePath )
+		private static string NormalizeRelativePath( string? pRelativePath )
 		{
 			string lRelativePath = ( pRelativePath ?? string.Empty ).Trim().TrimStart( '/', '\\' ).Replace( "\\", "/" );
-
 			return string.IsNullOrWhiteSpace( lRelativePath ) ? string.Empty : lRelativePath;
 		}
 
@@ -147,27 +145,22 @@ namespace ResumeApp.ViewModels.Pages
 				return string.Empty;
 			}
 
-			string lUnescapedPath = lNormalizedPath;
-
 			try
 			{
-				lUnescapedPath = Uri.UnescapeDataString( lNormalizedPath );
+				string lUnescapedPath = Uri.UnescapeDataString( lNormalizedPath );
+				return NormalizeRelativePath( lUnescapedPath );
 			}
 			catch ( Exception )
 			{
-				// ignored
+				return lNormalizedPath;
 			}
-
-			return NormalizeRelativePath( lUnescapedPath );
 		}
 
 		private static Assembly GetResourcesAssembly() => Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
 
 		private static string GetResourcesAssemblyName()
 		{
-			Assembly lAssembly = GetResourcesAssembly();
-			string lAssemblyName = lAssembly?.GetName()?.Name;
-
+			string? lAssemblyName = GetResourcesAssembly().GetName().Name;
 			return string.IsNullOrWhiteSpace( lAssemblyName ) ? "ResumeApp" : lAssemblyName;
 		}
 
@@ -181,18 +174,15 @@ namespace ResumeApp.ViewModels.Pages
 			}
 
 			string lAssemblyName = GetResourcesAssemblyName();
-
 			return $"pack://application:,,,/{lAssemblyName};component/{lNormalizedPathForPackUri}";
 		}
 
-		private static ImageSource TryCreateBitmapImageFromStream( Stream pStream )
+		private static ImageSource? TryCreateBitmapImageFromStream( Stream? pStream )
 		{
 			if ( pStream == null )
 			{
 				return null;
 			}
-
-			ImageSource lImageSource = null;
 
 			try
 			{
@@ -208,17 +198,15 @@ namespace ResumeApp.ViewModels.Pages
 				lBitmapImage.EndInit();
 				lBitmapImage.Freeze();
 
-				lImageSource = lBitmapImage;
+				return lBitmapImage;
 			}
 			catch ( Exception )
 			{
-				// ignored
+				return null;
 			}
-
-			return lImageSource;
 		}
 
-		private static ImageSource TryCreatePackImageSource( string pRelativePath )
+		private static ImageSource? TryCreatePackImageSource( string pRelativePath )
 		{
 			string lUriText = BuildPackUriText( pRelativePath );
 
@@ -240,44 +228,31 @@ namespace ResumeApp.ViewModels.Pages
 			}
 			catch ( Exception )
 			{
-				// ignored
+				return null;
 			}
-
-			return null;
 		}
 
-		private static ImageSource TryCreateFileImageSource( string pFilePath )
+		private static ImageSource? TryCreateFileImageSource( string? pFilePath )
 		{
 			string lFilePath = ( pFilePath ?? string.Empty ).Trim();
 
-			if ( string.IsNullOrWhiteSpace( lFilePath ) )
+			if ( string.IsNullOrWhiteSpace( lFilePath ) || !File.Exists( lFilePath ) )
 			{
 				return null;
 			}
-
-			if ( !File.Exists( lFilePath ) )
-			{
-				return null;
-			}
-
-			ImageSource lImageSource = null;
 
 			try
 			{
-				using ( var lFileStream = new FileStream( lFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite ) )
-				{
-					lImageSource = TryCreateBitmapImageFromStream( lFileStream );
-				}
+				using var lFileStream = new FileStream( lFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite );
+				return TryCreateBitmapImageFromStream( lFileStream );
 			}
 			catch ( Exception )
 			{
-				// ignored
+				return null;
 			}
-
-			return lImageSource;
 		}
 
-		private static bool HasSupportedImageExtension( string pPath )
+		private static bool HasSupportedImageExtension( string? pPath )
 		{
 			string lExtension = Path.GetExtension( pPath ?? string.Empty ) ?? string.Empty;
 
@@ -291,7 +266,7 @@ namespace ResumeApp.ViewModels.Pages
 			return sSupportedImageExtensions.Contains( lExtensionWithoutDot, StringComparer.OrdinalIgnoreCase );
 		}
 
-		private static string GetFileNameFromRelativePath( string pRelativePath )
+		private static string GetFileNameFromRelativePath( string? pRelativePath )
 		{
 			string lPath = ( pRelativePath ?? string.Empty ).Replace( "\\", "/" );
 
@@ -301,8 +276,7 @@ namespace ResumeApp.ViewModels.Pages
 			}
 
 			int lLastSlashIndex = lPath.LastIndexOf( '/', lPath.Length - 1 );
-
-			return lLastSlashIndex >= 0 ? lPath.Substring( lLastSlashIndex + 1 ) : lPath;
+			return lLastSlashIndex >= 0 ? lPath[ ( lLastSlashIndex + 1 ).. ] : lPath;
 		}
 
 		private static IEnumerable<string> GetCandidateFolderRelativePaths( string pFolderRelativePath )
@@ -329,7 +303,7 @@ namespace ResumeApp.ViewModels.Pages
 				yield break;
 			}
 
-			string lSuffix = lFolderRelativePath.Substring( lResourcesPhotographyPrefix.Length );
+			string lSuffix = lFolderRelativePath[ lResourcesPhotographyPrefix.Length.. ];
 			string lAlternatePath = NormalizeFolderPath( lResourcesProjectsPhotographyPrefix + lSuffix );
 
 			if ( lYieldedPaths.Add( lAlternatePath ) )
@@ -349,9 +323,9 @@ namespace ResumeApp.ViewModels.Pages
 
 			lock ( sCacheLock )
 			{
-				if ( sImageRelativePathsByFolderPath.TryGetValue( lFolderRelativePath, out IReadOnlyList<string> lCachedPaths ) )
+				if ( sImageRelativePathsByFolderPath.TryGetValue( lFolderRelativePath, out IReadOnlyList<string>? lCachedPaths ) )
 				{
-					return lCachedPaths ?? [];
+					return lCachedPaths;
 				}
 			}
 
@@ -359,10 +333,10 @@ namespace ResumeApp.ViewModels.Pages
 
 			lock ( sCacheLock )
 			{
-				sImageRelativePathsByFolderPath[ lFolderRelativePath ] = lComputedPaths ?? [];
+				sImageRelativePathsByFolderPath[ lFolderRelativePath ] = lComputedPaths;
 			}
 
-			return lComputedPaths ?? [];
+			return lComputedPaths;
 		}
 
 		private static IReadOnlyList<string> ComputeImageRelativePathsWithFallbacks( string pFolderRelativePath )
@@ -380,7 +354,7 @@ namespace ResumeApp.ViewModels.Pages
 			return [];
 		}
 
-		private static IReadOnlyList<string> GetAllImageResourceRelativePathsOrNull()
+		private static IReadOnlyList<string>? GetAllImageResourceRelativePathsOrNull()
 		{
 			lock ( sAllResourcePathsLock )
 			{
@@ -391,59 +365,55 @@ namespace ResumeApp.ViewModels.Pages
 
 				sHasAttemptedAllResourcePathsBuild = true;
 
-				List<string> lPaths = null;
-
 				try
 				{
 					Assembly lAssembly = GetResourcesAssembly();
-					string lAssemblyName = lAssembly?.GetName()?.Name ?? "ResumeApp";
+					string lAssemblyName = lAssembly.GetName().Name ?? "ResumeApp";
 					string lGResourcesName = $"{lAssemblyName}.g.resources";
 
-					using ( Stream lGResourcesStream = lAssembly?.GetManifestResourceStream( lGResourcesName ) )
+					using Stream? lGResourcesStream = lAssembly.GetManifestResourceStream( lGResourcesName );
+
+					if ( lGResourcesStream == null )
 					{
-						if ( lGResourcesStream == null )
-						{
-							sAllImageResourceRelativePaths = null;
-							return null;
-						}
-
-						using ( var lResourceReader = new ResourceReader( lGResourcesStream ) )
-						{
-							lPaths = [ ];
-
-							IDictionaryEnumerator lEnumerator = lResourceReader.GetEnumerator();
-
-							while ( lEnumerator.MoveNext() )
-							{
-								if ( lEnumerator.Key is not string lResourceKey )
-								{
-									continue;
-								}
-
-								if ( !HasSupportedImageExtension( lResourceKey ) )
-								{
-									continue;
-								}
-
-								string lNormalized = NormalizeRelativePath( lResourceKey );
-
-								if ( string.IsNullOrWhiteSpace( lNormalized ) )
-								{
-									continue;
-								}
-
-								lPaths.Add( lNormalized.Replace( "\\", "/" ) );
-							}
-						}
+						sAllImageResourceRelativePaths = null;
+						return null;
 					}
+
+					using var lResourceReader = new ResourceReader( lGResourcesStream );
+					var lPaths = new List<string>();
+
+					IDictionaryEnumerator lEnumerator = lResourceReader.GetEnumerator();
+
+					while ( lEnumerator.MoveNext() )
+					{
+						if ( lEnumerator.Key is not string lResourceKey )
+						{
+							continue;
+						}
+
+						if ( !HasSupportedImageExtension( lResourceKey ) )
+						{
+							continue;
+						}
+
+						string lNormalized = NormalizeRelativePath( lResourceKey );
+
+						if ( string.IsNullOrWhiteSpace( lNormalized ) )
+						{
+							continue;
+						}
+
+						lPaths.Add( lNormalized.Replace( "\\", "/" ) );
+					}
+
+					sAllImageResourceRelativePaths = lPaths;
+					return sAllImageResourceRelativePaths;
 				}
 				catch ( Exception )
 				{
-					// ignored
+					sAllImageResourceRelativePaths = null;
+					return null;
 				}
-
-				sAllImageResourceRelativePaths = lPaths;
-				return sAllImageResourceRelativePaths;
 			}
 		}
 
@@ -451,7 +421,7 @@ namespace ResumeApp.ViewModels.Pages
 		{
 			string lFolderRelativePath = NormalizeFolderPath( pFolderRelativePath );
 
-			IReadOnlyList<string> lAllResourcePaths = GetAllImageResourceRelativePathsOrNull();
+			IReadOnlyList<string>? lAllResourcePaths = GetAllImageResourceRelativePathsOrNull();
 
 			List<string> lResourcePaths = ( lAllResourcePaths ?? EnumerateResourceRelativePathsInFolderLegacy( lFolderRelativePath ) )
 				.Where( pRelativePath => !string.IsNullOrWhiteSpace( pRelativePath ) )
@@ -466,14 +436,12 @@ namespace ResumeApp.ViewModels.Pages
 				return lResourcePaths;
 			}
 
-			List<string> lFilePaths = EnumerateFilePathsInFolderNearExecutableOrProject( lFolderRelativePath )
+			return EnumerateFilePathsInFolderNearExecutableOrProject( lFolderRelativePath )
 				.Where( pFilePath => !string.IsNullOrWhiteSpace( pFilePath ) )
 				.Distinct( StringComparer.OrdinalIgnoreCase )
 				.OrderBy( Path.GetFileName, StringComparer.OrdinalIgnoreCase )
 				.ThenBy( pFilePath => pFilePath, StringComparer.OrdinalIgnoreCase )
 				.ToList();
-
-			return lFilePaths;
 		}
 
 		private static IEnumerable<string> EnumerateResourceRelativePathsInFolderLegacy( string pFolderRelativePath )
@@ -486,10 +454,10 @@ namespace ResumeApp.ViewModels.Pages
 			}
 
 			Assembly lAssembly = GetResourcesAssembly();
-			string lAssemblyName = lAssembly.GetName()?.Name ?? "ResumeApp";
+			string lAssemblyName = lAssembly.GetName().Name ?? "ResumeApp";
 			string lGResourcesName = $"{lAssemblyName}.g.resources";
 
-			Stream lGResourcesStream = null;
+			Stream? lGResourcesStream;
 
 			try
 			{
@@ -497,7 +465,7 @@ namespace ResumeApp.ViewModels.Pages
 			}
 			catch ( Exception )
 			{
-				// ignored
+				yield break;
 			}
 
 			if ( lGResourcesStream == null )
@@ -506,51 +474,33 @@ namespace ResumeApp.ViewModels.Pages
 			}
 
 			using ( lGResourcesStream )
+			using ( var lResourceReader = new ResourceReader( lGResourcesStream ) )
 			{
-				ResourceReader lResourceReader = null;
+				IDictionaryEnumerator lEnumerator = lResourceReader.GetEnumerator();
 
-				try
+				while ( lEnumerator.MoveNext() )
 				{
-					lResourceReader = new ResourceReader( lGResourcesStream );
-				}
-				catch ( Exception )
-				{
-					// ignored
-				}
-
-				if ( lResourceReader == null )
-				{
-					yield break;
-				}
-
-				using ( lResourceReader )
-				{
-					IDictionaryEnumerator lEnumerator = lResourceReader.GetEnumerator();
-
-					while ( lEnumerator.MoveNext() )
+					if ( lEnumerator.Key is not string lResourceKey )
 					{
-						if ( lEnumerator.Key is not string lResourceKey )
-						{
-							continue;
-						}
-
-						if ( !lResourceKey.StartsWith( lFolderRelativePath, StringComparison.OrdinalIgnoreCase ) )
-						{
-							continue;
-						}
-
-						if ( !HasSupportedImageExtension( lResourceKey ) )
-						{
-							continue;
-						}
-
-						yield return lResourceKey.Replace( "\\", "/" );
+						continue;
 					}
+
+					if ( !lResourceKey.StartsWith( lFolderRelativePath, StringComparison.OrdinalIgnoreCase ) )
+					{
+						continue;
+					}
+
+					if ( !HasSupportedImageExtension( lResourceKey ) )
+					{
+						continue;
+					}
+
+					yield return lResourceKey.Replace( "\\", "/" );
 				}
 			}
 		}
 
-		private static IEnumerable<string> EnumerateDirectoryAndParents( string pDirectoryPath, int pMaxLevels )
+		private static IEnumerable<string> EnumerateDirectoryAndParents( string? pDirectoryPath, int pMaxLevels )
 		{
 			string lCurrentDirectoryPath = ( pDirectoryPath ?? string.Empty ).Trim();
 
@@ -559,7 +509,7 @@ namespace ResumeApp.ViewModels.Pages
 				yield break;
 			}
 
-			string lFullPath = string.Empty;
+			string lFullPath;
 
 			try
 			{
@@ -567,7 +517,7 @@ namespace ResumeApp.ViewModels.Pages
 			}
 			catch ( Exception )
 			{
-				// ignored
+				yield break;
 			}
 
 			if ( string.IsNullOrWhiteSpace( lFullPath ) )
@@ -598,15 +548,14 @@ namespace ResumeApp.ViewModels.Pages
 				}
 			}
 
-			string lCurrentDirectoryPath = string.Empty;
+			string? lCurrentDirectoryPath = null;
 
 			try
 			{
-				lCurrentDirectoryPath = Environment.CurrentDirectory ?? string.Empty;
+				lCurrentDirectoryPath = Environment.CurrentDirectory;
 			}
 			catch ( Exception )
 			{
-				// ignored
 			}
 
 			foreach ( string lDirectoryPath in EnumerateDirectoryAndParents( lCurrentDirectoryPath, pMaxLevels: 20 ) )
@@ -617,15 +566,14 @@ namespace ResumeApp.ViewModels.Pages
 				}
 			}
 
-			string lExecutingAssemblyDirectoryPath = string.Empty;
+			string? lExecutingAssemblyDirectoryPath = null;
 
 			try
 			{
-				lExecutingAssemblyDirectoryPath = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location ) ?? string.Empty;
+				lExecutingAssemblyDirectoryPath = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location );
 			}
 			catch ( Exception )
 			{
-				// ignored
 			}
 
 			foreach ( string lDirectoryPath in EnumerateDirectoryAndParents( lExecutingAssemblyDirectoryPath, pMaxLevels: 20 ) )
@@ -662,7 +610,7 @@ namespace ResumeApp.ViewModels.Pages
 					continue;
 				}
 
-				IEnumerable<string> lCandidateFiles = [];
+				IEnumerable<string> lCandidateFiles;
 
 				try
 				{
@@ -670,7 +618,7 @@ namespace ResumeApp.ViewModels.Pages
 				}
 				catch ( Exception )
 				{
-					// ignored
+					continue;
 				}
 
 				List<string> lSupportedFiles = lCandidateFiles
@@ -724,7 +672,7 @@ namespace ResumeApp.ViewModels.Pages
 
 		private static bool HasResourceRelativePath( string pRelativePath )
 		{
-			IReadOnlyList<string> lAllResourcePaths = GetAllImageResourceRelativePathsOrNull();
+			IReadOnlyList<string>? lAllResourcePaths = GetAllImageResourceRelativePathsOrNull();
 
 			if ( lAllResourcePaths == null )
 			{
@@ -737,7 +685,7 @@ namespace ResumeApp.ViewModels.Pages
 				&& lAllResourcePaths.Contains( lNormalized, StringComparer.OrdinalIgnoreCase );
 		}
 
-		private static ImageSource TryCreateImageSource( string pPath )
+		private static ImageSource? TryCreateImageSource( string? pPath )
 		{
 			string lPath = ( pPath ?? string.Empty ).Trim();
 
@@ -757,17 +705,17 @@ namespace ResumeApp.ViewModels.Pages
 			}
 
 			string lResolvedFilePath = TryResolveFilePathFromRelativePath( lPath );
-			ImageSource lFileImageSource = TryCreateFileImageSource( lResolvedFilePath );
+			ImageSource? lFileImageSource = TryCreateFileImageSource( lResolvedFilePath );
 
 			return lFileImageSource ?? TryCreatePackImageSource( lPath );
 		}
 
-		private static IEnumerable<ImageSource> CreateImageSources( IEnumerable<string> pPaths )
+		private static IEnumerable<ImageSource> CreateImageSources( IEnumerable<string>? pPaths )
 		{
 			return ( pPaths ?? [] )
 				.Where( pPath => !string.IsNullOrWhiteSpace( pPath ) )
 				.Select( TryCreateImageSource )
-				.Where( pImageSource => pImageSource != null );
+				.OfType<ImageSource>();
 		}
 
 		private static int GetRandomIndex( int pUpperBoundExclusive )
@@ -785,19 +733,12 @@ namespace ResumeApp.ViewModels.Pages
 
 		private static void MoveRandomImageToFront( IList<ImageSource> pImages )
 		{
-			if ( pImages == null )
+			if ( pImages.Count <= 1 )
 			{
 				return;
 			}
 
-			int lImageCount = pImages.Count;
-
-			if ( lImageCount <= 1 )
-			{
-				return;
-			}
-
-			int lRandomIndex = GetRandomIndex( lImageCount );
+			int lRandomIndex = GetRandomIndex( pImages.Count );
 
 			if ( lRandomIndex <= 0 )
 			{
@@ -821,7 +762,7 @@ namespace ResumeApp.ViewModels.Pages
 				return;
 			}
 
-			Dispatcher lDispatcher = Application.Current?.Dispatcher;
+			Dispatcher? lDispatcher = Application.Current?.Dispatcher;
 
 			if ( lDispatcher == null )
 			{
@@ -829,7 +770,6 @@ namespace ResumeApp.ViewModels.Pages
 			}
 
 			mHasQueuedImageInitialization = true;
-
 			lDispatcher.BeginInvoke( new Action( InitializeImagesAsync ), pPriority );
 		}
 
@@ -844,30 +784,12 @@ namespace ResumeApp.ViewModels.Pages
 
 			try
 			{
-				List<ImageSource> lImages = null;
-
-				try
-				{
-					lImages = await Task.Run( () =>
-					{
-						IEnumerable<string> lImagePaths = GetCachedImageRelativePaths( mAlbumImagesBasePath );
-
-						List<ImageSource> lCreatedImages = CreateImageSources( lImagePaths )
-							.ToList();
-
-						MoveRandomImageToFront( lCreatedImages );
-
-						return lCreatedImages;
-					} );
-				}
-				catch ( Exception )
-				{
-					// ignored
-				}
-
-				await ReplaceObservableImagesIncrementallyAsync( mImages, lImages ?? [ ], pBatchSize: 4 );
-
+				List<ImageSource> lImages = await LoadImagesAsync();
+				await ReplaceObservableImagesIncrementallyAsync( mImages, lImages, pBatchSize: 4 );
 				mHasInitializedImages = true;
+			}
+			catch ( Exception )
+			{
 			}
 			finally
 			{
@@ -875,11 +797,24 @@ namespace ResumeApp.ViewModels.Pages
 			}
 		}
 
-		private void OnResourcesServicePropertyChanged( object pSender, PropertyChangedEventArgs pArgs )
+		private Task<List<ImageSource>> LoadImagesAsync()
 		{
-			string lPropertyName = pArgs?.PropertyName ?? string.Empty;
+			return Task.Run( () =>
+			{
+				IEnumerable<string> lImagePaths = GetCachedImageRelativePaths( mAlbumImagesBasePath );
 
-			if ( !string.Equals( lPropertyName, "Item[]", StringComparison.Ordinal ) )
+				List<ImageSource> lCreatedImages = CreateImageSources( lImagePaths )
+					.ToList();
+
+				MoveRandomImageToFront( lCreatedImages );
+
+				return lCreatedImages;
+			} );
+		}
+
+		private void OnResourcesServicePropertyChanged( object? pSender, PropertyChangedEventArgs pArgs )
+		{
+			if ( !string.Equals( pArgs.PropertyName, "Item[]", StringComparison.Ordinal ) )
 			{
 				return;
 			}

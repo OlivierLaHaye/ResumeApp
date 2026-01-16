@@ -38,7 +38,7 @@ namespace ResumeApp.Helpers
 			return lExtremePoint;
 		}
 
-		private static IEnumerable<Point> GetPointsFromPath( Path pPath )
+		private static IEnumerable<Point> GetPointsFromPath( Path? pPath )
 		{
 			if ( pPath?.Data == null )
 			{

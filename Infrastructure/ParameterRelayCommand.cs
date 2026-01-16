@@ -6,21 +6,20 @@ using System.Windows.Input;
 namespace ResumeApp.Infrastructure
 {
 	public sealed class ParameterRelayCommand(
-		Action<object> pExecuteAction,
-		Func<object, bool> pCanExecutePredicate = null )
+		Action<object?> pExecuteAction,
+		Func<object?, bool>? pCanExecutePredicate = null )
 		: ICommand
 	{
-		public event EventHandler CanExecuteChanged;
-		private readonly Action<object> mExecuteAction = pExecuteAction ?? throw new ArgumentNullException( nameof( pExecuteAction ) );
+		private readonly Action<object?> mExecuteAction = pExecuteAction ?? throw new ArgumentNullException( nameof( pExecuteAction ) );
 
-		public bool CanExecute( object pParameter )
+		public event EventHandler? CanExecuteChanged
 		{
-			return pCanExecutePredicate == null || pCanExecutePredicate( pParameter );
+			add => CommandManager.RequerySuggested += value;
+			remove => CommandManager.RequerySuggested -= value;
 		}
 
-		public void Execute( object pParameter )
-		{
-			mExecuteAction( pParameter );
-		}
+		public bool CanExecute( object? pParameter ) => pCanExecutePredicate?.Invoke( pParameter ) ?? true;
+
+		public void Execute( object? pParameter ) => mExecuteAction( pParameter );
 	}
 }

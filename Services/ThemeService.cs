@@ -3,6 +3,7 @@
 
 using Microsoft.Win32;
 using ResumeApp.Infrastructure;
+using System.Runtime.Versioning;
 using System.Windows;
 
 namespace ResumeApp.Services
@@ -11,7 +12,7 @@ namespace ResumeApp.Services
 	{
 		private const int DarkThemeRegistryValue = 0;
 
-		public static ThemeService Instance { get; private set; }
+		public static ThemeService? Instance { get; private set; }
 
 		private AppTheme mActiveTheme;
 		public AppTheme ActiveTheme
@@ -25,14 +26,10 @@ namespace ResumeApp.Services
 		public ThemeService()
 		{
 			mActiveTheme = AppTheme.Light;
-
-			if ( Instance == null )
-			{
-				Instance = this;
-			}
+			Instance ??= this;
 		}
 
-		private static ResourceDictionary LoadThemeDictionary( AppTheme pTheme )
+		private static ResourceDictionary? LoadThemeDictionary( AppTheme pTheme )
 		{
 			try
 			{
@@ -50,9 +47,12 @@ namespace ResumeApp.Services
 			return null;
 		}
 
-		private static void ReplaceMergedDictionary( Application pApplication, ResourceDictionary pNewDictionary, Func<ResourceDictionary, bool> pIsMatch )
+		private static void ReplaceMergedDictionary(
+			Application pApplication,
+			ResourceDictionary pNewDictionary,
+			Func<ResourceDictionary, bool> pIsMatch )
 		{
-			ResourceDictionary lExistingDictionary = pApplication.Resources.MergedDictionaries.FirstOrDefault( pIsMatch );
+			ResourceDictionary? lExistingDictionary = pApplication.Resources.MergedDictionaries.FirstOrDefault( pIsMatch );
 
 			if ( lExistingDictionary != null )
 			{
@@ -62,39 +62,36 @@ namespace ResumeApp.Services
 			pApplication.Resources.MergedDictionaries.Add( pNewDictionary );
 		}
 
-		private static bool IsThemeDictionary( ResourceDictionary pDictionary )
+		private static bool IsThemeDictionary( ResourceDictionary? pDictionary )
 		{
-			Uri lSource = pDictionary?.Source;
+			Uri? lSource = pDictionary?.Source;
 
 			if ( lSource == null )
 			{
 				return false;
 			}
 
-			string lOriginalString = lSource.OriginalString ?? string.Empty;
+			string lOriginalString = lSource.OriginalString;
 			return lOriginalString.IndexOf( "Theme.", StringComparison.OrdinalIgnoreCase ) >= 0;
 		}
 
-		private static AppTheme DetectWindowsAppTheme()
+		[SupportedOSPlatform( "windows" )]
+		private static AppTheme DetectWindowsAppThemeWindows()
 		{
 			try
 			{
-				using ( RegistryKey lPersonalizeKey = Registry.CurrentUser.OpenSubKey( @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" ) )
-				{
-					object lValue = lPersonalizeKey?.GetValue( "AppsUseLightTheme" );
+				using RegistryKey? lPersonalizeKey = Registry.CurrentUser.OpenSubKey(
+					@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" );
 
-					switch ( lValue )
-					{
-						case int lDword:
-							{
-								return lDword == DarkThemeRegistryValue ? AppTheme.Dark : AppTheme.Light;
-							}
-						case string lStringValue when int.TryParse( lStringValue, out int lParsedValue ):
-							{
-								return lParsedValue == DarkThemeRegistryValue ? AppTheme.Dark : AppTheme.Light;
-							}
-					}
-				}
+				object? lValue = lPersonalizeKey?.GetValue( "AppsUseLightTheme" );
+
+				return lValue switch
+				{
+					int lDword => lDword == DarkThemeRegistryValue ? AppTheme.Dark : AppTheme.Light,
+					string lStringValue when int.TryParse( lStringValue, out int lParsedValue )
+						=> lParsedValue == DarkThemeRegistryValue ? AppTheme.Dark : AppTheme.Light,
+					_ => AppTheme.Light
+				};
 			}
 			catch ( Exception )
 			{
@@ -104,12 +101,16 @@ namespace ResumeApp.Services
 			return AppTheme.Light;
 		}
 
+		private static AppTheme DetectWindowsAppTheme()
+		{
+			return OperatingSystem.IsWindows()
+				? DetectWindowsAppThemeWindows()
+				: AppTheme.Light;
+		}
+
 		public void Initialize( Application pApplication )
 		{
-			if ( pApplication == null )
-			{
-				throw new ArgumentNullException( nameof( pApplication ) );
-			}
+			ArgumentNullException.ThrowIfNull( pApplication );
 
 			if ( RegistrySettingsService.TryLoadTheme( out AppTheme lSavedTheme ) )
 			{
@@ -117,16 +118,12 @@ namespace ResumeApp.Services
 				return;
 			}
 
-			AppTheme lDetectedTheme = DetectWindowsAppTheme();
-			ApplyTheme( pApplication, lDetectedTheme, true );
+			ApplyTheme( pApplication, DetectWindowsAppTheme(), true );
 		}
 
 		public void ToggleTheme( Application pApplication )
 		{
-			if ( pApplication == null )
-			{
-				throw new ArgumentNullException( nameof( pApplication ) );
-			}
+			ArgumentNullException.ThrowIfNull( pApplication );
 
 			AppTheme lNewTheme = ActiveTheme == AppTheme.Dark ? AppTheme.Light : AppTheme.Dark;
 			ApplyTheme( pApplication, lNewTheme, false );
@@ -139,8 +136,7 @@ namespace ResumeApp.Services
 				return;
 			}
 
-			ResourceDictionary lThemeDictionary = LoadThemeDictionary( pTheme );
-
+			ResourceDictionary? lThemeDictionary = LoadThemeDictionary( pTheme );
 			if ( lThemeDictionary == null )
 			{
 				return;

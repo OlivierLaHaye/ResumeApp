@@ -8,7 +8,6 @@ namespace ResumeApp.Models
 {
 	public sealed class TimelineTimeFrameItem : PropertyChangedNotifier
 	{
-
 		private DateTime mStartDate;
 		public DateTime StartDate
 		{
@@ -44,7 +43,7 @@ namespace ResumeApp.Models
 			set => SetProperty( ref mAccentColorKey, value );
 		}
 
-		public TimelineTimeFrameItem( DateTime pStartDate, DateTime pEndDate, string pTitle, string pAccentColorKey )
+		public TimelineTimeFrameItem( DateTime pStartDate, DateTime pEndDate, string? pTitle, string? pAccentColorKey )
 		{
 			DateTime lStartDate = pStartDate.Date;
 			DateTime lEndDate = pEndDate.Date;
@@ -58,6 +57,7 @@ namespace ResumeApp.Models
 			mEndDate = lEndDate;
 			mTitle = pTitle ?? string.Empty;
 			mAccentColorKey = pAccentColorKey ?? string.Empty;
+			mAccentBrush = Brushes.Transparent;
 		}
 	}
 }

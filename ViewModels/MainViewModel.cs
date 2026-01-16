@@ -87,14 +87,12 @@ namespace ResumeApp.ViewModels
 			mIsTopBarCollapsed = false;
 
 			pResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
-			pThemeService.PropertyChanged += ( pSender, pEventArgs ) => RaisePropertyChanged( nameof( IsDarkThemeActive ) );
+			pThemeService.PropertyChanged += ( _, _ ) => RaisePropertyChanged( nameof( IsDarkThemeActive ) );
 		}
 
-		private void OnResourcesServicePropertyChanged( object pSender, PropertyChangedEventArgs pEventArgs )
+		private void OnResourcesServicePropertyChanged( object? pSender, PropertyChangedEventArgs pEventArgs )
 		{
-			string lPropertyName = pEventArgs?.PropertyName ?? string.Empty;
-
-			if ( !string.Equals( lPropertyName, "Item[]", StringComparison.Ordinal ) )
+			if ( !string.Equals( pEventArgs.PropertyName, "Item[]", StringComparison.Ordinal ) )
 			{
 				return;
 			}

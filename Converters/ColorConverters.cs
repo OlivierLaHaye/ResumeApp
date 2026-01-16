@@ -13,38 +13,19 @@ namespace ResumeApp.Converters
 	{
 		protected static Color? GetColorFromBrush( Brush pBrush )
 		{
-			switch ( pBrush )
+			return pBrush switch
 			{
-				case SolidColorBrush lSolidBrush:
-					{
-						return lSolidBrush.Color;
-					}
-
-				case LinearGradientBrush lGradientBrush:
-					{
-						return ColorHelper.CalculateAverageColor( lGradientBrush.GradientStops.Select( pStop => pStop.Color ).ToList() );
-					}
-
-				case DrawingBrush lDrawingBrush:
-					{
-						return ColorHelper.GetAverageColorFromDrawingBrush( lDrawingBrush );
-					}
-
-				default:
-					{
-						return null;
-					}
-			}
+				SolidColorBrush lSolidBrush => lSolidBrush.Color,
+				LinearGradientBrush lGradientBrush => ColorHelper.CalculateAverageColor(
+					lGradientBrush.GradientStops.Select( pStop => pStop.Color ).ToList() ),
+				DrawingBrush lDrawingBrush => ColorHelper.GetAverageColorFromDrawingBrush( lDrawingBrush ),
+				_ => null
+			};
 		}
 
 		public object Convert( object pValue, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
-			if ( pValue is Brush lBrush )
-			{
-				return ConvertBrush( lBrush );
-			}
-
-			return DependencyProperty.UnsetValue;
+			return pValue is Brush lBrush ? ConvertBrush( lBrush ) : DependencyProperty.UnsetValue;
 		}
 
 		public object ConvertBack( object pValue, Type pTargetType, object pParameter, CultureInfo pCulture )
@@ -60,14 +41,13 @@ namespace ResumeApp.Converters
 	{
 		protected override object ConvertBrush( Brush pBrush )
 		{
-			var lColor = GetColorFromBrush( pBrush );
+			Color? lColor = GetColorFromBrush( pBrush );
 			if ( !lColor.HasValue )
 			{
 				return false;
 			}
 
-			var lOpaqueColor = Color.FromRgb( lColor.Value.R, lColor.Value.G, lColor.Value.B );
-
+			Color lOpaqueColor = Color.FromRgb( lColor.Value.R, lColor.Value.G, lColor.Value.B );
 			return ColorHelper.IsWhiteForegroundPreferred( lOpaqueColor );
 		}
 	}
@@ -75,7 +55,7 @@ namespace ResumeApp.Converters
 	[ValueConversion( typeof( int ), typeof( Brush ) )]
 	public sealed class PaletteIndexToBrushConverter : IValueConverter
 	{
-		private static Brush TryFindBrushOrNull( string pBrushKey )
+		private static Brush? TryFindBrushOrNull( string pBrushKey )
 		{
 			if ( string.IsNullOrWhiteSpace( pBrushKey ) )
 			{
@@ -87,33 +67,25 @@ namespace ResumeApp.Converters
 
 		public object Convert( object pValue, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
-			int lPaletteIndex = 0;
-
-			switch ( pValue )
+			int lPaletteIndex = pValue switch
 			{
-				case int lIndex:
-					{
-						lPaletteIndex = lIndex;
-						break;
-					}
-				case string lText when int.TryParse( lText, NumberStyles.Integer, CultureInfo.InvariantCulture, out int lParsedIndex ):
-					{
-						lPaletteIndex = lParsedIndex;
-						break;
-					}
-			}
+				int lIndex => lIndex,
+				string lText when int.TryParse( lText, NumberStyles.Integer, CultureInfo.InvariantCulture, out int lParsedIndex ) => lParsedIndex,
+				_ => 0
+			};
 
-			if ( ColorHelper.sAccentBrushKeys == null || ColorHelper.sAccentBrushKeys.Length == 0 )
+			string[] lAccentBrushKeys = ColorHelper.sAccentBrushKeys;
+			if ( lAccentBrushKeys.Length == 0 )
 			{
 				return TryFindBrushOrNull( "CommonBlueBrush" ) ?? Brushes.Transparent;
 			}
 
 			int lNormalizedIndex = lPaletteIndex < 0 ? 0 : lPaletteIndex;
-			string lBrushKey = ColorHelper.sAccentBrushKeys[ lNormalizedIndex % ColorHelper.sAccentBrushKeys.Length ];
+			string lBrushKey = lAccentBrushKeys[ lNormalizedIndex % lAccentBrushKeys.Length ];
 
 			return TryFindBrushOrNull( lBrushKey )
-			       ?? TryFindBrushOrNull( "CommonBlueBrush" )
-			       ?? Brushes.Transparent;
+				?? TryFindBrushOrNull( "CommonBlueBrush" )
+				?? Brushes.Transparent;
 		}
 
 		public object ConvertBack( object pValue, Type pTargetType, object pParameter, CultureInfo pCulture )

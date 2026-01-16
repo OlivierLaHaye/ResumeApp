@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Resources;
@@ -33,13 +34,12 @@ namespace ResumeApp.ViewModels.Pages
 			"tiff"
 		];
 
-		private static readonly object sResourceIndexLock = new();
+		private static readonly Lock sResourceIndexLock = new();
 		private static bool sHasAttemptedBuildResourceIndex;
-		private static HashSet<string> sAvailableResourceRelativePaths;
+		private static HashSet<string>? sAvailableResourceRelativePaths;
 
 		private readonly ResourcesService mResourcesService;
 
-		private readonly string mTitleResourceKey;
 		private readonly string mContextResourceKey;
 		private readonly string mConstraintsResourceKey;
 		private readonly string mImpactResourceKey;
@@ -52,27 +52,27 @@ namespace ResumeApp.ViewModels.Pages
 		private bool mHasQueuedImageInitialization;
 		private bool mIsInitializingImages;
 
-		public string TitleText => mResourcesService[ mTitleResourceKey ];
+		public string TitleText => mResourcesService[ field ];
 
-		private string mContextValueText;
+		[field: AllowNull, MaybeNull]
 		public string ContextValueText
 		{
-			get => mContextValueText;
-			private set => SetProperty( ref mContextValueText, value );
+			get;
+			private set => SetProperty( ref field, value );
 		}
 
-		private string mConstraintsValueText;
+		[field: AllowNull, MaybeNull]
 		public string ConstraintsValueText
 		{
-			get => mConstraintsValueText;
-			private set => SetProperty( ref mConstraintsValueText, value );
+			get;
+			private set => SetProperty( ref field, value );
 		}
 
-		private string mImpactValueText;
+		[field: AllowNull, MaybeNull]
 		public string ImpactValueText
 		{
-			get => mImpactValueText;
-			private set => SetProperty( ref mImpactValueText, value );
+			get;
+			private set => SetProperty( ref field, value );
 		}
 
 		public ObservableCollection<LocalizedResourceItemViewModel> WhatIBuiltItems { get; }
@@ -95,18 +95,18 @@ namespace ResumeApp.ViewModels.Pages
 
 		public ProjectCardViewModel(
 			ResourcesService pResourcesService,
-			string pTitleResourceKey,
-			string pContextResourceKey,
-			string pConstraintsResourceKey,
-			string[] pWhatIBuiltItemResourceKeys,
-			string pImpactResourceKey,
-			string pTechResourceKey,
-			string pProjectImagesBaseName,
-			string pProjectLinkUriText )
+			string? pTitleResourceKey,
+			string? pContextResourceKey,
+			string? pConstraintsResourceKey,
+			string[]? pWhatIBuiltItemResourceKeys,
+			string? pImpactResourceKey,
+			string? pTechResourceKey,
+			string? pProjectImagesBaseName,
+			string? pProjectLinkUriText )
 		{
 			mResourcesService = pResourcesService ?? throw new ArgumentNullException( nameof( pResourcesService ) );
 
-			mTitleResourceKey = pTitleResourceKey ?? string.Empty;
+			TitleText = pTitleResourceKey ?? string.Empty;
 			mContextResourceKey = pContextResourceKey ?? string.Empty;
 			mConstraintsResourceKey = pConstraintsResourceKey ?? string.Empty;
 			mImpactResourceKey = pImpactResourceKey ?? string.Empty;
@@ -121,15 +121,15 @@ namespace ResumeApp.ViewModels.Pages
 				.Where( pKey => !string.IsNullOrWhiteSpace( pKey ) )
 				.Select( pKey => new LocalizedResourceItemViewModel( mResourcesService, pKey ) ) );
 
-			TechItems = [ ];
-			mImages = [ ];
+			TechItems = [];
+			mImages = [];
 
 			RefreshFromResources();
 
 			mResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
 		}
 
-		private static async Task ReplaceObservableImagesIncrementallyAsync( ICollection<ImageSource> pTarget, IList<ImageSource> pImages, int pBatchSize )
+		private static async Task ReplaceObservableImagesIncrementallyAsync( ICollection<ImageSource>? pTarget, List<ImageSource?> pImages, int pBatchSize )
 		{
 			if ( pTarget == null )
 			{
@@ -138,7 +138,7 @@ namespace ResumeApp.ViewModels.Pages
 
 			pTarget.Clear();
 
-			if ( pImages == null || pImages.Count <= 0 )
+			if ( pImages is not { Count: > 0 } )
 			{
 				return;
 			}
@@ -151,7 +151,7 @@ namespace ResumeApp.ViewModels.Pages
 
 				for ( int lCurrentIndex = lStartIndex; lCurrentIndex < lEndIndexExclusive; lCurrentIndex++ )
 				{
-					ImageSource lImage = pImages[ lCurrentIndex ];
+					ImageSource? lImage = pImages[ lCurrentIndex ];
 
 					if ( lImage == null )
 					{
@@ -179,7 +179,7 @@ namespace ResumeApp.ViewModels.Pages
 				return pText.Trim();
 			}
 
-			return lColonIndex >= pText.Length - 1 ? string.Empty : pText.Substring( lColonIndex + 1 ).Trim();
+			return lColonIndex >= pText.Length - 1 ? string.Empty : pText[ ( lColonIndex + 1 ).. ].Trim();
 		}
 
 		private static IEnumerable<string> SplitSemicolonSeparatedItems( string pText )
@@ -210,7 +210,7 @@ namespace ResumeApp.ViewModels.Pages
 				.ToArray();
 		}
 
-		private static void ReplaceObservableItems( ICollection<string> pTarget, string[] pItems )
+		private static void ReplaceObservableItems( ICollection<string>? pTarget, string[]? pItems )
 		{
 			if ( pTarget == null )
 			{
@@ -227,13 +227,13 @@ namespace ResumeApp.ViewModels.Pages
 
 		private static string GetEntryAssemblyName()
 		{
-			Assembly lEntryAssembly = Assembly.GetEntryAssembly();
-			string lAssemblyName = lEntryAssembly?.GetName()?.Name;
+			Assembly? lEntryAssembly = Assembly.GetEntryAssembly();
+			string? lAssemblyName = lEntryAssembly?.GetName().Name;
 
 			return string.IsNullOrWhiteSpace( lAssemblyName ) ? "ResumeApp" : lAssemblyName;
 		}
 
-		private static string NormalizeRelativePath( string pRelativePath )
+		private static string NormalizeRelativePath( string? pRelativePath )
 		{
 			string lRelativePath = ( pRelativePath ?? string.Empty ).Trim();
 
@@ -261,7 +261,7 @@ namespace ResumeApp.ViewModels.Pages
 			return ( lRelativePath ?? string.Empty ).Trim().TrimStart( '/', '\\' ).Replace( "\\", "/" );
 		}
 
-		private static HashSet<string> GetAvailableResourceRelativePathsOrNull()
+		private static HashSet<string>? GetAvailableResourceRelativePathsOrNull()
 		{
 			lock ( sResourceIndexLock )
 			{
@@ -272,7 +272,7 @@ namespace ResumeApp.ViewModels.Pages
 
 				sHasAttemptedBuildResourceIndex = true;
 
-				HashSet<string> lPaths = null;
+				HashSet<string>? lPaths = null;
 
 				try
 				{
@@ -280,42 +280,39 @@ namespace ResumeApp.ViewModels.Pages
 					string lAssemblyName = lAssembly?.GetName()?.Name ?? "ResumeApp";
 					string lGResourcesName = $"{lAssemblyName}.g.resources";
 
-					using ( Stream lGResourcesStream = lAssembly.GetManifestResourceStream( lGResourcesName ) )
+					using Stream? lGResourcesStream = lAssembly?.GetManifestResourceStream( lGResourcesName );
+					if ( lGResourcesStream == null )
 					{
-						if ( lGResourcesStream == null )
+						sAvailableResourceRelativePaths = null;
+						return null;
+					}
+
+					using var lResourceReader = new ResourceReader( lGResourcesStream );
+					lPaths = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
+
+					IDictionaryEnumerator lEnumerator = lResourceReader.GetEnumerator();
+					using var lDisposable = lEnumerator as IDisposable;
+
+					while ( lEnumerator.MoveNext() )
+					{
+						if ( lEnumerator.Key is not string lResourceKey )
 						{
-							sAvailableResourceRelativePaths = null;
-							return null;
+							continue;
 						}
 
-						using ( var lResourceReader = new ResourceReader( lGResourcesStream ) )
+						if ( !IsKnownImageExtension( lResourceKey ) )
 						{
-							lPaths = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
-
-							IDictionaryEnumerator lEnumerator = lResourceReader.GetEnumerator();
-
-							while ( lEnumerator.MoveNext() )
-							{
-								if ( lEnumerator.Key is not string lResourceKey )
-								{
-									continue;
-								}
-
-								if ( !IsKnownImageExtension( lResourceKey ) )
-								{
-									continue;
-								}
-
-								string lNormalized = NormalizeRelativePath( lResourceKey );
-
-								if ( string.IsNullOrWhiteSpace( lNormalized ) )
-								{
-									continue;
-								}
-
-								lPaths.Add( lNormalized );
-							}
+							continue;
 						}
+
+						string lNormalized = NormalizeRelativePath( lResourceKey );
+
+						if ( string.IsNullOrWhiteSpace( lNormalized ) )
+						{
+							continue;
+						}
+
+						lPaths.Add( lNormalized );
 					}
 				}
 				catch ( Exception )
@@ -330,7 +327,7 @@ namespace ResumeApp.ViewModels.Pages
 
 		private static bool HasResourceRelativePath( string pRelativePath )
 		{
-			HashSet<string> lAvailablePaths = GetAvailableResourceRelativePathsOrNull();
+			HashSet<string>? lAvailablePaths = GetAvailableResourceRelativePathsOrNull();
 
 			if ( lAvailablePaths == null )
 			{
@@ -356,7 +353,7 @@ namespace ResumeApp.ViewModels.Pages
 			return $"pack://application:,,,/{lAssemblyName};component/{lNormalizedPath}";
 		}
 
-		private static string BuildImageUriText( string pPackOrRelativePath )
+		private static string BuildImageUriText( string? pPackOrRelativePath )
 		{
 			string lValue = ( pPackOrRelativePath ?? string.Empty ).Trim();
 
@@ -368,7 +365,7 @@ namespace ResumeApp.ViewModels.Pages
 			return lValue.StartsWith( "pack://", StringComparison.OrdinalIgnoreCase ) ? lValue : BuildPackUriText( lValue );
 		}
 
-		private static ImageSource TryCreateImageSource( string pPackOrRelativePath )
+		private static ImageSource? TryCreateImageSource( string? pPackOrRelativePath )
 		{
 			string lValue = ( pPackOrRelativePath ?? string.Empty ).Trim();
 
@@ -410,7 +407,7 @@ namespace ResumeApp.ViewModels.Pages
 			return null;
 		}
 
-		private static bool IsKnownImageExtension( string pPath )
+		private static bool IsKnownImageExtension( string? pPath )
 		{
 			string lPath = ( pPath ?? string.Empty ).Trim();
 
@@ -426,13 +423,13 @@ namespace ResumeApp.ViewModels.Pages
 				return false;
 			}
 
-			string lExtension = lPath.Substring( lLastDotIndex + 1 ).Trim();
+			string lExtension = lPath[ ( lLastDotIndex + 1 ).. ].Trim();
 
 			return sSupportedImageExtensions.Any( pSupportedExtension =>
 				string.Equals( pSupportedExtension, lExtension, StringComparison.OrdinalIgnoreCase ) );
 		}
 
-		private static string BuildProjectImagesBasePath( string pProjectImagesBaseName )
+		private static string BuildProjectImagesBasePath( string? pProjectImagesBaseName )
 		{
 			string lProjectImagesBaseName = ( pProjectImagesBaseName ?? string.Empty ).Trim().TrimStart( '/' );
 
@@ -446,7 +443,7 @@ namespace ResumeApp.ViewModels.Pages
 			return lLooksLikeAPath ? lProjectImagesBaseName.Replace( "\\", "/" ).TrimStart( '/' ) : $"Resources/Projects/{lProjectImagesBaseName}/{lProjectImagesBaseName}";
 		}
 
-		private static IEnumerable<ImageSource> BuildImageSourcesFromBasePathOrDescriptor( string pImagesDescriptorOrBasePath )
+		private static ImageSource?[] BuildImageSourcesFromBasePathOrDescriptor( string? pImagesDescriptorOrBasePath )
 		{
 			string lValueText = ( pImagesDescriptorOrBasePath ?? string.Empty ).Trim();
 
@@ -472,12 +469,12 @@ namespace ResumeApp.ViewModels.Pages
 				return EnumerateIndexedImagesFromBasePath( lValueText ).ToArray();
 			}
 
-			ImageSource lSingleImage = TryCreateImageSource( lValueText );
+			ImageSource? lSingleImage = TryCreateImageSource( lValueText );
 
 			return lSingleImage == null ? [] : [ lSingleImage ];
 		}
 
-		private static IEnumerable<ImageSource> EnumerateIndexedImagesFromBasePath( string pImagesBasePath )
+		private static IEnumerable<ImageSource> EnumerateIndexedImagesFromBasePath( string? pImagesBasePath )
 		{
 			string lBasePath = ( pImagesBasePath ?? string.Empty ).Trim();
 
@@ -486,12 +483,12 @@ namespace ResumeApp.ViewModels.Pages
 				yield break;
 			}
 
-			string lIndexSeparator = lBasePath.EndsWith( "_", StringComparison.Ordinal ) ? string.Empty : "_";
+			string lIndexSeparator = lBasePath.EndsWith( '_' ) ? string.Empty : "_";
 			string lIndexedPrefix = lBasePath + lIndexSeparator;
 
 			for ( int lImageIndex = 1; lImageIndex <= MaximumIndexedImageProbeCount; lImageIndex++ )
 			{
-				ImageSource lImageSource = TryCreateFirstExistingIndexedImage( lIndexedPrefix, lImageIndex );
+				ImageSource? lImageSource = TryCreateFirstExistingIndexedImage( lIndexedPrefix, lImageIndex );
 
 				if ( lImageSource == null )
 				{
@@ -502,7 +499,7 @@ namespace ResumeApp.ViewModels.Pages
 			}
 		}
 
-		private static ImageSource TryCreateFirstExistingIndexedImage( string pIndexedPrefix, int pImageIndex )
+		private static ImageSource? TryCreateFirstExistingIndexedImage( string? pIndexedPrefix, int pImageIndex )
 		{
 			string lIndexedPrefix = ( pIndexedPrefix ?? string.Empty ).Trim();
 
@@ -521,7 +518,7 @@ namespace ResumeApp.ViewModels.Pages
 				return;
 			}
 
-			Dispatcher lDispatcher = Application.Current?.Dispatcher;
+			Dispatcher? lDispatcher = Application.Current?.Dispatcher;
 
 			if ( lDispatcher == null )
 			{
@@ -544,7 +541,7 @@ namespace ResumeApp.ViewModels.Pages
 
 			try
 			{
-				List<ImageSource> lImages = null;
+				List<ImageSource?>? lImages = null;
 
 				try
 				{
@@ -562,7 +559,7 @@ namespace ResumeApp.ViewModels.Pages
 					// ignored
 				}
 
-				await ReplaceObservableImagesIncrementallyAsync( mImages, lImages ?? [ ], pBatchSize: 4 );
+				await ReplaceObservableImagesIncrementallyAsync( mImages, lImages ?? [], pBatchSize: 4 );
 
 				mHasInitializedImages = true;
 			}
@@ -607,7 +604,7 @@ namespace ResumeApp.ViewModels.Pages
 			RaisePropertyChanged( nameof( TitleText ) );
 		}
 
-		private void OnResourcesServicePropertyChanged( object pSender, PropertyChangedEventArgs pArgs )
+		private void OnResourcesServicePropertyChanged( object? pSender, PropertyChangedEventArgs? pArgs )
 		{
 			string lPropertyName = pArgs?.PropertyName ?? string.Empty;
 

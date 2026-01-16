@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 
 namespace ResumeApp.Models
 {
-	public sealed class SkillGroupModel( string pGroupTitleResourceKey, ObservableCollection<SkillItemModel> pSkills )
+	public sealed class SkillGroupModel( string? pGroupTitleResourceKey, ObservableCollection<SkillItemModel>? pSkills )
 	{
 		public string GroupTitleResourceKey { get; } = pGroupTitleResourceKey ?? string.Empty;
 

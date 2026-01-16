@@ -5,22 +5,22 @@ using System.Windows.Input;
 
 namespace ResumeApp.Infrastructure
 {
-	public sealed class RelayCommand( Action pExecuteAction, Func<bool> pCanExecuteFunc = null ) : ICommand
+	public sealed class RelayCommand( Action pExecuteAction, Func<bool>? pCanExecuteFunc = null ) : ICommand
 	{
-		public event EventHandler CanExecuteChanged
+		private readonly Action mExecuteAction = pExecuteAction ?? throw new ArgumentNullException( nameof( pExecuteAction ) );
+
+		public event EventHandler? CanExecuteChanged
 		{
 			add => CommandManager.RequerySuggested += value;
 			remove => CommandManager.RequerySuggested -= value;
 		}
 
-		private readonly Action mExecuteAction = pExecuteAction ?? throw new ArgumentNullException( nameof( pExecuteAction ) );
-
-		public bool CanExecute( object pParameter )
+		public bool CanExecute( object? pParameter )
 		{
-			return pCanExecuteFunc == null || pCanExecuteFunc();
+			return pCanExecuteFunc?.Invoke() ?? true;
 		}
 
-		public void Execute( object pParameter )
+		public void Execute( object? pParameter )
 		{
 			mExecuteAction();
 		}

@@ -28,15 +28,17 @@ namespace ResumeApp.ViewModels.Pages
 
 		private static IEnumerable<string> BuildKeys( string pPrefix, int pCount )
 		{
-			if ( string.IsNullOrWhiteSpace( pPrefix ) )
+			if ( string.IsNullOrWhiteSpace( pPrefix ) || pCount <= 0 )
 			{
 				return [];
 			}
 
-			return pCount <= 0 ? [] : Enumerable.Range( 1, pCount ).Select( pIndex => pPrefix + pIndex ).ToArray();
+			return Enumerable.Range( 1, pCount )
+				.Select( pIndex => pPrefix + pIndex )
+				.ToArray();
 		}
 
-		private void OnResourcesServicePropertyChanged( object pSender, PropertyChangedEventArgs pArgs )
+		private void OnResourcesServicePropertyChanged( object? pSender, PropertyChangedEventArgs pArgs )
 		{
 			RaisePropertyChanged( nameof( PageTitleText ) );
 			RaisePropertyChanged( nameof( PageSubtitleText ) );
