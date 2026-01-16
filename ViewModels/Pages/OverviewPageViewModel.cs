@@ -123,7 +123,7 @@ namespace ResumeApp.ViewModels.Pages
 
 		private static void ExecuteComposeEmail( object pParameter )
 		{
-			if ( !( pParameter is string lEmailAddress ) )
+			if ( pParameter is not string lEmailAddress )
 			{
 				return;
 			}
@@ -134,7 +134,7 @@ namespace ResumeApp.ViewModels.Pages
 
 		private static void ExecuteOpenUrl( object pParameter )
 		{
-			if ( !( pParameter is string lUrl ) )
+			if ( pParameter is not string lUrl )
 			{
 				return;
 			}

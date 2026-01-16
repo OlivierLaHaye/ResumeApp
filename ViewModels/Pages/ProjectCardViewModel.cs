@@ -33,7 +33,7 @@ namespace ResumeApp.ViewModels.Pages
 			"tiff"
 		};
 
-		private static readonly object sResourceIndexLock = new object();
+		private static readonly object sResourceIndexLock = new();
 		private static bool sHasAttemptedBuildResourceIndex;
 		private static HashSet<string> sAvailableResourceRelativePaths;
 
@@ -296,7 +296,7 @@ namespace ResumeApp.ViewModels.Pages
 
 							while ( lEnumerator.MoveNext() )
 							{
-								if ( !( lEnumerator.Key is string lResourceKey ) )
+								if ( lEnumerator.Key is not string lResourceKey )
 								{
 									continue;
 								}

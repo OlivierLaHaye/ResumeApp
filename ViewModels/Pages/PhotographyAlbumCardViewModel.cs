@@ -29,13 +29,13 @@ namespace ResumeApp.ViewModels.Pages
 			"tiff"
 		};
 
-		private static readonly object sCacheLock = new object();
-		private static readonly Dictionary<string, IReadOnlyList<string>> sImageRelativePathsByFolderPath = new Dictionary<string, IReadOnlyList<string>>( StringComparer.OrdinalIgnoreCase );
+		private static readonly object sCacheLock = new();
+		private static readonly Dictionary<string, IReadOnlyList<string>> sImageRelativePathsByFolderPath = new( StringComparer.OrdinalIgnoreCase );
 
-		private static readonly object sRandomLock = new object();
-		private static readonly Random sRandom = new Random();
+		private static readonly object sRandomLock = new();
+		private static readonly Random sRandom = new();
 
-		private static readonly object sAllResourcePathsLock = new object();
+		private static readonly object sAllResourcePathsLock = new();
 		private static bool sHasAttemptedAllResourcePathsBuild;
 		private static IReadOnlyList<string> sAllImageResourceRelativePaths;
 
@@ -371,7 +371,7 @@ namespace ResumeApp.ViewModels.Pages
 			{
 				IReadOnlyList<string> lPaths = ComputeImageRelativePaths( lCandidateFolderRelativePath );
 
-				if ( lPaths != null && lPaths.Count > 0 )
+				if ( lPaths is { Count: > 0 } )
 				{
 					return lPaths;
 				}
@@ -415,7 +415,7 @@ namespace ResumeApp.ViewModels.Pages
 
 							while ( lEnumerator.MoveNext() )
 							{
-								if ( !( lEnumerator.Key is string lResourceKey ) )
+								if ( lEnumerator.Key is not string lResourceKey )
 								{
 									continue;
 								}
@@ -529,7 +529,7 @@ namespace ResumeApp.ViewModels.Pages
 
 					while ( lEnumerator.MoveNext() )
 					{
-						if ( !( lEnumerator.Key is string lResourceKey ) )
+						if ( lEnumerator.Key is not string lResourceKey )
 						{
 							continue;
 						}

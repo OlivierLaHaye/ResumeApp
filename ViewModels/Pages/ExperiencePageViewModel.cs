@@ -172,7 +172,7 @@ namespace ResumeApp.ViewModels.Pages
 
 		private void ExecuteSelectExperience( object pParameter )
 		{
-			if ( !( pParameter is ExperienceTimelineEntryViewModel lEntry ) )
+			if ( pParameter is not ExperienceTimelineEntryViewModel lEntry )
 			{
 				return;
 			}

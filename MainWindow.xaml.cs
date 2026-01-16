@@ -157,7 +157,7 @@ namespace ResumeApp
 			pMinHeightDip = 0.0;
 
 			HwndSource lHwndSource = HwndSource.FromHwnd( pHwnd );
-			if ( !( lHwndSource?.RootVisual is Window lWindow ) )
+			if ( lHwndSource?.RootVisual is not Window lWindow )
 			{
 				return false;
 			}

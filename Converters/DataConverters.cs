@@ -16,7 +16,7 @@ namespace ResumeApp.Converters
 	{
 		public object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
-			if ( pValues.Length == 2 && pValues[ 0 ] != null && pValues[ 1 ] != null )
+			if ( pValues is [not null, not null] )
 			{
 				return pValues[ 0 ].Equals( pValues[ 1 ] );
 			}
@@ -258,7 +258,7 @@ namespace ResumeApp.Converters
 			double lControlOffset = ParseControlOffset( pParameter );
 
 			Geometry lGeometry = BuildGeometry( lCorners, lControlOffset );
-			if ( lGeometry != null && lGeometry.CanFreeze )
+			if ( lGeometry is { CanFreeze: true } )
 			{
 				lGeometry.Freeze();
 			}
@@ -276,7 +276,7 @@ namespace ResumeApp.Converters
 	{
 		public object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
-			if ( pValues == null || pValues.Length < 2 || !( pValues[ 0 ] is Grid lParentGrid ) || !( pValues[ 1 ] is Path lCurrentPath ) )
+			if ( pValues == null || pValues.Length < 2 || pValues[ 0 ] is not Grid lParentGrid || pValues[ 1 ] is not Path lCurrentPath )
 			{
 				return 0.0;
 			}
@@ -313,7 +313,7 @@ namespace ResumeApp.Converters
 	{
 		public object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
-			if ( pValues == null || pValues.Length < 2 || !( pValues[ 0 ] is Grid lParentGrid ) || !( pValues[ 1 ] is Path lCurrentPath ) )
+			if ( pValues == null || pValues.Length < 2 || pValues[ 0 ] is not Grid lParentGrid || pValues[ 1 ] is not Path lCurrentPath )
 			{
 				return 1.0;
 			}
@@ -346,7 +346,7 @@ namespace ResumeApp.Converters
 	{
 		public object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
-			if ( pValues == null || pValues.Length < 2 || !( pValues[ 0 ] is Grid lParentGrid ) || !( pValues[ 1 ] is Path lCurrentPath ) )
+			if ( pValues == null || pValues.Length < 2 || pValues[ 0 ] is not Grid lParentGrid || pValues[ 1 ] is not Path lCurrentPath )
 			{
 				return 0.0;
 			}
@@ -383,7 +383,7 @@ namespace ResumeApp.Converters
 	{
 		public object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
-			if ( pValues == null || pValues.Length < 2 || !( pValues[ 0 ] is Grid lParentGrid ) || !( pValues[ 1 ] is Path lCurrentPath ) )
+			if ( pValues == null || pValues.Length < 2 || pValues[ 0 ] is not Grid lParentGrid || pValues[ 1 ] is not Path lCurrentPath )
 			{
 				return 1.0;
 			}
@@ -430,8 +430,8 @@ namespace ResumeApp.Converters
 	{
 		public override object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
-			if ( !( pValues[ 0 ] is double lActualWidth ) || !( pValues[ 1 ] is double lHorizontalOffset ) ||
-				 !( pParameter is double lOffsetPixels ) )
+			if ( pValues[ 0 ] is not double lActualWidth || pValues[ 1 ] is not double lHorizontalOffset ||
+				 pParameter is not double lOffsetPixels )
 			{
 				return 0.0;
 			}
@@ -451,10 +451,10 @@ namespace ResumeApp.Converters
 	{
 		public override object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
-			if ( !( pValues[ 0 ] is double lActualWidth )
-				 || !( pValues[ 1 ] is double lHorizontalOffset )
-				 || !( pValues[ 2 ] is double lScrollableWidth )
-				 || !( pParameter is double lOffsetPixels ) )
+			if ( pValues[ 0 ] is not double lActualWidth
+				 || pValues[ 1 ] is not double lHorizontalOffset
+				 || pValues[ 2 ] is not double lScrollableWidth
+				 || pParameter is not double lOffsetPixels )
 			{
 				return 1.0;
 			}
@@ -475,9 +475,9 @@ namespace ResumeApp.Converters
 	{
 		public override object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
-			if ( !( pValues[ 0 ] is double lActualHeight )
-				 || !( pValues[ 1 ] is double lVerticalOffset )
-				 || !( pParameter is double lOffsetPixels ) )
+			if ( pValues[ 0 ] is not double lActualHeight
+				 || pValues[ 1 ] is not double lVerticalOffset
+				 || pParameter is not double lOffsetPixels )
 			{
 				return 0.0;
 			}
@@ -497,10 +497,10 @@ namespace ResumeApp.Converters
 	{
 		public override object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
-			if ( !( pValues[ 0 ] is double lActualHeight )
-				 || !( pValues[ 1 ] is double lVerticalOffset )
-				 || !( pValues[ 2 ] is double lScrollableHeight )
-				 || !( pParameter is double lOffsetPixels ) )
+			if ( pValues[ 0 ] is not double lActualHeight
+				 || pValues[ 1 ] is not double lVerticalOffset
+				 || pValues[ 2 ] is not double lScrollableHeight
+				 || pParameter is not double lOffsetPixels )
 			{
 				return 1.0;
 			}
@@ -520,7 +520,7 @@ namespace ResumeApp.Converters
 	[ValueConversion( typeof( object[] ), typeof( object ) )]
 	public class MathOperationConverter : IMultiValueConverter
 	{
-		private static readonly ThicknessConverter sThicknessConverter = new ThicknessConverter();
+		private static readonly ThicknessConverter sThicknessConverter = new();
 
 		private static object[] GetCleanValues( IEnumerable<object> pValues )
 		{
@@ -725,7 +725,7 @@ namespace ResumeApp.Converters
 					}
 			}
 
-			if ( pInput is IConvertible && !( pInput is bool ) && !( pInput is char ) )
+			if ( pInput is IConvertible && pInput is not bool && pInput is not char )
 			{
 				try
 				{

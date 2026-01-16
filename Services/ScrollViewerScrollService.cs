@@ -57,12 +57,12 @@ namespace ResumeApp.Services
 				return lViewer;
 			}
 
-			if ( !( pCandidate is DependencyObject lCurrent ) )
+			if ( pCandidate is not DependencyObject lCurrent )
 			{
 				return null;
 			}
 
-			while ( lCurrent != null && !( lCurrent is ScrollViewer ) )
+			while ( lCurrent != null && lCurrent is not ScrollViewer )
 			{
 				lCurrent = VisualTreeHelper.GetParent( lCurrent );
 			}

@@ -58,7 +58,7 @@ namespace ResumeApp
 
 			mHasQueuedMainWindowInitialization = true;
 
-			if ( !( pSender is MainWindow lMainWindow ) )
+			if ( pSender is not MainWindow lMainWindow )
 			{
 				return;
 			}

@@ -68,7 +68,7 @@ namespace ResumeApp.Helpers
 			"CommonPinkStrongBrush"
 		};
 
-		private static readonly Dictionary<string, object> sPendingResourceUpdates = new Dictionary<string, object>();
+		private static readonly Dictionary<string, object> sPendingResourceUpdates = new();
 
 		public static Color CalculateAverageColor( List<Color> pColors )
 		{

@@ -65,7 +65,7 @@ namespace ResumeApp.Controls
 				typeof( ProjectImageCarouselControl ),
 				new FrameworkPropertyMetadata( false, OnIsOpenOnClickEnabledChanged ) );
 
-		private static readonly Dictionary<string, ImageSource> sCachedImageSourcesByUri = new Dictionary<string, ImageSource>( StringComparer.OrdinalIgnoreCase );
+		private static readonly Dictionary<string, ImageSource> sCachedImageSourcesByUri = new( StringComparer.OrdinalIgnoreCase );
 
 		private static readonly TimeSpan sTransitionDuration = TimeSpan.FromMilliseconds( 240 );
 
@@ -182,7 +182,7 @@ namespace ResumeApp.Controls
 
 		private static void OnImagesChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
-			if ( !( pDependencyObject is ProjectImageCarouselControl lControl ) )
+			if ( pDependencyObject is not ProjectImageCarouselControl lControl )
 			{
 				return;
 			}
@@ -196,7 +196,7 @@ namespace ResumeApp.Controls
 
 		private static void OnSelectedIndexChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
-			if ( !( pDependencyObject is ProjectImageCarouselControl lControl ) || lControl.mIsUpdatingSelectedIndexInternally )
+			if ( pDependencyObject is not ProjectImageCarouselControl lControl || lControl.mIsUpdatingSelectedIndexInternally )
 			{
 				return;
 			}
@@ -207,7 +207,7 @@ namespace ResumeApp.Controls
 
 		private static void OnIsFullscreenChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
-			if ( !( pDependencyObject is ProjectImageCarouselControl lControl ) )
+			if ( pDependencyObject is not ProjectImageCarouselControl lControl )
 			{
 				return;
 			}
@@ -218,7 +218,7 @@ namespace ResumeApp.Controls
 
 		private static void OnIsOpenOnClickEnabledChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
-			if ( !( pDependencyObject is ProjectImageCarouselControl lControl ) )
+			if ( pDependencyObject is not ProjectImageCarouselControl lControl )
 			{
 				return;
 			}
@@ -256,7 +256,7 @@ namespace ResumeApp.Controls
 					}
 			}
 
-			if ( !( pItem is string lUriText ) || string.IsNullOrWhiteSpace( lUriText ) )
+			if ( pItem is not string lUriText || string.IsNullOrWhiteSpace( lUriText ) )
 			{
 				return null;
 			}
@@ -414,7 +414,7 @@ namespace ResumeApp.Controls
 
 		private static Tuple<ScaleTransform, TranslateTransform> GetSlotTransforms( UIElement pImage )
 		{
-			if ( !( pImage.RenderTransform is TransformGroup lTransformGroup ) )
+			if ( pImage.RenderTransform is not TransformGroup lTransformGroup )
 			{
 				return null;
 			}
@@ -580,7 +580,7 @@ namespace ResumeApp.Controls
 		{
 			DetachFromImagesCollectionChanged();
 
-			if ( !( Images is INotifyCollectionChanged lNotifyCollectionChanged ) )
+			if ( Images is not INotifyCollectionChanged lNotifyCollectionChanged )
 			{
 				return;
 			}
@@ -626,7 +626,7 @@ namespace ResumeApp.Controls
 			DependencyObject lCurrentElement = GetParentDependencyObject( this );
 			while ( lCurrentElement != null )
 			{
-				if ( lCurrentElement is ScrollViewer lScrollViewer && lScrollViewer.ScrollableHeight > 0 )
+				if ( lCurrentElement is ScrollViewer { ScrollableHeight: > 0 } lScrollViewer )
 				{
 					return lScrollViewer;
 				}
@@ -853,7 +853,7 @@ namespace ResumeApp.Controls
 				return;
 			}
 
-			if ( !( pTarget is Animatable lAnimatable ) )
+			if ( pTarget is not Animatable lAnimatable )
 			{
 				return;
 			}
@@ -968,13 +968,13 @@ namespace ResumeApp.Controls
 
 			DependencyObject lOriginalSource = pMouseButtonEventArgs.OriginalSource as DependencyObject;
 
-			if ( pMouseButtonEventArgs.ChangedButton == MouseButton.Left && pMouseButtonEventArgs.ClickCount == 1 )
+			if ( pMouseButtonEventArgs is { ChangedButton: MouseButton.Left, ClickCount: 1 } )
 			{
 				mHasNavigatedDuringDrag = false;
 				mHasViewerOpenSuppressedDueToDragNavigation = false;
 			}
 
-			if ( pMouseButtonEventArgs.ChangedButton == MouseButton.Left && pMouseButtonEventArgs.ClickCount == 2 )
+			if ( pMouseButtonEventArgs is { ChangedButton: MouseButton.Left, ClickCount: 2 } )
 			{
 				bool lHasOpenedViewer = TryOpenViewerOnDoubleClick( lOriginalSource, pMouseButtonEventArgs );
 
@@ -1186,7 +1186,7 @@ namespace ResumeApp.Controls
 
 		private void OnDotPreviewMouseLeftButtonDown( object pSender, MouseButtonEventArgs pMouseButtonEventArgs )
 		{
-			if ( !( pSender is ListBoxItem lListBoxItem ) )
+			if ( pSender is not ListBoxItem lListBoxItem )
 			{
 				return;
 			}

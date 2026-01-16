@@ -48,7 +48,7 @@ namespace ResumeApp.Behaviors
 				new PropertyMetadata( null, OnSelectedItemChanged ) );
 
 		private static readonly ConditionalWeakTable<ScrollViewer, ExperienceTimelineScrollSyncState> sStateByScrollViewer =
-			new ConditionalWeakTable<ScrollViewer, ExperienceTimelineScrollSyncState>();
+			new();
 
 		public static void SetIsEnabled( DependencyObject pElement, bool pValue ) => pElement.SetValue( sIsEnabledProperty, pValue );
 		public static bool GetIsEnabled( DependencyObject pElement ) => ( bool )pElement.GetValue( sIsEnabledProperty );
@@ -64,12 +64,12 @@ namespace ResumeApp.Behaviors
 
 		private static void OnIsEnabledChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
 		{
-			if ( !( pDependencyObject is ScrollViewer lScrollViewer ) )
+			if ( pDependencyObject is not ScrollViewer lScrollViewer )
 			{
 				return;
 			}
 
-			bool lIsEnabled = pArgs.NewValue is bool lEnabled && lEnabled;
+			bool lIsEnabled = pArgs.NewValue is true;
 
 			if ( lIsEnabled )
 			{
@@ -86,7 +86,7 @@ namespace ResumeApp.Behaviors
 
 		private static void OnItemsControlChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
 		{
-			if ( !( pDependencyObject is ScrollViewer lScrollViewer ) )
+			if ( pDependencyObject is not ScrollViewer lScrollViewer )
 			{
 				return;
 			}
@@ -107,7 +107,7 @@ namespace ResumeApp.Behaviors
 
 		private static void OnSelectedDateChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
 		{
-			if ( !( pDependencyObject is ScrollViewer lScrollViewer ) )
+			if ( pDependencyObject is not ScrollViewer lScrollViewer )
 			{
 				return;
 			}
@@ -127,7 +127,7 @@ namespace ResumeApp.Behaviors
 				return;
 			}
 
-			if ( !( pArgs.NewValue is DateTime lNewDate ) )
+			if ( pArgs.NewValue is not DateTime lNewDate )
 			{
 				return;
 			}
@@ -160,7 +160,7 @@ namespace ResumeApp.Behaviors
 
 		private static void OnSelectedItemChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
 		{
-			if ( !( pDependencyObject is ScrollViewer lScrollViewer ) )
+			if ( pDependencyObject is not ScrollViewer lScrollViewer )
 			{
 				return;
 			}
@@ -276,7 +276,7 @@ namespace ResumeApp.Behaviors
 
 		private static void OnScrollViewerLoaded( object pSender, RoutedEventArgs pArgs )
 		{
-			if ( !( pSender is ScrollViewer lScrollViewer ) )
+			if ( pSender is not ScrollViewer lScrollViewer )
 			{
 				return;
 			}
@@ -297,7 +297,7 @@ namespace ResumeApp.Behaviors
 
 		private static void OnScrollChanged( object pSender, ScrollChangedEventArgs pArgs )
 		{
-			if ( !( pSender is ScrollViewer lScrollViewer ) )
+			if ( pSender is not ScrollViewer lScrollViewer )
 			{
 				return;
 			}
@@ -422,7 +422,7 @@ namespace ResumeApp.Behaviors
 
 		private static void ScrollToItem( ScrollViewer pScrollViewer, ItemsControl pItemsControl, object pItem, ExperienceTimelineScrollSyncState pState )
 		{
-			if ( !(pItemsControl.ItemContainerGenerator.ContainerFromItem( pItem ) is FrameworkElement lContainer) )
+			if ( pItemsControl.ItemContainerGenerator.ContainerFromItem( pItem ) is not FrameworkElement lContainer )
 			{
 				pItemsControl.UpdateLayout();
 				lContainer = pItemsControl.ItemContainerGenerator.ContainerFromItem( pItem ) as FrameworkElement;
@@ -479,7 +479,7 @@ namespace ResumeApp.Behaviors
 
 			object lValue = lPropertyInfo.GetValue( pItem, null );
 
-			if ( !( lValue is DateTime lDateTime ) )
+			if ( lValue is not DateTime lDateTime )
 			{
 				return false;
 			}

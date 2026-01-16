@@ -338,7 +338,7 @@ namespace ResumeApp.Controls
 
 		public DateTime ViewportStartDate
 		{
-			get => new DateTime( Math.Max( 0L, ( long )ViewportStartTicks ) );
+			get => new( Math.Max( 0L, ( long )ViewportStartTicks ) );
 			set => ViewportStartTicks = value.Ticks;
 		}
 
@@ -517,7 +517,7 @@ namespace ResumeApp.Controls
 
 		private static object CoerceMinDate( DependencyObject pDependencyObject, object pBaseValue )
 		{
-			if ( !( pBaseValue is DateTime lDate ) )
+			if ( pBaseValue is not DateTime lDate )
 			{
 				return DateTime.MinValue;
 			}
@@ -527,7 +527,7 @@ namespace ResumeApp.Controls
 
 		private static void OnMinDateChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
-			if ( !( pDependencyObject is TimelineControl lControl ) )
+			if ( pDependencyObject is not TimelineControl lControl )
 			{
 				return;
 			}
@@ -544,7 +544,7 @@ namespace ResumeApp.Controls
 
 		private static object CoerceSelectedDate( DependencyObject pDependencyObject, object pBaseValue )
 		{
-			if ( !( pBaseValue is DateTime lDate ) )
+			if ( pBaseValue is not DateTime lDate )
 			{
 				return DateTime.Today;
 			}
@@ -559,7 +559,7 @@ namespace ResumeApp.Controls
 
 		private static void OnSelectedDateChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
-			if ( !( pDependencyObject is TimelineControl lControl ) )
+			if ( pDependencyObject is not TimelineControl lControl )
 			{
 				return;
 			}
@@ -589,7 +589,7 @@ namespace ResumeApp.Controls
 
 		private static void OnSelectedTimeFrameChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
-			if ( !( pDependencyObject is TimelineControl lControl ) )
+			if ( pDependencyObject is not TimelineControl lControl )
 			{
 				return;
 			}
@@ -601,7 +601,7 @@ namespace ResumeApp.Controls
 				return;
 			}
 
-			if ( !( pEventArgs.NewValue is TimelineTimeFrameItem lNewTimeFrame ) )
+			if ( pEventArgs.NewValue is not TimelineTimeFrameItem lNewTimeFrame )
 			{
 				return;
 			}
@@ -618,7 +618,7 @@ namespace ResumeApp.Controls
 
 		private static void OnTimeFramesChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
-			if ( !( pDependencyObject is TimelineControl lControl ) )
+			if ( pDependencyObject is not TimelineControl lControl )
 			{
 				return;
 			}
@@ -646,7 +646,7 @@ namespace ResumeApp.Controls
 
 		private static object CoerceZoomLevel( DependencyObject pDependencyObject, object pBaseValue )
 		{
-			if ( !( pBaseValue is double lZoom ) )
+			if ( pBaseValue is not double lZoom )
 			{
 				return 2.0;
 			}
@@ -661,7 +661,7 @@ namespace ResumeApp.Controls
 
 		private static void OnZoomLevelChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
-			if ( !( pDependencyObject is TimelineControl lControl ) )
+			if ( pDependencyObject is not TimelineControl lControl )
 			{
 				return;
 			}
@@ -693,12 +693,12 @@ namespace ResumeApp.Controls
 
 		private static object CoerceViewportStartTicks( DependencyObject pDependencyObject, object pBaseValue )
 		{
-			if ( !( pBaseValue is double lTicks ) )
+			if ( pBaseValue is not double lTicks )
 			{
 				return ( double )DateTime.Today.AddYears( -1 ).Ticks;
 			}
 
-			if ( !( pDependencyObject is TimelineControl lControl ) )
+			if ( pDependencyObject is not TimelineControl lControl )
 			{
 				return lTicks;
 			}
@@ -963,7 +963,7 @@ namespace ResumeApp.Controls
 			}
 
 			var lPadding = Padding;
-			if ( lPadding.Left <= 0.0 && lPadding.Top <= 0.0 && lPadding.Right <= 0.0 && lPadding.Bottom <= 0.0 )
+			if ( lPadding is { Left: <= 0.0, Top: <= 0.0, Right: <= 0.0, Bottom: <= 0.0 } )
 			{
 				lPadding = new Thickness( DefaultPadding );
 			}
@@ -1880,7 +1880,7 @@ namespace ResumeApp.Controls
 				return;
 			}
 
-			if ( !( TryFindResource( "CommonBrush" ) is Brush lFocusBrush ) )
+			if ( TryFindResource( "CommonBrush" ) is not Brush lFocusBrush )
 			{
 				return;
 			}
@@ -2064,7 +2064,7 @@ namespace ResumeApp.Controls
 		private Rect GetContentRect()
 		{
 			var lPadding = Padding;
-			if ( lPadding.Left <= 0.0 && lPadding.Top <= 0.0 && lPadding.Right <= 0.0 && lPadding.Bottom <= 0.0 )
+			if ( lPadding is { Left: <= 0.0, Top: <= 0.0, Right: <= 0.0, Bottom: <= 0.0 } )
 			{
 				lPadding = new Thickness( DefaultPadding );
 			}
@@ -2305,7 +2305,7 @@ namespace ResumeApp.Controls
 				return false;
 			}
 
-			return !( lLocalValue is BindingExpressionBase );
+			return lLocalValue is not BindingExpressionBase;
 		}
 
 		private bool HasInitialFitRangeAvailable()
@@ -2316,12 +2316,12 @@ namespace ResumeApp.Controls
 			}
 
 			var lTimeFrames = TimeFrames;
-			return lTimeFrames != null && lTimeFrames.Count > 0;
+			return lTimeFrames is { Count: > 0 };
 		}
 
 		private void UpdateBindingSourceIfNeeded( DependencyProperty pDependencyProperty )
 		{
-			if ( !( BindingOperations.GetBindingExpression( this, pDependencyProperty ) is BindingExpression lBindingExpression ) )
+			if ( BindingOperations.GetBindingExpression( this, pDependencyProperty ) is not BindingExpression lBindingExpression )
 			{
 				return;
 			}
