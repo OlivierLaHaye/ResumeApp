@@ -2053,12 +2053,7 @@ namespace ResumeApp.Controls
 
 			var lLatestStart = lMax.AddDays( -lVisibleDays );
 
-			if ( lLatestStart < lMin )
-			{
-				return lMin;
-			}
-
-			if ( pViewportStart < lMin )
+			if ( lLatestStart < lMin || pViewportStart < lMin )
 			{
 				return lMin;
 			}
@@ -2076,12 +2071,7 @@ namespace ResumeApp.Controls
 
 			var lLatestStart = lMax.AddDays( -lVisibleDays );
 
-			if ( lLatestStart < lMin )
-			{
-				return lMin;
-			}
-
-			if ( pViewportStart < lMin )
+			if ( lLatestStart < lMin || pViewportStart < lMin )
 			{
 				return lMin;
 			}
@@ -2131,11 +2121,6 @@ namespace ResumeApp.Controls
 				return null;
 			}
 
-			if ( pItem.AccentBrush != null )
-			{
-				return pItem.AccentBrush;
-			}
-
 			var lKey = pItem.AccentColorKey;
 			if ( string.IsNullOrWhiteSpace( lKey ) )
 			{
@@ -2167,7 +2152,6 @@ namespace ResumeApp.Controls
 			Rect pContentRect )
 		{
 			var lFrames = pTimeFrames
-				.Where( pItem => pItem != null )
 				.Select( pItem =>
 				{
 					var lStart = pItem.StartDate.Date;
@@ -2222,9 +2206,6 @@ namespace ResumeApp.Controls
 		{
 			CoerceValue( sZoomLevelProperty );
 			CoerceValue( sViewportStartTicksProperty );
-
-			MinDate = MinDate;
-
 			EnsureInitialFitIfNeeded();
 			InvalidateVisual();
 		}
@@ -2259,7 +2240,7 @@ namespace ResumeApp.Controls
 			}
 
 			var lMode = lBindingExpression.ParentBinding?.Mode ?? BindingMode.Default;
-			var lIsUpdateAllowed = lMode == BindingMode.TwoWay || lMode == BindingMode.OneWayToSource || lMode == BindingMode.Default;
+			var lIsUpdateAllowed = lMode is BindingMode.TwoWay or BindingMode.OneWayToSource or BindingMode.Default;
 
 			if ( !lIsUpdateAllowed )
 			{

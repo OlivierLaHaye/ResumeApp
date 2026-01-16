@@ -392,10 +392,7 @@ namespace ResumeApp.ViewModels.Pages
 			if ( TimelineEntries.Count > 0 )
 			{
 				ExperienceTimelineEntryViewModel lFirstEntry = TimelineEntries[ 0 ];
-				if ( SelectedTimelineEntry == null )
-				{
-					SelectedTimelineEntry = lFirstEntry;
-				}
+				SelectedTimelineEntry ??= lFirstEntry;
 
 				ExperienceTimelineEntryViewModel? lSelectedEntry = SelectedTimelineEntry;
 				SelectedDate = mSelectedDate == default

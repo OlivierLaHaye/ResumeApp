@@ -29,13 +29,6 @@ namespace ResumeApp.Models
 			set => SetProperty( ref mTitle, value );
 		}
 
-		private Brush mAccentBrush;
-		public Brush AccentBrush
-		{
-			get => mAccentBrush;
-			set => SetProperty( ref mAccentBrush, value );
-		}
-
 		private string mAccentColorKey;
 		public string AccentColorKey
 		{
@@ -57,7 +50,6 @@ namespace ResumeApp.Models
 			mEndDate = lEndDate;
 			mTitle = pTitle ?? string.Empty;
 			mAccentColorKey = pAccentColorKey ?? string.Empty;
-			mAccentBrush = Brushes.Transparent;
 		}
 	}
 }

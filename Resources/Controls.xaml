@@ -780,8 +780,8 @@
                             x:Name="squirclePath"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch"
-                            Fill="{TemplateBinding Background}"
                             Data="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource SquircleCornerDataConverter}}"
+                            Fill="{TemplateBinding Background}"
                             Stretch="Uniform">
                             <Path.Effect>
                                 <DropShadowEffect
@@ -966,8 +966,8 @@
                             x:Name="secondarySquirclePath"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch"
-                            Fill="{TemplateBinding Background}"
                             Data="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource SquircleCornerDataConverter}}"
+                            Fill="{TemplateBinding Background}"
                             Stretch="Uniform"
                             Stroke="{TemplateBinding BorderBrush}"
                             StrokeThickness="{StaticResource ExtraSmallThicknessValue}">
@@ -1164,8 +1164,8 @@
                             x:Name="miniSquirclePath"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch"
-                            Fill="{TemplateBinding Background}"
                             Data="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource SquircleCornerDataConverter}}"
+                            Fill="{TemplateBinding Background}"
                             Stretch="Uniform"
                             Stroke="{TemplateBinding BorderBrush}"
                             StrokeThickness="{StaticResource ExtraExtraSmallThicknessValue}">
@@ -2216,8 +2216,8 @@
                             </Grid.Margin>
                             <Path
                                 x:Name="squirclePath"
-                                Fill="{TemplateBinding Background}"
                                 Data="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource SquircleCornerDataConverter}}"
+                                Fill="{TemplateBinding Background}"
                                 RenderTransformOrigin="0.5,0.5"
                                 Stretch="Fill">
                                 <Path.RenderTransform>
@@ -3332,7 +3332,7 @@
                                 Tag="{StaticResource CommonCornerRadius}">
                                 <Viewbox Stretch="Uniform">
                                     <Grid>
-                                        <Path Fill="{DynamicResource CommonWhiteBrush}" Data="F1 M 40.062,121.484 L 42.843,119.037 L 100.086,60.705 L 157.243,119.025 C 166.908,128.886 182.736,129.045 192.597,119.381 C 201.561,110.596 202.508,96.716 195.345,86.856 L 192.953,84.028 L 117.953,7.501 C 109.046,-1.587 94.934,-2.418 85.075,5.013 L 82.255,7.490 L 7.157,84.016 C -2.514,93.871 -2.365,109.699 7.490,119.370 C 16.448,128.161 30.344,128.837 40.062,121.484 Z" />
+                                        <Path Data="F1 M 40.062,121.484 L 42.843,119.037 L 100.086,60.705 L 157.243,119.025 C 166.908,128.886 182.736,129.045 192.597,119.381 C 201.561,110.596 202.508,96.716 195.345,86.856 L 192.953,84.028 L 117.953,7.501 C 109.046,-1.587 94.934,-2.418 85.075,5.013 L 82.255,7.490 L 7.157,84.016 C -2.514,93.871 -2.365,109.699 7.490,119.370 C 16.448,128.161 30.344,128.837 40.062,121.484 Z" Fill="{DynamicResource CommonWhiteBrush}" />
                                     </Grid>
                                 </Viewbox>
                             </Button>
@@ -3349,7 +3349,7 @@
                                 </Button.Margin>
                                 <Viewbox Stretch="Uniform">
                                     <Grid>
-                                        <Path Fill="{DynamicResource CommonWhiteBrush}" Data="F1 M 160.036,5.043 L 157.255,7.490 L 100.012,65.821 L 42.855,7.501 C 33.191,-2.360 17.362,-2.519 7.501,7.145 C -1.463,15.931 -2.410,29.811 4.753,39.671 L 7.145,42.499 L 82.145,119.025 C 91.052,128.113 105.165,128.944 115.023,121.514 L 117.843,119.037 L 192.942,42.510 C 202.612,32.656 202.463,16.827 192.609,7.157 C 183.650,-1.635 169.754,-2.311 160.036,5.043 Z" />
+                                        <Path Data="F1 M 160.036,5.043 L 157.255,7.490 L 100.012,65.821 L 42.855,7.501 C 33.191,-2.360 17.362,-2.519 7.501,7.145 C -1.463,15.931 -2.410,29.811 4.753,39.671 L 7.145,42.499 L 82.145,119.025 C 91.052,128.113 105.165,128.944 115.023,121.514 L 117.843,119.037 L 192.942,42.510 C 202.612,32.656 202.463,16.827 192.609,7.157 C 183.650,-1.635 169.754,-2.311 160.036,5.043 Z" Fill="{DynamicResource CommonWhiteBrush}" />
                                     </Grid>
                                 </Viewbox>
                             </Button>
@@ -4460,7 +4460,7 @@
                         <Grid Height="30">
                             <Viewbox Margin="14" Stretch="Uniform">
                                 <Grid>
-                                    <Path Fill="{DynamicResource CommonWhiteBrush}" Data="F1 M 0.000,0.000 L 400.000,0.000 L 400.000,99.414 L 0.000,99.414 L 0.000,0.000 Z" />
+                                    <Path Data="F1 M 0.000,0.000 L 400.000,0.000 L 400.000,99.414 L 0.000,99.414 L 0.000,0.000 Z" Fill="{DynamicResource CommonWhiteBrush}" />
                                 </Grid>
                             </Viewbox>
                         </Grid>
@@ -4517,7 +4517,7 @@
                         <Grid Height="30">
                             <Viewbox Margin="11" Stretch="Uniform">
                                 <Grid>
-                                    <Path Fill="{DynamicResource CommonWhiteBrush}" Data="F1 M 100.000,100.000 L 300.586,100.000 L 300.586,300.586 L 100.000,300.586 L 100.000,100.000 Z M 0.000,0.000 L 0.000,400.586 L 400.586,400.586 L 400.586,0.000 L 0.000,0.000 Z" />
+                                    <Path Data="F1 M 100.000,100.000 L 300.586,100.000 L 300.586,300.586 L 100.000,300.586 L 100.000,100.000 Z M 0.000,0.000 L 0.000,400.586 L 400.586,400.586 L 400.586,0.000 L 0.000,0.000 Z" Fill="{DynamicResource CommonWhiteBrush}" />
                                 </Grid>
                             </Viewbox>
                         </Grid>
@@ -4574,7 +4574,7 @@
                         <Grid Height="30">
                             <Viewbox Margin="11" Stretch="Uniform">
                                 <Grid>
-                                    <Path Fill="{DynamicResource CommonWhiteBrush}" Data="F1 M 100.000,100.000 L 200.586,100.000 L 200.586,200.586 L 100.000,200.586 L 100.000,100.000 Z M 0.000,0.000 L 0.000,300.586 L 300.586,300.586 L 300.586,0.000 L 0.000,0.000 Z" />
+                                    <Path Data="F1 M 100.000,100.000 L 200.586,100.000 L 200.586,200.586 L 100.000,200.586 L 100.000,100.000 Z M 0.000,0.000 L 0.000,300.586 L 300.586,300.586 L 300.586,0.000 L 0.000,0.000 Z" Fill="{DynamicResource CommonWhiteBrush}" />
                                 </Grid>
                             </Viewbox>
                         </Grid>
@@ -4632,7 +4632,7 @@
                         <Grid Height="30">
                             <Viewbox Margin="11" Stretch="Uniform">
                                 <Grid>
-                                    <Path Fill="{DynamicResource CommonWhiteBrush}" Data="F1 M 0.176,0.000 L 50.176,0.000 L 51.738,0.000 C 64.434,0.586 77.324,6.445 86.113,15.625 L 200.176,129.688 L 315.801,15.625 C 329.082,4.102 338.066,0.391 350.176,0.000 L 400.176,0.000 L 400.176,50.000 C 400.176,64.258 398.418,77.539 387.676,87.500 L 273.613,201.562 L 386.113,314.062 C 395.488,323.438 400.176,336.719 400.176,350.000 L 400.176,400.000 L 350.176,400.000 C 336.895,400.000 323.613,395.312 314.238,385.938 L 200.176,271.875 L 86.113,385.938 C 76.738,395.312 63.457,400.000 50.176,400.000 L 0.176,400.000 L 0.176,350.000 C 0.176,336.719 4.863,323.438 14.238,314.062 L 128.301,201.562 L 14.238,87.500 C 3.691,77.734 -0.996,64.062 0.176,50.000 L 0.176,0.000 Z" />
+                                    <Path Data="F1 M 0.176,0.000 L 50.176,0.000 L 51.738,0.000 C 64.434,0.586 77.324,6.445 86.113,15.625 L 200.176,129.688 L 315.801,15.625 C 329.082,4.102 338.066,0.391 350.176,0.000 L 400.176,0.000 L 400.176,50.000 C 400.176,64.258 398.418,77.539 387.676,87.500 L 273.613,201.562 L 386.113,314.062 C 395.488,323.438 400.176,336.719 400.176,350.000 L 400.176,400.000 L 350.176,400.000 C 336.895,400.000 323.613,395.312 314.238,385.938 L 200.176,271.875 L 86.113,385.938 C 76.738,395.312 63.457,400.000 50.176,400.000 L 0.176,400.000 L 0.176,350.000 C 0.176,336.719 4.863,323.438 14.238,314.062 L 128.301,201.562 L 14.238,87.500 C 3.691,77.734 -0.996,64.062 0.176,50.000 L 0.176,0.000 Z" Fill="{DynamicResource CommonWhiteBrush}" />
                                 </Grid>
                             </Viewbox>
                         </Grid>
