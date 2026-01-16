@@ -20,11 +20,11 @@ namespace ResumeApp.ViewModels.Pages
 					pTitleResourceKey: "Project3Title",
 					pContextResourceKey: "Project3Context",
 					pConstraintsResourceKey: "Project3Constraints",
-					pWhatIBuiltItemResourceKeys: new[]
-					{
+					pWhatIBuiltItemResourceKeys:
+					[
 						"Project3Bullet1",
 						"Project3Bullet2"
-					},
+					],
 					pImpactResourceKey: "Project3Impact",
 					pTechResourceKey: "Project3Tech",
 					pProjectImagesBaseName: "OLHphotographie",
@@ -35,11 +35,11 @@ namespace ResumeApp.ViewModels.Pages
 					pTitleResourceKey: "Project1Title",
 					pContextResourceKey: "Project1Context",
 					pConstraintsResourceKey: "Project1Constraints",
-					pWhatIBuiltItemResourceKeys: new[]
-					{
+					pWhatIBuiltItemResourceKeys:
+					[
 						"Project1Bullet1",
 						"Project1Bullet2"
-					},
+					],
 					pImpactResourceKey: "Project1Impact",
 					pTechResourceKey: "Project1Tech",
 					pProjectImagesBaseName: "Creaform.OS",
@@ -50,10 +50,10 @@ namespace ResumeApp.ViewModels.Pages
 					pTitleResourceKey: "Project2Title",
 					pContextResourceKey: "Project2Context",
 					pConstraintsResourceKey: "Project2Constraints",
-					pWhatIBuiltItemResourceKeys: new[]
-					{
+					pWhatIBuiltItemResourceKeys:
+					[
 						"Project2Bullet1"
-					},
+					],
 					pImpactResourceKey: "Project2Impact",
 					pTechResourceKey: "Project2Tech",
 					pProjectImagesBaseName: "Peel.OS",

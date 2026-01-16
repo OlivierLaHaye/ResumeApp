@@ -79,7 +79,7 @@ namespace ResumeApp.Converters
 							return lFromInt == CornerSelection.None ? CornerSelection.All : lFromInt;
 						}
 
-						string[] lTokens = lText.ToLowerInvariant().Split( new[] { ',', ';', '|', ' ', '+' }, StringSplitOptions.RemoveEmptyEntries );
+						string[] lTokens = lText.ToLowerInvariant().Split( [ ',', ';', '|', ' ', '+' ], StringSplitOptions.RemoveEmptyEntries );
 
 						bool lIsTopLeft = HasCornerTokenEnabled( lTokens, "topleft", "tl" );
 						bool lIsTopRight = HasCornerTokenEnabled( lTokens, "topright", "tr" );
@@ -123,7 +123,7 @@ namespace ResumeApp.Converters
 
 			foreach ( string lPair in pTokens.Where( pEntry => pEntry.Contains( "=" ) ) )
 			{
-				string[] lSplit = lPair.Split( new[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries );
+				string[] lSplit = lPair.Split( [ '=' ], 2, StringSplitOptions.RemoveEmptyEntries );
 				if ( lSplit.Length != 2 )
 				{
 					continue;
@@ -535,7 +535,7 @@ namespace ResumeApp.Converters
 			string lNormalized = lRaw.Trim().ToLowerInvariant();
 
 			string[] lTokens = lNormalized
-				.Split( new[] { ' ', ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries )
+				.Split( [ ' ', ',', ';', '|' ], StringSplitOptions.RemoveEmptyEntries )
 				.ToArray();
 
 			pIsInverted = lTokens.Any( IsInvertToken );

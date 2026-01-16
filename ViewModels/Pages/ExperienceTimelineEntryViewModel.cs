@@ -74,7 +74,7 @@ namespace ResumeApp.ViewModels.Pages
 			StartDate = pStartDate;
 			EndDate = pEndDate;
 
-			Accomplishments = pAccomplishments ?? new ObservableCollection<string>();
+			Accomplishments = pAccomplishments ?? [ ];
 
 			UpdateDateRangeText();
 			SetLaneIndex( 0 );
@@ -86,7 +86,7 @@ namespace ResumeApp.ViewModels.Pages
 		{
 			if ( string.IsNullOrWhiteSpace( pTechText ) )
 			{
-				return Enumerable.Empty<string>();
+				return [];
 			}
 
 			string lNormalizedText = pTechText
@@ -97,7 +97,7 @@ namespace ResumeApp.ViewModels.Pages
 				.Replace( ";", "," );
 
 			string[] lParts = lNormalizedText.Split(
-				new[] { ',', '\r', '\n', '\t' },
+				[ ',', '\r', '\n', '\t' ],
 				StringSplitOptions.RemoveEmptyEntries );
 
 			return lParts

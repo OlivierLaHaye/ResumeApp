@@ -35,7 +35,7 @@ namespace ResumeApp.Helpers
 		}
 
 		public static readonly string[] sAccentBrushKeys =
-		{
+		[
 			"CommonBlueStrongBrush",
 			"CommonGreenStrongBrush",
 			"CommonYellowStrongBrush",
@@ -44,7 +44,7 @@ namespace ResumeApp.Helpers
 			"CommonOrangeStrongBrush",
 			"CommonCyanStrongBrush",
 			"CommonPinkStrongBrush"
-		};
+		];
 
 		private static readonly Dictionary<string, object> sPendingResourceUpdates = new();
 
@@ -128,14 +128,16 @@ namespace ResumeApp.Helpers
 			double lY16 = lLuminance > 0.008856 ? Math.Pow( lLuminance, 1.0 / 3.0 ) : 7.787 * lLuminance + 16.0 / 116.0;
 			double lLstar = 116.0 * lY16 - 16.0;
 
-			if ( lLstar >= 75.0 )
+			switch (lLstar)
 			{
-				return false;
-			}
-
-			if ( lLstar <= 45.0 )
-			{
-				return true;
+				case >= 75.0:
+					{
+						return false;
+					}
+				case <= 45.0:
+					{
+						return true;
+					}
 			}
 
 			double lMax = Math.Max( pColor.R / 255.0, Math.Max( pColor.G / 255.0, pColor.B / 255.0 ) );
@@ -150,17 +152,21 @@ namespace ResumeApp.Helpers
 				return lContrastWithWhite >= lContrastWithBlack;
 			}
 
-			if ( lLightness >= 0.55 && lSaturation >= 0.25 )
+			switch (lLightness)
 			{
-				return false;
+				case >= 0.55 when lSaturation >= 0.25:
+					{
+						return false;
+					}
+				case <= 0.45:
+					{
+						return true;
+					}
+				default:
+					{
+						return lContrastWithWhite >= lContrastWithBlack;
+					}
 			}
-
-			if ( lLightness <= 0.45 )
-			{
-				return true;
-			}
-
-			return lContrastWithWhite >= lContrastWithBlack;
 		}
 
 		public static LabColor LabFromColor( Color pColor )
@@ -278,13 +284,18 @@ namespace ResumeApp.Helpers
 						}
 
 						double lT = lColumnTerms[ lColumn ] + lRowTerm;
-						if ( lT < 0.0 )
+						switch (lT)
 						{
-							lT = 0.0;
-						}
-						else if ( lT > 1.0 )
-						{
-							lT = 1.0;
+							case < 0.0:
+								{
+									lT = 0.0;
+									break;
+								}
+							case > 1.0:
+								{
+									lT = 1.0;
+									break;
+								}
 						}
 
 						int lLutIndex = ( int )Math.Round( lT * ( lLut.Length - 1 ) );
@@ -328,7 +339,7 @@ namespace ResumeApp.Helpers
 		{
 			if ( pBitmapImage == null )
 			{
-				return Array.Empty<byte>();
+				return [];
 			}
 
 			int lStride = pBitmapImage.PixelWidth * 4;
@@ -543,13 +554,18 @@ namespace ResumeApp.Helpers
 			double lBb = 200.0 * ( lFy - lFz );
 
 			lL *= pLuminanceMultiplier;
-			if ( lL < 0.0 )
+			switch (lL)
 			{
-				lL = 0.0;
-			}
-			else if ( lL > 100.0 )
-			{
-				lL = 100.0;
+				case < 0.0:
+					{
+						lL = 0.0;
+						break;
+					}
+				case > 100.0:
+					{
+						lL = 100.0;
+						break;
+					}
 			}
 
 			double lFy2 = ( lL + 16.0 ) / 116.0;

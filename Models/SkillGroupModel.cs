@@ -9,6 +9,6 @@ namespace ResumeApp.Models
 	{
 		public string GroupTitleResourceKey { get; } = pGroupTitleResourceKey ?? string.Empty;
 
-		public ObservableCollection<SkillItemModel> Skills { get; } = pSkills ?? new ObservableCollection<SkillItemModel>();
+		public ObservableCollection<SkillItemModel> Skills { get; } = pSkills ?? [ ];
 	}
 }

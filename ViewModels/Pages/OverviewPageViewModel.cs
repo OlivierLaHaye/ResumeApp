@@ -97,10 +97,10 @@ namespace ResumeApp.ViewModels.Pages
 		{
 			if ( string.IsNullOrWhiteSpace( pPrefix ) )
 			{
-				return Array.Empty<string>();
+				return [];
 			}
 
-			return pCount <= 0 ? Array.Empty<string>() : Enumerable.Range( 1, pCount ).Select( pIndex => pPrefix + pIndex ).ToArray();
+			return pCount <= 0 ? [] : Enumerable.Range( 1, pCount ).Select( pIndex => pPrefix + pIndex ).ToArray();
 		}
 
 		private static bool CanExecuteNonEmptyString( object pParameter )

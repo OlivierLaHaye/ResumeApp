@@ -62,8 +62,8 @@ namespace ResumeApp.ViewModels.Pages
 		public ExperiencePageViewModel( ResourcesService pResourcesService, ThemeService pThemeService )
 			: base( pResourcesService, pThemeService )
 		{
-			TimelineEntries = new ObservableCollection<ExperienceTimelineEntryViewModel>();
-			ExperienceTimeFrames = new ObservableCollection<TimelineTimeFrameItem>();
+			TimelineEntries = [ ];
+			ExperienceTimeFrames = [ ];
 
 			ResourcesService.PropertyChanged += ( pSender, pArgs ) =>
 			{
@@ -359,13 +359,13 @@ namespace ResumeApp.ViewModels.Pages
 					pTechKey: "ExperienceCreaformUiUxExpertTech",
 					pStartIsoKey: "ExperienceCreaformUiUxExpertStartIso",
 					pEndIsoKey: "ExperienceCreaformUiUxExpertEndIso",
-					pAccomplishmentKeys: new[]
-					{
+					pAccomplishmentKeys:
+					[
 						"ExperienceCreaformUiUxExpertAcc1",
 						"ExperienceCreaformUiUxExpertAcc2",
 						"ExperienceCreaformUiUxExpertAcc3",
 						"ExperienceCreaformUiUxExpertAcc4"
-					} ),
+					] ),
 
 				CreateEntry(
 					pCompanyKey: "ExperienceCreaformSoftwareDeveloperCompany",
@@ -375,12 +375,12 @@ namespace ResumeApp.ViewModels.Pages
 					pTechKey: "ExperienceCreaformSoftwareDeveloperTech",
 					pStartIsoKey: "ExperienceCreaformSoftwareDeveloperStartIso",
 					pEndIsoKey: "ExperienceCreaformSoftwareDeveloperEndIso",
-					pAccomplishmentKeys: new[]
-					{
+					pAccomplishmentKeys:
+					[
 						"ExperienceCreaformSoftwareDeveloperAcc1",
 						"ExperienceCreaformSoftwareDeveloperAcc2",
 						"ExperienceCreaformSoftwareDeveloperAcc3"
-					} ),
+					] ),
 
 				CreateEntry(
 					pCompanyKey: "ExperienceArcaneCompany",
@@ -390,12 +390,12 @@ namespace ResumeApp.ViewModels.Pages
 					pTechKey: "ExperienceArcaneTech",
 					pStartIsoKey: "ExperienceArcaneStartIso",
 					pEndIsoKey: "ExperienceArcaneEndIso",
-					pAccomplishmentKeys: new[]
-					{
+					pAccomplishmentKeys:
+					[
 						"ExperienceArcaneAcc1",
 						"ExperienceArcaneAcc2",
 						"ExperienceArcaneAcc3"
-					} ),
+					] ),
 
 				CreateEntry(
 					pCompanyKey: "ExperienceIaCompany",
@@ -405,11 +405,11 @@ namespace ResumeApp.ViewModels.Pages
 					pTechKey: "ExperienceIaTech",
 					pStartIsoKey: "ExperienceIaStartIso",
 					pEndIsoKey: "ExperienceIaEndIso",
-					pAccomplishmentKeys: new[]
-					{
+					pAccomplishmentKeys:
+					[
 						"ExperienceIaAcc1",
 						"ExperienceIaAcc2"
-					} ),
+					] ),
 
 				CreateEntry(
 					pCompanyKey: "ExperienceOlhPhotographieCompany",
@@ -419,8 +419,8 @@ namespace ResumeApp.ViewModels.Pages
 					pTechKey: "ExperienceOlhPhotographieTech",
 					pStartIsoKey: "ExperienceOlhPhotographieStartIso",
 					pEndIsoKey: "ExperienceOlhPhotographieEndIso",
-					pAccomplishmentKeys: new[]
-					{
+					pAccomplishmentKeys:
+					[
 						"ExperienceOlhPhotographieAcc1",
 						"ExperienceOlhPhotographieAcc2",
 						"ExperienceOlhPhotographieAcc3",
@@ -428,7 +428,7 @@ namespace ResumeApp.ViewModels.Pages
 						"ExperienceOlhPhotographieAcc5",
 						"ExperienceOlhPhotographieAcc6",
 						"ExperienceOlhPhotographieAcc7"
-					} )
+					] )
 			}.Where( pItem => pItem != null ).ToList();
 
 			AssignLanes( lEntries );
@@ -478,7 +478,7 @@ namespace ResumeApp.ViewModels.Pages
 			DateTime lStartDate = ParseIsoDateOrDefault( ResourcesService[ pStartIsoKey ] );
 			DateTime? lEndDate = ParseIsoDateOrNull( ResourcesService[ pEndIsoKey ] );
 
-			string[] lAccomplishments = ( pAccomplishmentKeys ?? Array.Empty<string>() )
+			string[] lAccomplishments = ( pAccomplishmentKeys ?? [] )
 				.Select( pKey => ResourcesService[ pKey ] )
 				.Where( pText => !string.IsNullOrWhiteSpace( pText ) )
 				.ToArray();

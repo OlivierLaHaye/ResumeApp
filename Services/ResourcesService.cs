@@ -53,12 +53,12 @@ namespace ResumeApp.Services
 			string lAssemblyName = lAssembly.GetName().Name ?? "ResumeApp";
 
 			string[] lCandidateBaseNames =
-			{
+			[
 				$"{lAssemblyName}.Properties.Resources",
 				$"{lAssemblyName}.Resources",
 				"ResumeApp.Properties.Resources",
 				"ResumeApp.Resources"
-			};
+			];
 
 			foreach ( string lBaseName in lCandidateBaseNames )
 			{

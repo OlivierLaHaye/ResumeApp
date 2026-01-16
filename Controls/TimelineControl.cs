@@ -311,8 +311,8 @@ namespace ResumeApp.Controls
 
 		public TimelineControl()
 		{
-			mTimeFrameHitInfos = new List<TimeFrameHitInfo>();
-			mPanSamples = new List<PanSample>();
+			mTimeFrameHitInfos = [ ];
+			mPanSamples = [ ];
 			mFormattedTextCache = new Dictionary<FormattedTextCacheKey, FormattedText>();
 
 			Focusable = true;
@@ -405,21 +405,28 @@ namespace ResumeApp.Controls
 			var lZoom = Math.Max( MinimumZoomPixelsPerDay, pZoomLevel );
 
 			KeyboardStep lBaseStep;
-			if ( lZoom >= 20.0 )
+			switch (lZoom)
 			{
-				lBaseStep = KeyboardStep.Day;
-			}
-			else if ( lZoom >= 6.0 )
-			{
-				lBaseStep = KeyboardStep.Week;
-			}
-			else if ( lZoom >= 1.5 )
-			{
-				lBaseStep = KeyboardStep.Month;
-			}
-			else
-			{
-				lBaseStep = KeyboardStep.Year;
+				case >= 20.0:
+					{
+						lBaseStep = KeyboardStep.Day;
+						break;
+					}
+				case >= 6.0:
+					{
+						lBaseStep = KeyboardStep.Week;
+						break;
+					}
+				case >= 1.5:
+					{
+						lBaseStep = KeyboardStep.Month;
+						break;
+					}
+				default:
+					{
+						lBaseStep = KeyboardStep.Year;
+						break;
+					}
 			}
 
 			return pIsControlDown ? PromoteStep( lBaseStep ) : lBaseStep;
@@ -1252,10 +1259,10 @@ namespace ResumeApp.Controls
 			Brush pTextBrush,
 			double pPixelsPerDip )
 		{
-			var lVisibleFrames = pVisibleFrames?.Where( pFrame => pFrame?.Item != null ).ToList() ?? new List<VisibleTimeFrame>();
+			var lVisibleFrames = pVisibleFrames?.Where( pFrame => pFrame?.Item != null ).ToList() ?? [ ];
 			if ( lVisibleFrames.Count == 0 || pBarRectsByItem == null || pBarRectsByItem.Count == 0 || pTypeface == null || pTextBrush == null )
 			{
-				return new List<TimeFrameTitleDrawInfo>();
+				return [ ];
 			}
 
 			var lCandidates = lVisibleFrames
@@ -1302,7 +1309,7 @@ namespace ResumeApp.Controls
 
 			if ( lCandidates.Count == 0 )
 			{
-				return new List<TimeFrameTitleDrawInfo>();
+				return [ ];
 			}
 
 			var lPlacedByLane = new Dictionary<int, List<Rect>>();
@@ -1312,7 +1319,7 @@ namespace ResumeApp.Controls
 			{
 				if ( !lPlacedByLane.TryGetValue( lCandidate.LaneIndex, out var lPlacedRects ) )
 				{
-					lPlacedRects = new List<Rect>();
+					lPlacedRects = [ ];
 					lPlacedByLane[ lCandidate.LaneIndex ] = lPlacedRects;
 				}
 

@@ -23,7 +23,7 @@ namespace ResumeApp.ViewModels.Pages
 		private const int MaximumIndexedImageProbeCount = 100;
 
 		private static readonly string[] sSupportedImageExtensions =
-		{
+		[
 			"png",
 			"jpg",
 			"jpeg",
@@ -31,7 +31,7 @@ namespace ResumeApp.ViewModels.Pages
 			"gif",
 			"tif",
 			"tiff"
-		};
+		];
 
 		private static readonly object sResourceIndexLock = new();
 		private static bool sHasAttemptedBuildResourceIndex;
@@ -117,12 +117,12 @@ namespace ResumeApp.ViewModels.Pages
 
 			OpenProjectLinkCommand = new RelayCommand( ExecuteOpenProjectLink, () => IsProjectLinkButtonVisible );
 
-			WhatIBuiltItems = new ObservableCollection<LocalizedResourceItemViewModel>( ( pWhatIBuiltItemResourceKeys ?? Array.Empty<string>() )
+			WhatIBuiltItems = new ObservableCollection<LocalizedResourceItemViewModel>( ( pWhatIBuiltItemResourceKeys ?? [] )
 				.Where( pKey => !string.IsNullOrWhiteSpace( pKey ) )
 				.Select( pKey => new LocalizedResourceItemViewModel( mResourcesService, pKey ) ) );
 
-			TechItems = new ObservableCollection<string>();
-			mImages = new ObservableCollection<ImageSource>();
+			TechItems = [ ];
+			mImages = [ ];
 
 			RefreshFromResources();
 
@@ -186,11 +186,11 @@ namespace ResumeApp.ViewModels.Pages
 		{
 			if ( string.IsNullOrWhiteSpace( pText ) )
 			{
-				return Array.Empty<string>();
+				return [];
 			}
 
 			return pText
-				.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries )
+				.Split( [ ';' ], StringSplitOptions.RemoveEmptyEntries )
 				.Select( pItem => pItem.Trim() )
 				.Where( pItem => !string.IsNullOrWhiteSpace( pItem ) )
 				.ToArray();
@@ -200,11 +200,11 @@ namespace ResumeApp.ViewModels.Pages
 		{
 			if ( string.IsNullOrWhiteSpace( pText ) )
 			{
-				return Array.Empty<string>();
+				return [];
 			}
 
 			return pText
-				.Split( new[] { ',' }, StringSplitOptions.RemoveEmptyEntries )
+				.Split( [ ',' ], StringSplitOptions.RemoveEmptyEntries )
 				.Select( pItem => pItem.Trim() )
 				.Where( pItem => !string.IsNullOrWhiteSpace( pItem ) )
 				.ToArray();
@@ -219,7 +219,7 @@ namespace ResumeApp.ViewModels.Pages
 
 			pTarget.Clear();
 
-			foreach ( string lItem in pItems ?? Array.Empty<string>() )
+			foreach ( string lItem in pItems ?? [] )
 			{
 				pTarget.Add( lItem );
 			}
@@ -452,7 +452,7 @@ namespace ResumeApp.ViewModels.Pages
 
 			if ( string.IsNullOrWhiteSpace( lValueText ) )
 			{
-				return Enumerable.Empty<ImageSource>();
+				return [];
 			}
 
 			bool lHasExplicitList = lValueText.Contains( ";" );
@@ -474,7 +474,7 @@ namespace ResumeApp.ViewModels.Pages
 
 			ImageSource lSingleImage = TryCreateImageSource( lValueText );
 
-			return lSingleImage == null ? Enumerable.Empty<ImageSource>() : new[] { lSingleImage };
+			return lSingleImage == null ? [] : [ lSingleImage ];
 		}
 
 		private static IEnumerable<ImageSource> EnumerateIndexedImagesFromBasePath( string pImagesBasePath )
@@ -562,7 +562,7 @@ namespace ResumeApp.ViewModels.Pages
 					// ignored
 				}
 
-				await ReplaceObservableImagesIncrementallyAsync( mImages, lImages ?? new List<ImageSource>(), pBatchSize: 4 );
+				await ReplaceObservableImagesIncrementallyAsync( mImages, lImages ?? [ ], pBatchSize: 4 );
 
 				mHasInitializedImages = true;
 			}

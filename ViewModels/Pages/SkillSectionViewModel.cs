@@ -21,7 +21,7 @@ namespace ResumeApp.ViewModels.Pages
 			mResourcesService = pResourcesService ?? throw new ArgumentNullException( nameof( pResourcesService ) );
 			mTitleResourceKey = pTitleResourceKey ?? string.Empty;
 
-			Items = new ObservableCollection<LocalizedResourceItemViewModel>( ( pItemResourceKeys ?? Array.Empty<string>() )
+			Items = new ObservableCollection<LocalizedResourceItemViewModel>( ( pItemResourceKeys ?? [] )
 				.Where( pKey => !string.IsNullOrWhiteSpace( pKey ) )
 				.Select( pKey => new LocalizedResourceItemViewModel( mResourcesService, pKey ) ) );
 

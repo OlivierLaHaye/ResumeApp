@@ -19,7 +19,7 @@ namespace ResumeApp.ViewModels.Pages
 	public sealed class PhotographyAlbumCardViewModel : PropertyChangedNotifier
 	{
 		private static readonly string[] sSupportedImageExtensions =
-		{
+		[
 			"jpg",
 			"jpeg",
 			"png",
@@ -27,7 +27,7 @@ namespace ResumeApp.ViewModels.Pages
 			"gif",
 			"tif",
 			"tiff"
-		};
+		];
 
 		private static readonly object sCacheLock = new();
 		private static readonly Dictionary<string, IReadOnlyList<string>> sImageRelativePathsByFolderPath = new( StringComparer.OrdinalIgnoreCase );
@@ -76,7 +76,7 @@ namespace ResumeApp.ViewModels.Pages
 
 			mAlbumImagesBasePath = NormalizeFolderPath( pAlbumImagesBasePath );
 
-			mImages = new ObservableCollection<ImageSource>();
+			mImages = [ ];
 
 			mResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
 		}
@@ -344,14 +344,14 @@ namespace ResumeApp.ViewModels.Pages
 
 			if ( string.IsNullOrWhiteSpace( lFolderRelativePath ) )
 			{
-				return Array.Empty<string>();
+				return [];
 			}
 
 			lock ( sCacheLock )
 			{
 				if ( sImageRelativePathsByFolderPath.TryGetValue( lFolderRelativePath, out IReadOnlyList<string> lCachedPaths ) )
 				{
-					return lCachedPaths ?? Array.Empty<string>();
+					return lCachedPaths ?? [];
 				}
 			}
 
@@ -359,10 +359,10 @@ namespace ResumeApp.ViewModels.Pages
 
 			lock ( sCacheLock )
 			{
-				sImageRelativePathsByFolderPath[ lFolderRelativePath ] = lComputedPaths ?? Array.Empty<string>();
+				sImageRelativePathsByFolderPath[ lFolderRelativePath ] = lComputedPaths ?? [];
 			}
 
-			return lComputedPaths ?? Array.Empty<string>();
+			return lComputedPaths ?? [];
 		}
 
 		private static IReadOnlyList<string> ComputeImageRelativePathsWithFallbacks( string pFolderRelativePath )
@@ -377,7 +377,7 @@ namespace ResumeApp.ViewModels.Pages
 				}
 			}
 
-			return Array.Empty<string>();
+			return [];
 		}
 
 		private static IReadOnlyList<string> GetAllImageResourceRelativePathsOrNull()
@@ -409,7 +409,7 @@ namespace ResumeApp.ViewModels.Pages
 
 						using ( var lResourceReader = new ResourceReader( lGResourcesStream ) )
 						{
-							lPaths = new List<string>();
+							lPaths = [ ];
 
 							IDictionaryEnumerator lEnumerator = lResourceReader.GetEnumerator();
 
@@ -662,7 +662,7 @@ namespace ResumeApp.ViewModels.Pages
 					continue;
 				}
 
-				IEnumerable<string> lCandidateFiles = Enumerable.Empty<string>();
+				IEnumerable<string> lCandidateFiles = [];
 
 				try
 				{
@@ -764,7 +764,7 @@ namespace ResumeApp.ViewModels.Pages
 
 		private static IEnumerable<ImageSource> CreateImageSources( IEnumerable<string> pPaths )
 		{
-			return ( pPaths ?? Enumerable.Empty<string>() )
+			return ( pPaths ?? [] )
 				.Where( pPath => !string.IsNullOrWhiteSpace( pPath ) )
 				.Select( TryCreateImageSource )
 				.Where( pImageSource => pImageSource != null );
@@ -865,7 +865,7 @@ namespace ResumeApp.ViewModels.Pages
 					// ignored
 				}
 
-				await ReplaceObservableImagesIncrementallyAsync( mImages, lImages ?? new List<ImageSource>(), pBatchSize: 4 );
+				await ReplaceObservableImagesIncrementallyAsync( mImages, lImages ?? [ ], pBatchSize: 4 );
 
 				mHasInitializedImages = true;
 			}
