@@ -1,8 +1,6 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
-using System;
-
 namespace ResumeApp.Services
 {
 	public sealed class ProjectImageCarouselAdjacentImagesVisualService

@@ -1,8 +1,6 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
-using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;

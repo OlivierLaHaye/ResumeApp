@@ -1,8 +1,6 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
-using System;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows;

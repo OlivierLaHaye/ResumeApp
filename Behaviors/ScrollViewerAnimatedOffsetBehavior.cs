@@ -1,7 +1,6 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;

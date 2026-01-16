@@ -2,12 +2,9 @@
 // All rights reserved.
 
 using ResumeApp.Infrastructure;
-using System;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Resources;
-using System.Threading;
 
 namespace ResumeApp.Services
 {

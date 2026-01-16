@@ -3,8 +3,6 @@
 
 using Microsoft.Win32;
 using ResumeApp.Infrastructure;
-using System;
-using System.Linq;
 using System.Windows;
 
 namespace ResumeApp.Services

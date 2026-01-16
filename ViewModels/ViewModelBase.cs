@@ -3,7 +3,6 @@
 
 using ResumeApp.Infrastructure;
 using ResumeApp.Services;
-using System;
 
 namespace ResumeApp.ViewModels
 {

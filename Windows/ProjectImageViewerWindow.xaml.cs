@@ -1,7 +1,6 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
-using System;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using System.Windows;

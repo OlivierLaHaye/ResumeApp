@@ -3,9 +3,7 @@
 
 using ResumeApp.Infrastructure;
 using ResumeApp.Services;
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace ResumeApp.ViewModels.Pages
 {

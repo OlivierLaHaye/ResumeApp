@@ -2,10 +2,8 @@
 // All rights reserved.
 
 using ResumeApp.Services;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 
 namespace ResumeApp.ViewModels.Pages
 {

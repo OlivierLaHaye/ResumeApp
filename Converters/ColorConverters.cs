@@ -2,9 +2,7 @@
 // All rights reserved.
 
 using ResumeApp.Helpers;
-using System;
 using System.Globalization;
-using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;

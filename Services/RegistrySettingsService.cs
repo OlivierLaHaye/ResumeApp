@@ -2,7 +2,6 @@
 // All rights reserved.
 
 using Microsoft.Win32;
-using System;
 
 namespace ResumeApp.Services
 {

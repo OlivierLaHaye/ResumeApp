@@ -2,7 +2,6 @@
 // All rights reserved.
 
 using ResumeApp.Infrastructure;
-using System;
 using System.Windows.Media;
 
 namespace ResumeApp.Models

@@ -5,11 +5,8 @@ using ResumeApp.Helpers;
 using ResumeApp.Infrastructure;
 using ResumeApp.Models;
 using ResumeApp.Services;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
 using System.Windows.Input;
 
 namespace ResumeApp.ViewModels.Pages

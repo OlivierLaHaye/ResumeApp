@@ -4,8 +4,6 @@
 using ResumeApp.Services;
 using ResumeApp.ViewModels;
 using ResumeApp.ViewModels.Pages;
-using System;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 

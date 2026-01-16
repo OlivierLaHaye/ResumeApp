@@ -4,7 +4,6 @@
 using ResumeApp.Infrastructure;
 using ResumeApp.Services;
 using ResumeApp.ViewModels.Pages;
-using System;
 using System.ComponentModel;
 using System.Windows;
 

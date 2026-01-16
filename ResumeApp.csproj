@@ -1,556 +1,74 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{80F5FC88-4E2F-4F1D-AFEE-19041B3539C6}</ProjectGuid>
     <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>14.0</LangVersion>
     <RootNamespace>ResumeApp</RootNamespace>
     <AssemblyName>ResumeApp</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <LangVersion>7.3</LangVersion>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <LangVersion>7.3</LangVersion>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
     <ApplicationIcon>Resources\ResumeApp.ico</ApplicationIcon>
+    <Deterministic>true</Deterministic>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-  </ItemGroup>
-  <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Page Include="Controls\LanguageCheckBoxControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\ProjectImageCarouselControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\ThemeCheckBox.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Pages\EducationPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Pages\ExperiencePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Pages\OverviewPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Pages\PhotographyPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\ProjectsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Pages\SkillsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Resources\Controls.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Resources\Converters.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Resources\Theme.Dark.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Resources\Theme.Light.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Resources\Tokens.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Windows\ProjectImageViewerWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="AttachedProperties\CornerRadiusAssist.cs" />
-    <Compile Include="Behaviors\ExperienceTimelineScrollSyncBehavior.cs" />
-    <Compile Include="Behaviors\ScrollViewerAnimatedOffsetBehavior.cs" />
-    <Compile Include="Controls\LanguageCheckBoxControl.xaml.cs">
-      <DependentUpon>LanguageCheckBoxControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\ProjectImageCarouselControl.xaml.cs">
-      <DependentUpon>ProjectImageCarouselControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\ThemeCheckBox.xaml.cs">
-      <DependentUpon>ThemeCheckBox.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Controls\TimelineControl.cs" />
-    <Compile Include="Converters\ColorConverters.cs" />
-    <Compile Include="Converters\DataConverters.cs" />
-    <Compile Include="Converters\VisibilityConverter.cs" />
-    <Compile Include="Helpers\ColorHelper.cs" />
-    <Compile Include="Helpers\PathExtremesCalculatorHelper.cs" />
-    <Compile Include="Infrastructure\ParameterRelayCommand.cs" />
-    <Compile Include="Infrastructure\PropertyChangedNotifier.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Infrastructure\RelayCommand.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Infrastructure\RelayCommandOfT.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Models\ProjectImageModel.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Models\SkillGroupModel.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Models\SkillItemModel.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Models\TimelineTimeFrameItem.cs" />
-    <Compile Include="Pages\EducationPage.xaml.cs">
-      <DependentUpon>EducationPage.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Pages\ExperiencePage.xaml.cs">
-      <DependentUpon>ExperiencePage.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Pages\OverviewPage.xaml.cs">
-      <DependentUpon>OverviewPage.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Pages\PhotographyPage.xaml.cs">
-      <DependentUpon>PhotographyPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\ProjectsPage.xaml.cs">
-      <DependentUpon>ProjectsPage.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Pages\SkillsPage.xaml.cs">
-      <DependentUpon>SkillsPage.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="Services\AppLanguage.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Services\AppTheme.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Services\ProjectImageCarouselAdjacentImagesVisualService.cs" />
-    <Compile Include="Services\RegistrySettingsService.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Services\ResourcesService.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Services\ScrollViewerScrollService.cs" />
-    <Compile Include="Services\ThemeService.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ViewModels\MainViewModel.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ViewModels\Pages\EducationItemViewModel.cs" />
-    <Compile Include="ViewModels\Pages\EducationPageViewModel.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ViewModels\Pages\ExperiencePageViewModel.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ViewModels\Pages\ExperienceTimelineEntryViewModel.cs" />
-    <Compile Include="ViewModels\Pages\LocalizedResourceItemViewModel.cs" />
-    <Compile Include="ViewModels\Pages\OverviewPageViewModel.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ViewModels\Pages\PhotographyAlbumCardViewModel.cs" />
-    <Compile Include="ViewModels\Pages\PhotographyPageViewModel.cs" />
-    <Compile Include="ViewModels\Pages\ProjectCardViewModel.cs" />
-    <Compile Include="ViewModels\Pages\ProjectsPageViewModel.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ViewModels\Pages\SkillSectionViewModel.cs" />
-    <Compile Include="ViewModels\Pages\SkillsPageViewModel.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ViewModels\ViewModelBase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Windows\ProjectImageViewerWindow.xaml.cs">
-      <DependentUpon>ProjectImageViewerWindow.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.fr-CA.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="NOTICE.txt" />
-    <None Include="Properties\Settings.settings">
+    <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Resource Include="Resources\Fonts\Inconsolata-Black.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata-Bold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata-ExtraBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata-ExtraLight.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata-Light.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata-Medium.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata-Regular.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata-SemiBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata-VariableFont_wdth,wght.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Condensed-Black.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Condensed-Bold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Condensed-ExtraBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Condensed-ExtraLight.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Condensed-Light.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Condensed-Medium.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Condensed-Regular.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Condensed-SemiBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Expanded-Black.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Expanded-Bold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Expanded-ExtraBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Expanded-ExtraLight.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Expanded-Light.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Expanded-Medium.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Expanded-Regular.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_Expanded-SemiBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraCondensed-Black.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraCondensed-Bold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraCondensed-ExtraBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraCondensed-ExtraLight.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraCondensed-Light.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraCondensed-Medium.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraCondensed-Regular.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraCondensed-SemiBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraExpanded-Black.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraExpanded-Bold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraExpanded-ExtraBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraExpanded-ExtraLight.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraExpanded-Light.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraExpanded-Medium.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraExpanded-Regular.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_ExtraExpanded-SemiBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiCondensed-Black.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiCondensed-Bold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiCondensed-ExtraBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiCondensed-ExtraLight.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiCondensed-Light.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiCondensed-Medium.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiCondensed-Regular.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiCondensed-SemiBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiExpanded-Black.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiExpanded-Bold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiExpanded-ExtraBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiExpanded-ExtraLight.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiExpanded-Light.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiExpanded-Medium.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiExpanded-Regular.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_SemiExpanded-SemiBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraCondensed-Black.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraCondensed-Bold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraCondensed-ExtraBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraCondensed-ExtraLight.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraCondensed-Light.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraCondensed-Medium.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraCondensed-Regular.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraCondensed-SemiBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraExpanded-Black.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraExpanded-Bold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraExpanded-ExtraBold.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraExpanded-ExtraLight.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraExpanded-Light.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraExpanded-Medium.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraExpanded-Regular.ttf" />
-    <Resource Include="Resources\Fonts\Inconsolata_UltraExpanded-SemiBold.ttf" />
-    <Resource Include="Resources\Fonts\Inter-Italic-VariableFont_opsz,wght.ttf" />
-    <Resource Include="Resources\Fonts\Inter-VariableFont_opsz,wght.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-Black.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-BlackItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-Bold.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-BoldItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-ExtraBold.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-ExtraBoldItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-ExtraLight.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-ExtraLightItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-Italic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-Light.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-LightItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-Medium.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-MediumItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-Regular.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-SemiBold.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-SemiBoldItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-Thin.ttf" />
-    <Resource Include="Resources\Fonts\Inter_18pt-ThinItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-Black.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-BlackItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-Bold.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-BoldItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-ExtraBold.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-ExtraBoldItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-ExtraLight.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-ExtraLightItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-Italic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-Light.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-LightItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-Medium.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-MediumItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-Regular.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-SemiBold.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-SemiBoldItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-Thin.ttf" />
-    <Resource Include="Resources\Fonts\Inter_24pt-ThinItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-Black.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-BlackItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-Bold.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-BoldItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-ExtraBold.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-ExtraBoldItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-ExtraLight.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-ExtraLightItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-Italic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-Light.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-LightItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-Medium.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-MediumItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-Regular.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-SemiBold.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-SemiBoldItalic.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-Thin.ttf" />
-    <Resource Include="Resources\Fonts\Inter_28pt-ThinItalic.ttf" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Fonts\**\*.ttf" />
+  </ItemGroup>
+
   <ItemGroup>
     <Resource Include="Resources\ResumeApp.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\ResumeApp.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
+
   <ItemGroup>
-    <Resource Include="Resources\Projects\Peel.OS\Peel.OS_1.png">
+    <Resource Include="Resources\Projects\Peel.OS\*.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\Projects\Peel.OS\Peel.OS_2.png">
+    <Resource Include="Resources\Projects\Creaform.OS\*.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\Projects\Peel.OS\Peel.OS_3.png">
+    <Resource Include="Resources\Projects\OLHphotographie\*.png" />
+    <Resource Include="Resources\Projects\Photography\**\*.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\Projects\Peel.OS\Peel.OS_4.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Peel.OS\Peel.OS_5.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Peel.OS\Peel.OS_6.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Peel.OS\Peel.OS_7.png">
+    <Resource Include="Resources\Projects\Photography\**\*.CR2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Projects\Photography\Volleyball\2025 - Ligue des Nations de Volleyball %28VNL%29 - Jour 5 - Québec 00837.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Projects\Creaform.OS\Creaform.OS_1.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Creaform.OS\Creaform.OS_2.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Creaform.OS\Creaform.OS_3.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Creaform.OS\Creaform.OS_4.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Creaform.OS\Creaform.OS_5.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_1.png" />
-    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_10.png" />
-    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_2.png" />
-    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_3.png" />
-    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_4.png" />
-    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_5.png" />
-    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_6.png" />
-    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_7.png" />
-    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_8.png" />
-    <Resource Include="Resources\Projects\OLHphotographie\OLHPhotographie_9.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Projects\Photography\Volleyball\2025 - Ligue des Nations de Volleyball %28VNL%29 - Jour 3 - Québec 04794.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Projects\Photography\Volleyball\2025 - Dimanche - Elite16 Montreal CAN 2025 - Beach Pro Tour 17288.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Photography\Volleyball\2025 - Jeudi - Elite16 Montreal CAN 2025 - Beach Pro Tour 14645.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Photography\Volleyball\2025 - Ligue des Nations de Volleyball %28VNL%29 - Jour 2 - Québec 12871.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Photography\Volleyball\2025 - Vendredi - Elite16 Montreal CAN 2025 - Beach Pro Tour 21591.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <Resource Include="Resources\Projects\Photography\Portraits\2024 - Shooting Hermès Exécutif 0511.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Photography\Portraits\2024 - Shooting ORAMA 0344.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Photography\Portraits\2025 - Shooting AGERIUL 013.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Photography\Portraits\2025 - Shooting Hermès Exécutif 099.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Photography\Portraits\2025 - Shooting Podcast Santé Sport 057.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Projects\Photography\Events\2024 - INSOLITE - 20e édition du Défilé CML 1451-CR2.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Photography\Events\2024 - soie - 27e édition du FSA Fashion Show 4056-CR2.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Photography\Events\2025 - Intégrations FSA 3030.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Photography\Events\2025 - RENAISSANCE - 21e édition du Défilé CML 2230.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Projects\Photography\Events\2025 - À la Une - 28e édition du FSA Fashion Show 10893.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PreBuildEvent>REM Pre-build event in Project Properties → Build Events
-if not exist "$(ProjectDir)ResxCleaner.exe" (
-    echo Executable not found: "$(ProjectDir)ResxCleaner.exe"
-    exit /b 1
-) else (
-    call "$(ProjectDir)ResxCleaner.exe" "$(ProjectDir)Properties"
-)</PreBuildEvent>
-  </PropertyGroup>
+
+  <Target Name="RunResxCleaner" BeforeTargets="PreBuildEvent">
+    <Exec Command="if not exist &quot;$(ProjectDir)ResxCleaner.exe&quot; ( echo Executable not found: &quot;$(ProjectDir)ResxCleaner.exe&quot; &amp; exit /b 1 ) else ( call &quot;$(ProjectDir)ResxCleaner.exe&quot; &quot;$(ProjectDir)Properties&quot; )" />
+  </Target>
+
 </Project>

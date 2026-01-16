@@ -1,7 +1,6 @@
 // Copyright (C) Olivier La Haye
 // All rights reserved.
 
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
