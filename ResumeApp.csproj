@@ -59,6 +59,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\DragCustom.cur">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\ResumeApp.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -81,6 +84,10 @@
     <Resource Include="Resources\Projects\Photography\**\*.CR2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\DragCustom.cur" />
   </ItemGroup>
 
   <Target Name="RunResxCleaner" BeforeTargets="PreBuildEvent">

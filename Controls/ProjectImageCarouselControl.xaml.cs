@@ -1,6 +1,7 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using ResumeApp.Infrastructure;
 using ResumeApp.Services;
 using ResumeApp.Windows;
 using System.Collections;
@@ -1046,7 +1047,7 @@ namespace ResumeApp.Controls
 			}
 
 			mPreviousCursor = Cursor;
-			Cursor = Cursors.SizeWE;
+			Cursor = CustomCursors.DragLeftRightCursor;
 
 			pMouseButtonEventArgs.Handled = true;
 		}
@@ -1154,7 +1155,7 @@ namespace ResumeApp.Controls
 
 			bool lIsDragPossible = GetImageCount() > 1 && IsValidDragStartSource( pOriginalSource );
 
-			Cursor lTargetCursor = lIsDragPossible ? Cursors.SizeWE : mDefaultCursor;
+			Cursor lTargetCursor = lIsDragPossible ? CustomCursors.DragLeftRightCursor : mDefaultCursor;
 			if ( !Equals( Cursor, lTargetCursor ) )
 			{
 				Cursor = lTargetCursor;
