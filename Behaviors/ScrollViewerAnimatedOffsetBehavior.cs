@@ -16,8 +16,6 @@ namespace ResumeApp.Behaviors
 				typeof( ScrollViewerAnimatedOffsetBehavior ),
 				new PropertyMetadata( 0d, OnAnimatedVerticalOffsetChanged ) );
 
-		public static void SetAnimatedVerticalOffset( DependencyObject pElement, double pValue ) => pElement.SetValue( sAnimatedVerticalOffsetProperty, pValue );
-
 		public static void AnimateVerticalOffset( ScrollViewer? pScrollViewer, double pTargetVerticalOffset, int pDurationMilliseconds )
 		{
 			if ( pScrollViewer == null )
@@ -59,6 +57,8 @@ namespace ResumeApp.Behaviors
 
 			pScrollViewer.BeginAnimation( sAnimatedVerticalOffsetProperty, lAnimation, HandoffBehavior.SnapshotAndReplace );
 		}
+
+		private static void SetAnimatedVerticalOffset( DependencyObject pElement, double pValue ) => pElement.SetValue( sAnimatedVerticalOffsetProperty, pValue );
 
 		private static void OnAnimatedVerticalOffsetChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pArgs )
 		{
