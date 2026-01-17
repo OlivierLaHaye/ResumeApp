@@ -614,10 +614,10 @@
     <value>Impact: strong internal feedback on the refreshed look, with improved visual consistency and reduced UI fragmentation across the product.</value>
   </data>
   <data name="Project1Tech" xml:space="preserve">
-    <value>Tech: WPF, XAML, C# 7.3, MVVM</value>
+    <value>Tech: WPF, XAML, C# 13, .NET 9.0, MVVM</value>
   </data>
   <data name="Project1Title" xml:space="preserve">
-    <value>Creaform.OS UI Modernization (internal)</value>
+    <value>Creaform.OS UI Modernization</value>
   </data>
   <data name="Project1WhatIBuiltHeader" xml:space="preserve">
     <value>What I built:</value>
@@ -635,7 +635,7 @@
     <value>Impact: clearer, more consistent UI with improved visual hierarchy and workflows that are easier to follow.</value>
   </data>
   <data name="Project2Tech" xml:space="preserve">
-    <value>Tech: WPF, XAML, C#, MVVM</value>
+    <value>Tech: WPF, XAML, C# 7.3, .NET Framework 4.8.1, MVVM</value>
   </data>
   <data name="Project2Title" xml:space="preserve">
     <value>peel.OS UI Redesign</value>
@@ -659,7 +659,7 @@
     <value>Impact: personal productivity gains by reducing repetitive manual steps and speeding up real editing sessions.</value>
   </data>
   <data name="Project3Tech" xml:space="preserve">
-    <value>Tech: WPF, XAML, C# 7.3, MVVM</value>
+    <value>Tech: WPF, XAML, C# 14, .NET 10.0, MVVM</value>
   </data>
   <data name="Project3Title" xml:space="preserve">
     <value>OLHphotographie Workflow App (personal)</value>
@@ -676,11 +676,14 @@
   <data name="Project4Context" xml:space="preserve">
     <value>Context: Interactive resume built as a WPF MVVM application with theme and language switching.</value>
   </data>
+  <data name="Project4Impact" xml:space="preserve">
+    <value>Impact: a scannable, app-like resume experience with consistent styling, light and dark mode, and bilingual readiness, making the content easier to browse quickly.</value>
+  </data>
   <data name="Project4Links" xml:space="preserve">
     <value>Links: https://github.com/OlivierLaHaye</value>
   </data>
   <data name="Project4Tech" xml:space="preserve">
-    <value>Tech: WPF, XAML, C# 7.3, MVVM, resx localization</value>
+    <value>Tech: WPF, XAML, C# 14, .NET 10.0, MVVM</value>
   </data>
   <data name="Project4Title" xml:space="preserve">
     <value>WPF Resume App (this CV)</value>

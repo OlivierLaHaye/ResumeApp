@@ -2,6 +2,7 @@
 // All rights reserved.
 
 using ResumeApp.Infrastructure;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -11,11 +12,11 @@ namespace ResumeApp.Services;
 
 public static class ScrollViewerScrollService
 {
-	private static ICommand? sScrollToTopCommand;
-	public static ICommand ScrollToTopCommand => sScrollToTopCommand ??= new RelayCommand( ExecuteScrollToTop );
+	[field: AllowNull, MaybeNull]
+	public static ICommand ScrollToTopCommand => field ??= new RelayCommand( ExecuteScrollToTop );
 
-	private static ICommand? sScrollToBottomCommand;
-	public static ICommand ScrollToBottomCommand => sScrollToBottomCommand ??= new RelayCommand( ExecuteScrollToBottom );
+	[field: AllowNull, MaybeNull]
+	public static ICommand ScrollToBottomCommand => field ??= new RelayCommand( ExecuteScrollToBottom );
 
 	private static void ExecuteScrollToTop()
 	{

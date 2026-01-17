@@ -57,7 +57,21 @@ namespace ResumeApp.ViewModels.Pages
 					pImpactResourceKey: "Project2Impact",
 					pTechResourceKey: "Project2Tech",
 					pProjectImagesBaseName: "Peel.OS",
-					pProjectLinkUriText: "https://store.peel-3d.com/software/peel-os/" )
+					pProjectLinkUriText: "https://store.peel-3d.com/software/peel-os/" ),
+
+				new ProjectCardViewModel(
+					pResourcesService: ResourcesService,
+					pTitleResourceKey: "Project4Title",
+					pContextResourceKey: "Project4Context",
+					pConstraintsResourceKey: "Project4Constraints",
+					pWhatIBuiltItemResourceKeys:
+					[
+						"Project4Bullet1"
+					],
+					pImpactResourceKey: "Project4Impact",
+					pTechResourceKey: "Project4Tech",
+					pProjectImagesBaseName: "ResumeApp",
+					pProjectLinkUriText: "https://github.com/OlivierLaHaye" )
 			} );
 		}
 
@@ -65,7 +79,7 @@ namespace ResumeApp.ViewModels.Pages
 		{
 			foreach ( ProjectCardViewModel lProjectCardViewModel in Projects )
 			{
-				lProjectCardViewModel?.QueueImagesPreload();
+				lProjectCardViewModel.QueueImagesPreload();
 			}
 		}
 	}

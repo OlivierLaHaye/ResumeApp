@@ -42,8 +42,6 @@ namespace ResumeApp.ViewModels.Pages
 
 		private readonly ResourcesService mResourcesService;
 
-		private readonly string mTitleResourceKey;
-		private readonly string mSubtitleResourceKey;
 		private readonly string mAlbumImagesBasePath;
 
 		private bool mHasInitializedImages;
@@ -52,9 +50,9 @@ namespace ResumeApp.ViewModels.Pages
 
 		private readonly ObservableCollection<ImageSource> mImages;
 
-		public string TitleText => mResourcesService[ mTitleResourceKey ];
+		public string TitleText => mResourcesService[ field ];
 
-		public string SubtitleText => mResourcesService[ mSubtitleResourceKey ];
+		public string SubtitleText => mResourcesService[ field ];
 
 		public ObservableCollection<ImageSource> Images
 		{
@@ -73,8 +71,8 @@ namespace ResumeApp.ViewModels.Pages
 		{
 			mResourcesService = pResourcesService ?? throw new ArgumentNullException( nameof( pResourcesService ) );
 
-			mTitleResourceKey = pTitleResourceKey ?? string.Empty;
-			mSubtitleResourceKey = pSubtitleResourceKey ?? string.Empty;
+			TitleText = pTitleResourceKey ?? string.Empty;
+			SubtitleText = pSubtitleResourceKey ?? string.Empty;
 
 			mAlbumImagesBasePath = NormalizeFolderPath( pAlbumImagesBasePath );
 			mImages = [];
@@ -103,11 +101,6 @@ namespace ResumeApp.ViewModels.Pages
 				for ( int lCurrentIndex = lStartIndex; lCurrentIndex < lEndIndexExclusive; lCurrentIndex++ )
 				{
 					ImageSource lImage = pImages[ lCurrentIndex ];
-
-					if ( lImage == null )
-					{
-						continue;
-					}
 
 					pTarget.Add( lImage );
 				}
@@ -383,6 +376,7 @@ namespace ResumeApp.ViewModels.Pages
 					var lPaths = new List<string>();
 
 					IDictionaryEnumerator lEnumerator = lResourceReader.GetEnumerator();
+					using var lDisposable = lEnumerator as IDisposable;
 
 					while ( lEnumerator.MoveNext() )
 					{
@@ -477,6 +471,7 @@ namespace ResumeApp.ViewModels.Pages
 			using ( var lResourceReader = new ResourceReader( lGResourcesStream ) )
 			{
 				IDictionaryEnumerator lEnumerator = lResourceReader.GetEnumerator();
+				using var lDisposable = lEnumerator as IDisposable;
 
 				while ( lEnumerator.MoveNext() )
 				{
@@ -556,6 +551,7 @@ namespace ResumeApp.ViewModels.Pages
 			}
 			catch ( Exception )
 			{
+				// ignored
 			}
 
 			foreach ( string lDirectoryPath in EnumerateDirectoryAndParents( lCurrentDirectoryPath, pMaxLevels: 20 ) )
@@ -574,6 +570,7 @@ namespace ResumeApp.ViewModels.Pages
 			}
 			catch ( Exception )
 			{
+				// ignored
 			}
 
 			foreach ( string lDirectoryPath in EnumerateDirectoryAndParents( lExecutingAssemblyDirectoryPath, pMaxLevels: 20 ) )
@@ -775,25 +772,33 @@ namespace ResumeApp.ViewModels.Pages
 
 		private async void InitializeImagesAsync()
 		{
-			if ( mHasInitializedImages || mIsInitializingImages )
-			{
-				return;
-			}
-
-			mIsInitializingImages = true;
-
 			try
 			{
-				List<ImageSource> lImages = await LoadImagesAsync();
-				await ReplaceObservableImagesIncrementallyAsync( mImages, lImages, pBatchSize: 4 );
-				mHasInitializedImages = true;
+				if ( mHasInitializedImages || mIsInitializingImages )
+				{
+					return;
+				}
+
+				mIsInitializingImages = true;
+
+				try
+				{
+					List<ImageSource> lImages = await LoadImagesAsync();
+					await ReplaceObservableImagesIncrementallyAsync( mImages, lImages, pBatchSize: 4 );
+					mHasInitializedImages = true;
+				}
+				catch ( Exception )
+				{
+					// ignored
+				}
+				finally
+				{
+					mIsInitializingImages = false;
+				}
 			}
 			catch ( Exception )
 			{
-			}
-			finally
-			{
-				mIsInitializingImages = false;
+				// ignored
 			}
 		}
 

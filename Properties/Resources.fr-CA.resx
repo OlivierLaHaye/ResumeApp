@@ -614,10 +614,10 @@
     <value>Impact: retours internes très positifs sur le look modernisé, avec une cohérence visuelle renforcée et moins de fragmentation UI à travers le produit.</value>
   </data>
   <data name="Project1Tech" xml:space="preserve">
-    <value>Tech: WPF, XAML, C# 7.3, MVVM</value>
+    <value>Tech: WPF, XAML, C# 13, .NET 9.0, MVVM</value>
   </data>
   <data name="Project1Title" xml:space="preserve">
-    <value>Modernisation UI Creaform.OS (interne)</value>
+    <value>Modernisation UI Creaform.OS</value>
   </data>
   <data name="Project1WhatIBuiltHeader" xml:space="preserve">
     <value>Ce que j’ai fait:</value>
@@ -635,7 +635,7 @@
     <value>Impact: interface plus claire et cohérente, avec une hiérarchie visuelle améliorée et des workflows plus faciles à suivre.</value>
   </data>
   <data name="Project2Tech" xml:space="preserve">
-    <value>Tech: WPF, XAML, C#, MVVM</value>
+    <value>Tech: WPF, XAML, C# 7.3, .NET Framework 4.8.1, MVVM</value>
   </data>
   <data name="Project2Title" xml:space="preserve">
     <value>Refonte UI peel.OS</value>
@@ -659,7 +659,7 @@
     <value>Impact: gains de productivité personnels grâce à la réduction des étapes manuelles répétitives et à une exécution plus rapide des tâches.</value>
   </data>
   <data name="Project3Tech" xml:space="preserve">
-    <value>Tech: WPF, XAML, C# 7.3, MVVM</value>
+    <value>Tech: WPF, XAML, C# 14, .NET 10.0, MVVM</value>
   </data>
   <data name="Project3Title" xml:space="preserve">
     <value>OLHphotographie Workflow App (personnel)</value>
@@ -676,11 +676,14 @@
   <data name="Project4Context" xml:space="preserve">
     <value>Contexte: CV interactif construit en application WPF MVVM avec changement de thème et de langue.</value>
   </data>
+  <data name="Project4Impact" xml:space="preserve">
+    <value>Impact : un CV interactif et facile à parcourir, avec un style cohérent, un mode clair et sombre, et une structure bilingue, pour repérer l’information rapidement.</value>
+  </data>
   <data name="Project4Links" xml:space="preserve">
     <value>Liens: https://github.com/OlivierLaHaye</value>
   </data>
   <data name="Project4Tech" xml:space="preserve">
-    <value>Tech: WPF, XAML, C# 7.3, MVVM, localisation resx</value>
+    <value>Tech: WPF, XAML, C# 14, .NET 10.0, MVVM</value>
   </data>
   <data name="Project4Title" xml:space="preserve">
     <value>App CV WPF (ce CV)</value>

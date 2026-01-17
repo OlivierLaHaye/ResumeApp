@@ -260,9 +260,12 @@
                                     <StackPanel
                                         x:Name="mTechStackPanel"
                                         Grid.Column="1"
+                                        HorizontalAlignment="Right"
                                         Orientation="Vertical">
                                         <TextBlock
                                             x:Name="mTechLabelTextBlock"
+                                            Margin="{StaticResource SmallThickness}"
+                                            HorizontalAlignment="Right"
                                             Style="{StaticResource LabelTextBlockStyle}"
                                             Text="{Binding DataContext.ResourcesService[LabelTech], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
 
@@ -295,7 +298,8 @@
                                     Grid.Row="5"
                                     Margin="{StaticResource SmallThickness}"
                                     Images="{Binding Images}"
-                                    PlaceholderText="{Binding DataContext.ResourcesService[LabelProjectNoImagesYet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                    PlaceholderText="{Binding DataContext.ResourcesService[LabelProjectNoImagesYet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                    Visibility="{Binding Images, Converter={StaticResource CollectionToVisibilityConverter}, TargetNullValue=Collapsed}" />
                             </Grid>
                         </Border>
                     </DataTemplate>
