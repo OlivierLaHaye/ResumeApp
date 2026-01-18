@@ -12,9 +12,21 @@ namespace ResumeApp.Infrastructure
 		private static readonly Lazy<Cursor> sDragLeftRightCursor = new( CreateDragLeftRightCursor );
 		public static Cursor DragLeftRightCursor => sDragLeftRightCursor.Value;
 
-		private static Cursor CreateDragLeftRightCursor()
+		private static readonly Lazy<Cursor> sDraggingCursor = new( CreateDraggingCursor );
+		public static Cursor DraggingCursor => sDraggingCursor.Value;
+
+		private static Cursor CreateDragLeftRightCursor() => CreateCursorFromPackUri( "pack://application:,,,/Resources/DragCustom.cur" );
+
+		private static Cursor CreateDraggingCursor() => CreateCursorFromPackUri( "pack://application:,,,/Resources/DraggingCustom.cur" );
+
+		private static Cursor CreateCursorFromPackUri( string pPackUri )
 		{
-			var lResourceInfo = Application.GetResourceStream( new Uri( "pack://application:,,,/Resources/DragCustom.cur", UriKind.Absolute ) );
+			if ( string.IsNullOrWhiteSpace( pPackUri ) )
+			{
+				return Cursors.Arrow;
+			}
+
+			var lResourceInfo = Application.GetResourceStream( new Uri( pPackUri, UriKind.Absolute ) );
 
 			if ( lResourceInfo?.Stream is not { } lStream )
 			{

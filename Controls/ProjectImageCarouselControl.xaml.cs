@@ -251,7 +251,7 @@ namespace ResumeApp.Controls
 
 		private static ImageSource? ConvertToImageSource( object? pItem )
 		{
-			switch (pItem)
+			switch ( pItem )
 			{
 				case null:
 					{
@@ -412,7 +412,7 @@ namespace ResumeApp.Controls
 			bool lIsScrollingUp = pWheelDelta > 0;
 
 			int lWheelScrollLines = SystemParameters.WheelScrollLines;
-			switch (lWheelScrollLines)
+			switch ( lWheelScrollLines )
 			{
 				case < 0:
 					{
@@ -474,7 +474,7 @@ namespace ResumeApp.Controls
 
 		private static ResourcesService? ExtractResourcesServiceFromDataContext( object? pDataContext )
 		{
-			switch (pDataContext)
+			switch ( pDataContext )
 			{
 				case null:
 					{
@@ -943,7 +943,7 @@ namespace ResumeApp.Controls
 			IList? lImages = Images;
 			if ( lImages is null || lImages.Count == 0 )
 			{
-				return [ ];
+				return [];
 			}
 
 			IEnumerable<ImageSource> lImageSources = lImages.Cast<object?>()
@@ -1047,7 +1047,7 @@ namespace ResumeApp.Controls
 			}
 
 			mPreviousCursor = Cursor;
-			Cursor = CustomCursors.DragLeftRightCursor;
+			Cursor = CustomCursors.DraggingCursor;
 
 			pMouseButtonEventArgs.Handled = true;
 		}
