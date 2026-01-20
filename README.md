@@ -49,9 +49,20 @@ To reset to defaults:
 
 ### Prerequisites
 
-- Visual Studio 2019 or 2022
+Recommended:
+- Visual Studio 2026
 - Workload: .NET desktop development
-- Targeting pack: .NET Framework 4.8
+- .NET SDK: .NET 10 (Windows)
+
+Visual Studio 2022 option:
+- Visual Studio 2022
+- Workload: .NET desktop development
+- Recommended target: .NET 9 (Windows)
+
+Note about Visual Studio 2022:
+- If the solution targets .NET 10, VS2022 may not fully support the project system and tooling.
+- A workaround is to retarget the project to .NET 9 (Windows), for example `net9.0-windows`.
+- This should work in many cases, but it is not guaranteed depending on your dependencies and features used.
 
 ### Build
 
@@ -149,9 +160,20 @@ Pour revenir aux valeurs par défaut :
 
 ### Prérequis
 
-- Visual Studio 2019 ou 2022
+Recommandé :
+- Visual Studio 2026
 - Workload : .NET desktop development
-- Targeting pack : .NET Framework 4.8
+- .NET SDK : .NET 10 (Windows)
+
+Option Visual Studio 2022 :
+- Visual Studio 2022
+- Workload : .NET desktop development
+- Cible recommandée : .NET 9 (Windows)
+
+Note pour Visual Studio 2022 :
+- Si la solution cible .NET 10, VS2022 peut ne pas supporter complètement le projet et l’outillage.
+- Un contournement est de retargeter le projet vers .NET 9 (Windows), par exemple `net9.0-windows`.
+- Ça peut fonctionner dans beaucoup de cas, mais ce n’est pas garanti selon tes dépendances et les features utilisées.
 
 ### Build
 
@@ -182,7 +204,7 @@ Les projets et les albums affichent des images via un contrôle de carrousel.
 
 Pour ajouter ou mettre à jour des images :
 - Place les images dans les dossiers `Resources\...` appropriés.
-- Assure-toi que les fichiers sont inclus comme Resources dans le projet et copiés au besoin.
+- Assure-toi que les fichiers sont inclus comme Resources dans le projet file et copiés au besoin.
 
 ## Dépannage
 
