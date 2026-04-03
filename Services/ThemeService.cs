@@ -1,6 +1,7 @@
 // Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Win32;
 using ResumeApp.Infrastructure;
 using System.Runtime.Versioning;
@@ -29,6 +30,7 @@ namespace ResumeApp.Services
 			Instance ??= this;
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Creates ResourceDictionary from XAML Source URI requiring compiled BAML resources." )]
 		private static ResourceDictionary? LoadThemeDictionary( AppTheme pTheme )
 		{
 			try
@@ -47,6 +49,7 @@ namespace ResumeApp.Services
 			return null;
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Accesses Application.Resources.MergedDictionaries requiring a running WPF Application." )]
 		private static void ReplaceMergedDictionary(
 			Application pApplication,
 			ResourceDictionary pNewDictionary,
@@ -62,6 +65,7 @@ namespace ResumeApp.Services
 			pApplication.Resources.MergedDictionaries.Add( pNewDictionary );
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Inspects ResourceDictionary.Source URIs for theme detection." )]
 		private static bool IsThemeDictionary( ResourceDictionary? pDictionary )
 		{
 			Uri? lSource = pDictionary?.Source;
@@ -75,6 +79,7 @@ namespace ResumeApp.Services
 			return lOriginalString.IndexOf( "Theme.", StringComparison.OrdinalIgnoreCase ) >= 0;
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Windows-only code path using Registry.CurrentUser for theme detection; unreachable on non-Windows CI." )]
 		[SupportedOSPlatform( "windows" )]
 		private static AppTheme DetectWindowsAppThemeWindows()
 		{
@@ -101,6 +106,7 @@ namespace ResumeApp.Services
 			return AppTheme.Light;
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Delegates to Windows-only theme detection using Registry." )]
 		private static AppTheme DetectWindowsAppTheme()
 		{
 			return OperatingSystem.IsWindows()
@@ -108,6 +114,7 @@ namespace ResumeApp.Services
 				: AppTheme.Light;
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Applies theme to Application via ResourceDictionary replacement requiring a running WPF Application; null-guard tested separately." )]
 		public void Initialize( Application pApplication )
 		{
 			ArgumentNullException.ThrowIfNull( pApplication );
@@ -121,6 +128,7 @@ namespace ResumeApp.Services
 			ApplyTheme( pApplication, DetectWindowsAppTheme(), true );
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Applies toggled theme to Application via ResourceDictionary replacement requiring a running WPF Application; null-guard tested separately." )]
 		public void ToggleTheme( Application pApplication )
 		{
 			ArgumentNullException.ThrowIfNull( pApplication );
@@ -129,6 +137,7 @@ namespace ResumeApp.Services
 			ApplyTheme( pApplication, lNewTheme, false );
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Orchestrates ResourceDictionary replacement on Application requiring a running WPF Application." )]
 		private void ApplyTheme( Application pApplication, AppTheme pTheme, bool pIsInitialization )
 		{
 			if ( ActiveTheme == pTheme && !pIsInitialization )

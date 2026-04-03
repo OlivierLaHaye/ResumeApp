@@ -1,6 +1,7 @@
 // Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Win32;
 using System.Runtime.Versioning;
 
@@ -85,6 +86,7 @@ public static class RegistrySettingsService
 		}
 	}
 
+	[ExcludeFromCodeCoverage( Justification = "Windows-only code path using Registry.CurrentUser; unreachable on non-Windows CI." )]
 	[SupportedOSPlatform( "windows" )]
 	private static string LoadStringValueOnWindows( string pValueName )
 	{
@@ -92,6 +94,7 @@ public static class RegistrySettingsService
 		return lKey.GetValue( pValueName ) as string ?? string.Empty;
 	}
 
+	[ExcludeFromCodeCoverage( Justification = "Windows-only code path using Registry.CurrentUser; unreachable on non-Windows CI." )]
 	[SupportedOSPlatform( "windows" )]
 	private static void SaveStringValueOnWindows( string pValueName, string pValue )
 	{

@@ -30,13 +30,37 @@ public sealed class ThemeServiceTests
     }
 
     [Fact]
-    public void PropertyChanged_RaisedWhenActiveThemeChanges()
+    public void ActiveTheme_SetToDark_RaisesPropertyChanged()
     {
         var lService = new ThemeService();
         var lRaisedProperties = new List<string?>();
         lService.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
 
-        // ActiveTheme is private set, so we just verify the property changed infrastructure works
+        lService.ActiveTheme = AppTheme.Dark;
+
+        Assert.Equal( AppTheme.Dark, lService.ActiveTheme );
+        Assert.Contains( "ActiveTheme", lRaisedProperties );
+    }
+
+    [Fact]
+    public void IsDarkThemeActive_WhenDark_ReturnsTrue()
+    {
+        var lService = new ThemeService();
+
+        lService.ActiveTheme = AppTheme.Dark;
+
+        Assert.True( lService.IsDarkThemeActive );
+    }
+
+    [Fact]
+    public void ActiveTheme_SameValue_DoesNotRaisePropertyChanged()
+    {
+        var lService = new ThemeService();
+        var lRaisedProperties = new List<string?>();
+        lService.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
+
+        lService.ActiveTheme = AppTheme.Light; // same as default
+
         Assert.Empty( lRaisedProperties );
     }
 
