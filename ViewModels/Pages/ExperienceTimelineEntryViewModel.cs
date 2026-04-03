@@ -1,6 +1,7 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using ResumeApp.Infrastructure;
 using ResumeApp.Services;
 using System.Collections.ObjectModel;
@@ -115,6 +116,7 @@ namespace ResumeApp.ViewModels.Pages
 				.ToList();
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Reads from Application.Current.Resources which requires a running WPF Application instance." )]
 		private static double GetDoubleResourceOrDefault( string pKey, double pDefault )
 		{
 			return Application.Current?.Resources[ pKey ] is double lValue ? lValue : pDefault;

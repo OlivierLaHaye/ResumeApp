@@ -44,4 +44,28 @@ public sealed class EducationPageViewModelTests
         Assert.Contains( "PageTitleText", lRaisedProperties );
         Assert.Contains( "PageSubtitleText", lRaisedProperties );
     }
+
+    [Fact]
+    public void BuildKeys_ValidPrefixAndCount_ReturnsKeys()
+    {
+        var lResult = EducationPageViewModel.BuildKeys( "Item", 2 ).ToList();
+
+        Assert.Equal( 2, lResult.Count );
+        Assert.Equal( "Item1", lResult[0] );
+        Assert.Equal( "Item2", lResult[1] );
+    }
+
+    [Fact]
+    public void BuildKeys_EmptyOrNullPrefix_ReturnsEmpty()
+    {
+        Assert.Empty( EducationPageViewModel.BuildKeys( "", 5 ) );
+        Assert.Empty( EducationPageViewModel.BuildKeys( "  ", 5 ) );
+    }
+
+    [Fact]
+    public void BuildKeys_ZeroOrNegativeCount_ReturnsEmpty()
+    {
+        Assert.Empty( EducationPageViewModel.BuildKeys( "Prefix", 0 ) );
+        Assert.Empty( EducationPageViewModel.BuildKeys( "Prefix", -1 ) );
+    }
 }

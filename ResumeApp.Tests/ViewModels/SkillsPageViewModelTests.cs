@@ -44,4 +44,27 @@ public sealed class SkillsPageViewModelTests
         Assert.Contains( "PageTitleText", lRaisedProperties );
         Assert.Contains( "PageSubtitleText", lRaisedProperties );
     }
+
+    [Fact]
+    public void BuildKeys_ValidPrefixAndCount_ReturnsKeys()
+    {
+        var lResult = SkillsPageViewModel.BuildKeys( "Item", 3 );
+
+        Assert.Equal( 3, lResult.Length );
+        Assert.Equal( "Item1", lResult[0] );
+    }
+
+    [Fact]
+    public void BuildKeys_EmptyPrefix_ReturnsEmpty()
+    {
+        Assert.Empty( SkillsPageViewModel.BuildKeys( "", 5 ) );
+        Assert.Empty( SkillsPageViewModel.BuildKeys( "  ", 5 ) );
+    }
+
+    [Fact]
+    public void BuildKeys_ZeroOrNegativeCount_ReturnsEmpty()
+    {
+        Assert.Empty( SkillsPageViewModel.BuildKeys( "Prefix", 0 ) );
+        Assert.Empty( SkillsPageViewModel.BuildKeys( "Prefix", -1 ) );
+    }
 }

@@ -129,6 +129,7 @@ namespace ResumeApp.ViewModels.Pages
 			mResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Async image loading pipeline using ImageSource and Task.Delay for incremental UI updates." )]
 		private static async Task ReplaceObservableImagesIncrementallyAsync( ICollection<ImageSource>? pTarget, List<ImageSource?> pImages, int pBatchSize )
 		{
 			if ( pTarget == null )
@@ -165,7 +166,7 @@ namespace ResumeApp.ViewModels.Pages
 			}
 		}
 
-		private static string ExtractValueAfterFirstColon( string pText )
+		internal static string ExtractValueAfterFirstColon( string pText )
 		{
 			if ( string.IsNullOrWhiteSpace( pText ) )
 			{
@@ -225,6 +226,7 @@ namespace ResumeApp.ViewModels.Pages
 			}
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Uses Assembly.GetEntryAssembly which returns null or test runner assembly in unit tests." )]
 		private static string GetEntryAssemblyName()
 		{
 			Assembly? lEntryAssembly = Assembly.GetEntryAssembly();
@@ -233,7 +235,7 @@ namespace ResumeApp.ViewModels.Pages
 			return string.IsNullOrWhiteSpace( lAssemblyName ) ? "ResumeApp" : lAssemblyName;
 		}
 
-		private static string NormalizeRelativePath( string? pRelativePath )
+		internal static string NormalizeRelativePath( string? pRelativePath )
 		{
 			string lRelativePath = ( pRelativePath ?? string.Empty ).Trim();
 
@@ -261,6 +263,7 @@ namespace ResumeApp.ViewModels.Pages
 			return ( lRelativePath ?? string.Empty ).Trim().TrimStart( '/', '\\' ).Replace( "\\", "/" );
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Uses Assembly.GetEntryAssembly/GetManifestResourceStream and ResourceReader requiring compiled assembly resources." )]
 		private static HashSet<string>? GetAvailableResourceRelativePathsOrNull()
 		{
 			lock ( sResourceIndexLock )
@@ -325,6 +328,7 @@ namespace ResumeApp.ViewModels.Pages
 			}
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Delegates to GetAvailableResourceRelativePathsOrNull which requires compiled assembly resources." )]
 		private static bool HasResourceRelativePath( string pRelativePath )
 		{
 			HashSet<string>? lAvailablePaths = GetAvailableResourceRelativePathsOrNull();
@@ -339,6 +343,7 @@ namespace ResumeApp.ViewModels.Pages
 			return !string.IsNullOrWhiteSpace( lNormalized ) && lAvailablePaths.Contains( lNormalized );
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Constructs pack:// URIs using Assembly names requiring compiled assembly context." )]
 		private static string BuildPackUriText( string pRelativePath )
 		{
 			string lNormalizedPath = NormalizeRelativePath( pRelativePath );
@@ -353,6 +358,7 @@ namespace ResumeApp.ViewModels.Pages
 			return $"pack://application:,,,/{lAssemblyName};component/{lNormalizedPath}";
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Delegates to BuildPackUriText which constructs pack:// URIs requiring assembly context." )]
 		private static string BuildImageUriText( string? pPackOrRelativePath )
 		{
 			string lValue = ( pPackOrRelativePath ?? string.Empty ).Trim();
@@ -365,6 +371,7 @@ namespace ResumeApp.ViewModels.Pages
 			return lValue.StartsWith( "pack://", StringComparison.OrdinalIgnoreCase ) ? lValue : BuildPackUriText( lValue );
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Creates BitmapImage from pack:// URIs requiring WPF resource loading." )]
 		private static ImageSource? TryCreateImageSource( string? pPackOrRelativePath )
 		{
 			string lValue = ( pPackOrRelativePath ?? string.Empty ).Trim();
@@ -407,7 +414,7 @@ namespace ResumeApp.ViewModels.Pages
 			return null;
 		}
 
-		private static bool IsKnownImageExtension( string? pPath )
+		internal static bool IsKnownImageExtension( string? pPath )
 		{
 			string lPath = ( pPath ?? string.Empty ).Trim();
 
@@ -429,7 +436,7 @@ namespace ResumeApp.ViewModels.Pages
 				string.Equals( pSupportedExtension, lExtension, StringComparison.OrdinalIgnoreCase ) );
 		}
 
-		private static string BuildProjectImagesBasePath( string? pProjectImagesBaseName )
+		internal static string BuildProjectImagesBasePath( string? pProjectImagesBaseName )
 		{
 			string lProjectImagesBaseName = ( pProjectImagesBaseName ?? string.Empty ).Trim().TrimStart( '/' );
 
@@ -443,6 +450,7 @@ namespace ResumeApp.ViewModels.Pages
 			return lLooksLikeAPath ? lProjectImagesBaseName.Replace( "\\", "/" ).TrimStart( '/' ) : $"Resources/Projects/{lProjectImagesBaseName}/{lProjectImagesBaseName}";
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Delegates to TryCreateImageSource which creates BitmapImage from pack:// URIs." )]
 		private static ImageSource?[] BuildImageSourcesFromBasePathOrDescriptor( string? pImagesDescriptorOrBasePath )
 		{
 			string lValueText = ( pImagesDescriptorOrBasePath ?? string.Empty ).Trim();
@@ -474,6 +482,7 @@ namespace ResumeApp.ViewModels.Pages
 			return lSingleImage == null ? [] : [ lSingleImage ];
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Delegates to TryCreateImageSource which creates BitmapImage from pack:// URIs." )]
 		private static IEnumerable<ImageSource> EnumerateIndexedImagesFromBasePath( string? pImagesBasePath )
 		{
 			string lBasePath = ( pImagesBasePath ?? string.Empty ).Trim();
@@ -499,6 +508,7 @@ namespace ResumeApp.ViewModels.Pages
 			}
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Delegates to TryCreateImageSource which creates BitmapImage from pack:// URIs." )]
 		private static ImageSource? TryCreateFirstExistingIndexedImage( string? pIndexedPrefix, int pImageIndex )
 		{
 			string lIndexedPrefix = ( pIndexedPrefix ?? string.Empty ).Trim();
@@ -511,6 +521,7 @@ namespace ResumeApp.ViewModels.Pages
 			EnsureImagesInitializationQueuedIfNeeded( DispatcherPriority.ContextIdle );
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Uses Application.Current.Dispatcher.BeginInvoke requiring a running WPF Dispatcher." )]
 		private void EnsureImagesInitializationQueuedIfNeeded( DispatcherPriority pPriority )
 		{
 			if ( mHasInitializedImages || mHasQueuedImageInitialization )
@@ -530,6 +541,7 @@ namespace ResumeApp.ViewModels.Pages
 			lDispatcher.BeginInvoke( new Action( InitializeImagesAsync ), pPriority );
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Async void image loading pipeline using Task.Run, BitmapImage, and Dispatcher integration." )]
 		private async void InitializeImagesAsync()
 		{
 			if ( mHasInitializedImages || mIsInitializingImages )
@@ -569,6 +581,7 @@ namespace ResumeApp.ViewModels.Pages
 			}
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Calls Process.Start with UseShellExecute requiring a running desktop shell." )]
 		private void ExecuteOpenProjectLink()
 		{
 			if ( !IsProjectLinkButtonVisible )

@@ -88,28 +88,55 @@ public sealed class ExperiencePageViewModelTests
     public void SetSelectedDate_SynchronizesTimelineEntry()
     {
         var lViewModel = Create();
+        Assert.True( lViewModel.TimelineEntries.Count > 1, "Test requires multiple timeline entries" );
 
-        if ( lViewModel.TimelineEntries.Count > 1 )
-        {
-            var lSecondEntry = lViewModel.TimelineEntries[1];
-            lViewModel.SelectedDate = lSecondEntry.StartDate;
+        var lSecondEntry = lViewModel.TimelineEntries[1];
+        lViewModel.SelectedDate = lSecondEntry.StartDate;
 
-            Assert.NotNull( lViewModel.SelectedTimelineEntry );
-        }
+        Assert.NotNull( lViewModel.SelectedTimelineEntry );
+    }
+
+    [Fact]
+    public void SetSelectedDate_AtExactMinDate_DoesNotClampFurther()
+    {
+        var lViewModel = Create();
+
+        lViewModel.SelectedDate = lViewModel.TimelineMinDate;
+
+        Assert.Equal( lViewModel.TimelineMinDate, lViewModel.SelectedDate );
+    }
+
+    [Fact]
+    public void SetSelectedDate_AtExactToday_DoesNotClampFurther()
+    {
+        var lViewModel = Create();
+
+        lViewModel.SelectedDate = DateTime.Today;
+
+        Assert.Equal( DateTime.Today, lViewModel.SelectedDate );
+    }
+
+    [Fact]
+    public void SetSelectedDate_WithinRange_AcceptsValue()
+    {
+        var lViewModel = Create();
+        var lMidDate = lViewModel.TimelineMinDate.AddDays( 30 );
+
+        lViewModel.SelectedDate = lMidDate;
+
+        Assert.Equal( lMidDate.Date, lViewModel.SelectedDate );
     }
 
     [Fact]
     public void SetSelectedTimeFrame_SynchronizesDate()
     {
         var lViewModel = Create();
+        Assert.True( lViewModel.ExperienceTimeFrames.Count > 1, "Test requires multiple time frames" );
 
-        if ( lViewModel.ExperienceTimeFrames.Count > 1 )
-        {
-            var lSecondFrame = lViewModel.ExperienceTimeFrames[1];
-            lViewModel.SelectedTimeFrame = lSecondFrame;
+        var lSecondFrame = lViewModel.ExperienceTimeFrames[1];
+        lViewModel.SelectedTimeFrame = lSecondFrame;
 
-            Assert.Equal( lSecondFrame.StartDate, lViewModel.SelectedDate );
-        }
+        Assert.Equal( lSecondFrame.StartDate, lViewModel.SelectedDate );
     }
 
     [Fact]
@@ -174,14 +201,13 @@ public sealed class ExperiencePageViewModelTests
     public void SelectExperienceCommand_WithEntry_SetsSelectedTimelineEntry()
     {
         var lViewModel = Create();
+        Assert.True( lViewModel.TimelineEntries.Count > 1, "Test requires multiple entries" );
 
-        if ( lViewModel.TimelineEntries.Count > 1 )
-        {
-            var lEntry = lViewModel.TimelineEntries[1];
-            lViewModel.SelectExperienceCommand.Execute( lEntry );
+        var lEntry = lViewModel.TimelineEntries[1];
+        lViewModel.SelectExperienceCommand.Execute( lEntry );
 
-            Assert.Same( lEntry, lViewModel.SelectedTimelineEntry );
-        }
+        Assert.Same( lEntry, lViewModel.SelectedTimelineEntry );
+        Assert.Equal( lEntry.StartDate, lViewModel.SelectedDate );
     }
 
     [StaFact]
@@ -228,12 +254,97 @@ public sealed class ExperiencePageViewModelTests
         Assert.Equal( lBefore, lViewModel.SelectedDate );
     }
 
+    [StaFact]
+    public void SelectDateCommand_WithUnparseableString_DoesNothing()
+    {
+        var lViewModel = Create();
+        var lBefore = lViewModel.SelectedDate;
+
+        lViewModel.SelectDateCommand.Execute( "not-a-date" );
+
+        Assert.Equal( lBefore, lViewModel.SelectedDate );
+    }
+
+    [StaFact]
+    public void SelectDateCommand_WithNull_DoesNothing()
+    {
+        var lViewModel = Create();
+        var lBefore = lViewModel.SelectedDate;
+
+        lViewModel.SelectDateCommand.Execute( null );
+
+        Assert.Equal( lBefore, lViewModel.SelectedDate );
+    }
+
+    [StaFact]
+    public void SelectExperienceCommand_WithNull_DoesNothing()
+    {
+        var lViewModel = Create();
+        var lBefore = lViewModel.SelectedTimelineEntry;
+
+        lViewModel.SelectExperienceCommand.Execute( null );
+
+        Assert.Same( lBefore, lViewModel.SelectedTimelineEntry );
+    }
+
     [Fact]
     public void TimelineControlInteractionsHelpText_ReturnsValue()
     {
         var lViewModel = Create();
 
         Assert.NotNull( lViewModel.TimelineControlInteractionsHelpText );
+    }
+
+    [Fact]
+    public void SetSelectedTimelineEntry_WithDifferentEntry_SynchronizesDate()
+    {
+        var lViewModel = Create();
+        Assert.True( lViewModel.TimelineEntries.Count > 1, "Test requires multiple entries" );
+
+        var lNewEntry = lViewModel.TimelineEntries[1];
+        lViewModel.SelectedTimelineEntry = lNewEntry;
+
+        Assert.Same( lNewEntry, lViewModel.SelectedTimelineEntry );
+        Assert.Equal( lNewEntry.StartDate, lViewModel.SelectedDate );
+    }
+
+    [Fact]
+    public void SelectedDate_RaisesPropertyChanged()
+    {
+        var lViewModel = Create();
+        var lRaisedProperties = new List<string?>();
+        lViewModel.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
+        var lNewDate = lViewModel.TimelineMinDate.AddDays( 60 );
+
+        lViewModel.SelectedDate = lNewDate;
+
+        Assert.Contains( "SelectedDate", lRaisedProperties );
+    }
+
+    [Fact]
+    public void SelectedTimeFrame_RaisesPropertyChanged()
+    {
+        var lViewModel = Create();
+        Assert.True( lViewModel.ExperienceTimeFrames.Count > 1, "Test requires multiple frames" );
+        var lRaisedProperties = new List<string?>();
+        lViewModel.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
+
+        lViewModel.SelectedTimeFrame = lViewModel.ExperienceTimeFrames[1];
+
+        Assert.Contains( "SelectedTimeFrame", lRaisedProperties );
+    }
+
+    [Fact]
+    public void SelectedTimelineEntry_RaisesPropertyChanged()
+    {
+        var lViewModel = Create();
+        Assert.True( lViewModel.TimelineEntries.Count > 1, "Test requires multiple entries" );
+        var lRaisedProperties = new List<string?>();
+        lViewModel.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
+
+        lViewModel.SelectedTimelineEntry = lViewModel.TimelineEntries[1];
+
+        Assert.Contains( "SelectedTimelineEntry", lRaisedProperties );
     }
 
     [Fact]

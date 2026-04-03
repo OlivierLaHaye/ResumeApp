@@ -151,4 +151,92 @@ public sealed class OverviewPageViewModelTests
         Assert.Contains( "FullNameText", lRaisedProperties );
         Assert.Contains( "ComposeEmailButtonText", lRaisedProperties );
     }
+
+    [Fact]
+    public void BuildKeys_ValidPrefixAndCount_ReturnsKeys()
+    {
+        var lResult = OverviewPageViewModel.BuildKeys( "Item", 3 ).ToList();
+
+        Assert.Equal( 3, lResult.Count );
+        Assert.Equal( "Item1", lResult[0] );
+        Assert.Equal( "Item2", lResult[1] );
+        Assert.Equal( "Item3", lResult[2] );
+    }
+
+    [Fact]
+    public void BuildKeys_EmptyPrefix_ReturnsEmpty()
+    {
+        Assert.Empty( OverviewPageViewModel.BuildKeys( "", 5 ) );
+        Assert.Empty( OverviewPageViewModel.BuildKeys( "  ", 5 ) );
+        Assert.Empty( OverviewPageViewModel.BuildKeys( null!, 5 ) );
+    }
+
+    [Fact]
+    public void BuildKeys_ZeroOrNegativeCount_ReturnsEmpty()
+    {
+        Assert.Empty( OverviewPageViewModel.BuildKeys( "Prefix", 0 ) );
+        Assert.Empty( OverviewPageViewModel.BuildKeys( "Prefix", -1 ) );
+    }
+
+    [Fact]
+    public void BuildMailtoUri_PlainEmail_AddsPrefix()
+    {
+        Assert.Equal( "mailto:test@example.com", OverviewPageViewModel.BuildMailtoUri( "test@example.com" ) );
+    }
+
+    [Fact]
+    public void BuildMailtoUri_AlreadyHasPrefix_ReturnsAsIs()
+    {
+        Assert.Equal( "mailto:test@example.com", OverviewPageViewModel.BuildMailtoUri( "mailto:test@example.com" ) );
+    }
+
+    [Fact]
+    public void BuildMailtoUri_Empty_ReturnsEmpty()
+    {
+        Assert.Equal( string.Empty, OverviewPageViewModel.BuildMailtoUri( "" ) );
+        Assert.Equal( string.Empty, OverviewPageViewModel.BuildMailtoUri( "  " ) );
+    }
+
+    [Fact]
+    public void NormalizeUrl_AbsoluteUrl_ReturnsAbsoluteUri()
+    {
+        string lResult = OverviewPageViewModel.NormalizeUrl( "https://example.com" );
+
+        Assert.Equal( "https://example.com/", lResult );
+    }
+
+    [Fact]
+    public void NormalizeUrl_RelativeUrl_AddsHttpsPrefix()
+    {
+        string lResult = OverviewPageViewModel.NormalizeUrl( "example.com" );
+
+        Assert.Equal( "https://example.com/", lResult );
+    }
+
+    [Fact]
+    public void NormalizeUrl_Empty_ReturnsEmpty()
+    {
+        Assert.Equal( string.Empty, OverviewPageViewModel.NormalizeUrl( "" ) );
+        Assert.Equal( string.Empty, OverviewPageViewModel.NormalizeUrl( "  " ) );
+    }
+
+    [StaFact]
+    public void ComposeEmailCommand_Execute_WithValidEmail_DoesNotThrow()
+    {
+        var lViewModel = Create();
+
+        var lException = Record.Exception( () => lViewModel.ComposeEmailCommand.Execute( "test@example.com" ) );
+
+        Assert.Null( lException );
+    }
+
+    [StaFact]
+    public void OpenUrlCommand_Execute_WithValidUrl_DoesNotThrow()
+    {
+        var lViewModel = Create();
+
+        var lException = Record.Exception( () => lViewModel.OpenUrlCommand.Execute( "https://example.com" ) );
+
+        Assert.Null( lException );
+    }
 }

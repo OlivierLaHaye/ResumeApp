@@ -166,4 +166,103 @@ public sealed class ProjectCardViewModelTests
         // Only "Item[]" triggers refresh - other property changes from ResourcesService are ignored
         Assert.DoesNotContain( "TitleText", lRaisedProperties );
     }
+
+    [Fact]
+    public void ExtractValueAfterFirstColon_WithColon_ReturnsValueAfter()
+    {
+        Assert.Equal( "value", ProjectCardViewModel.ExtractValueAfterFirstColon( "key: value" ) );
+    }
+
+    [Fact]
+    public void ExtractValueAfterFirstColon_NoColon_ReturnsTrimmedText()
+    {
+        Assert.Equal( "nocolon", ProjectCardViewModel.ExtractValueAfterFirstColon( "nocolon" ) );
+    }
+
+    [Fact]
+    public void ExtractValueAfterFirstColon_ColonAtEnd_ReturnsEmpty()
+    {
+        Assert.Equal( string.Empty, ProjectCardViewModel.ExtractValueAfterFirstColon( "key:" ) );
+    }
+
+    [Fact]
+    public void ExtractValueAfterFirstColon_Empty_ReturnsEmpty()
+    {
+        Assert.Equal( string.Empty, ProjectCardViewModel.ExtractValueAfterFirstColon( "" ) );
+        Assert.Equal( string.Empty, ProjectCardViewModel.ExtractValueAfterFirstColon( "  " ) );
+    }
+
+    [Fact]
+    public void NormalizeRelativePath_StandardPath_NormalizesSlashes()
+    {
+        Assert.Equal( "Resources/Images/test.png", ProjectCardViewModel.NormalizeRelativePath( @"Resources\Images\test.png" ) );
+    }
+
+    [Fact]
+    public void NormalizeRelativePath_LeadingSlashes_Strips()
+    {
+        Assert.Equal( "test.png", ProjectCardViewModel.NormalizeRelativePath( "/test.png" ) );
+        Assert.Equal( "test.png", ProjectCardViewModel.NormalizeRelativePath( @"\test.png" ) );
+    }
+
+    [Fact]
+    public void NormalizeRelativePath_NullOrEmpty_ReturnsEmpty()
+    {
+        Assert.Equal( string.Empty, ProjectCardViewModel.NormalizeRelativePath( null ) );
+        Assert.Equal( string.Empty, ProjectCardViewModel.NormalizeRelativePath( "" ) );
+        Assert.Equal( string.Empty, ProjectCardViewModel.NormalizeRelativePath( "  " ) );
+    }
+
+    [Fact]
+    public void NormalizeRelativePath_OnlySlashes_ReturnsEmpty()
+    {
+        Assert.Equal( string.Empty, ProjectCardViewModel.NormalizeRelativePath( "/" ) );
+        Assert.Equal( string.Empty, ProjectCardViewModel.NormalizeRelativePath( @"\" ) );
+    }
+
+    [Fact]
+    public void IsKnownImageExtension_SupportedExtensions_ReturnsTrue()
+    {
+        Assert.True( ProjectCardViewModel.IsKnownImageExtension( "test.png" ) );
+        Assert.True( ProjectCardViewModel.IsKnownImageExtension( "test.jpg" ) );
+        Assert.True( ProjectCardViewModel.IsKnownImageExtension( "test.jpeg" ) );
+        Assert.True( ProjectCardViewModel.IsKnownImageExtension( "test.bmp" ) );
+        Assert.True( ProjectCardViewModel.IsKnownImageExtension( "test.gif" ) );
+        Assert.True( ProjectCardViewModel.IsKnownImageExtension( "test.tif" ) );
+        Assert.True( ProjectCardViewModel.IsKnownImageExtension( "test.tiff" ) );
+    }
+
+    [Fact]
+    public void IsKnownImageExtension_UnsupportedOrMissing_ReturnsFalse()
+    {
+        Assert.False( ProjectCardViewModel.IsKnownImageExtension( "test.txt" ) );
+        Assert.False( ProjectCardViewModel.IsKnownImageExtension( "nodot" ) );
+        Assert.False( ProjectCardViewModel.IsKnownImageExtension( "endswithdot." ) );
+        Assert.False( ProjectCardViewModel.IsKnownImageExtension( "" ) );
+        Assert.False( ProjectCardViewModel.IsKnownImageExtension( null ) );
+    }
+
+    [Fact]
+    public void BuildProjectImagesBasePath_SimpleName_BuildsResourcePath()
+    {
+        string lResult = ProjectCardViewModel.BuildProjectImagesBasePath( "MyProject" );
+
+        Assert.Equal( "Resources/Projects/MyProject/MyProject", lResult );
+    }
+
+    [Fact]
+    public void BuildProjectImagesBasePath_PathWithSlash_ReturnsNormalized()
+    {
+        string lResult = ProjectCardViewModel.BuildProjectImagesBasePath( "Resources/Custom/MyProject" );
+
+        Assert.Equal( "Resources/Custom/MyProject", lResult );
+    }
+
+    [Fact]
+    public void BuildProjectImagesBasePath_NullOrEmpty_ReturnsEmpty()
+    {
+        Assert.Equal( string.Empty, ProjectCardViewModel.BuildProjectImagesBasePath( null ) );
+        Assert.Equal( string.Empty, ProjectCardViewModel.BuildProjectImagesBasePath( "" ) );
+        Assert.Equal( string.Empty, ProjectCardViewModel.BuildProjectImagesBasePath( "  " ) );
+    }
 }

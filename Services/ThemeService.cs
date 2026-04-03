@@ -18,7 +18,7 @@ namespace ResumeApp.Services
 		public AppTheme ActiveTheme
 		{
 			get => mActiveTheme;
-			private set => SetProperty( ref mActiveTheme, value );
+			internal set => SetProperty( ref mActiveTheme, value );
 		}
 
 		public bool IsDarkThemeActive => ActiveTheme == AppTheme.Dark;

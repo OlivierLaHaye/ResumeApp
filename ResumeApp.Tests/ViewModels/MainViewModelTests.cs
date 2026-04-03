@@ -215,9 +215,44 @@ public sealed class MainViewModelTests
         var lRaisedProperties = new List<string?>();
         lViewModel.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
 
-        // ThemeService property changes should propagate
-        // ActiveTheme is private set, verified by checking infrastructure works
-        Assert.NotNull( lViewModel.ThemeService );
+        lThemeService.ActiveTheme = AppTheme.Dark;
+
+        Assert.Contains( "IsDarkThemeActive", lRaisedProperties );
+        Assert.True( lViewModel.IsDarkThemeActive );
+    }
+
+    [Fact]
+    public void ThemeServicePropertyChanged_BackToLight_RaisesIsDarkThemeActive()
+    {
+        var lResourcesService = new ResourcesService();
+        var lThemeService = new ThemeService();
+        var lViewModel = Create( pResourcesService: lResourcesService, pThemeService: lThemeService );
+        lThemeService.ActiveTheme = AppTheme.Dark;
+        var lRaisedProperties = new List<string?>();
+        lViewModel.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
+
+        lThemeService.ActiveTheme = AppTheme.Light;
+
+        Assert.Contains( "IsDarkThemeActive", lRaisedProperties );
+        Assert.False( lViewModel.IsDarkThemeActive );
+    }
+
+    [Fact]
+    public void ResourcesServicePropertyChanged_NonItemArray_DoesNotRaiseActiveLanguageDisplayName()
+    {
+        var lResourcesService = new ResourcesService();
+        var lThemeService = new ThemeService();
+        var lViewModel = Create( pResourcesService: lResourcesService, pThemeService: lThemeService );
+        var lRaisedProperties = new List<string?>();
+        lViewModel.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
+
+        // Setting language raises multiple PropertyChanged events including "ActiveCulture"
+        // which should be filtered out by the OnResourcesServicePropertyChanged guard
+        lResourcesService.SetLanguage( AppLanguage.FrenchCanada );
+
+        // "ActiveLanguageDisplayName" should appear (from Item[] event) but not duplicated for non-Item[] events
+        int lActiveLanguageCount = lRaisedProperties.Count( pName => pName == "ActiveLanguageDisplayName" );
+        Assert.Equal( 1, lActiveLanguageCount );
     }
 
     [Fact]
