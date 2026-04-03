@@ -86,6 +86,16 @@ public sealed class ProjectImageCarouselAdjacentImagesVisualServiceTests
     }
 
     [Fact]
+    public void GetSlotVisualTargets_Step1_Direction0_TranslateIsZero()
+    {
+        var lResult = ProjectImageCarouselAdjacentImagesVisualService.GetSlotVisualTargets( 1, 0, 1000.0 );
+
+        Assert.Equal( 0.0, lResult.TranslateX );
+        Assert.True( lResult.Scale < 1.0 );
+        Assert.True( lResult.Opacity < 1.0 );
+    }
+
+    [Fact]
     public void ProjectImageCarouselSlotVisualTargets_Struct_StoresValues()
     {
         var lTargets = new ProjectImageCarouselSlotVisualTargets( 0.5, 0.7, 100.0 );

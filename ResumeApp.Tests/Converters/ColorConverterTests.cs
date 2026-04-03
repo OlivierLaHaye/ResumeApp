@@ -54,6 +54,20 @@ public sealed class IsDarkBrushConverterTests
     }
 
     [StaFact]
+    public void Convert_DrawingBrush_ReturnsBool()
+    {
+        var lConverter = new IsDarkBrushConverter();
+        var lDrawingGroup = new DrawingGroup();
+        lDrawingGroup.Children.Add( new GeometryDrawing( Brushes.Black, null, new RectangleGeometry( new Rect( 0, 0, 10, 10 ) ) ) );
+        var lDrawingBrush = new DrawingBrush( lDrawingGroup );
+        lDrawingBrush.Freeze();
+
+        var lResult = lConverter.Convert( lDrawingBrush, typeof( bool ), null!, CultureInfo.InvariantCulture );
+
+        Assert.IsType<bool>( lResult );
+    }
+
+    [StaFact]
     public void ConvertBack_ThrowsNotSupportedException()
     {
         var lConverter = new IsDarkBrushConverter();
