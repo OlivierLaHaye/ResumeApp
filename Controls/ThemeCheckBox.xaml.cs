@@ -1,12 +1,14 @@
 // Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using ResumeApp.Services;
 using System.Windows;
 using System.Windows.Input;
 
 namespace ResumeApp.Controls
 {
+	[ExcludeFromCodeCoverage( Justification = "XAML UserControl code-behind: constructor calls InitializeComponent requiring XAML resource loading; RefreshTexts and dependency property callbacks are tightly coupled to WPF dependency property system." )]
 	public partial class ThemeCheckBox
 	{
 		public static readonly DependencyProperty sIsDarkThemeActiveProperty = DependencyProperty.Register(

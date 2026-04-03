@@ -1,11 +1,13 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Input;
 
 namespace ResumeApp.Infrastructure
 {
+	[ExcludeFromCodeCoverage( Justification = "Loads cursors from pack:// URIs via Application.GetResourceStream requiring a running WPF Application with compiled BAML resources." )]
 	public static class CustomCursors
 	{
 

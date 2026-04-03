@@ -1,6 +1,7 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using ResumeApp.Models;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -13,6 +14,7 @@ using System.Windows.Media;
 
 namespace ResumeApp.Controls
 {
+	[ExcludeFromCodeCoverage( Justification = "Custom WPF Control with OnRender/DrawingContext rendering, mouse/touch/keyboard input handlers, pan/zoom inertia animation via CompositionTarget.Rendering, and VisualTreeHelper operations requiring a running WPF desktop." )]
 	public sealed class TimelineControl : Control
 	{
 		private sealed class TimeFrameHitInfo( TimelineTimeFrameItem pItem, Rect pHitRect )

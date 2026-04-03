@@ -1,8 +1,8 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
-using ResumeApp.Infrastructure;
 using System.Diagnostics.CodeAnalysis;
+using ResumeApp.Infrastructure;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,6 +10,7 @@ using System.Windows.Media;
 
 namespace ResumeApp.Services;
 
+[ExcludeFromCodeCoverage( Justification = "Static service using Keyboard.FocusedElement, Mouse.DirectlyOver, and VisualTreeHelper.GetParent for ScrollViewer discovery requiring a running WPF desktop with input focus." )]
 public static class ScrollViewerScrollService
 {
 	[field: AllowNull, MaybeNull]
