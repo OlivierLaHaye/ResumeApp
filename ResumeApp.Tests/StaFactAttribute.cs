@@ -1,5 +1,6 @@
 using System.Windows.Threading;
 using Xunit;
+using Xunit.Abstractions;
 using Xunit.Sdk;
 
 namespace ResumeApp.Tests;

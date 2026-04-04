@@ -48,6 +48,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ResumeApp.Tests\**" />
+    <None Remove="ResumeApp.Tests\**" />
+    <EmbeddedResource Remove="ResumeApp.Tests\**" />
+    <Resource Remove="ResumeApp.Tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
