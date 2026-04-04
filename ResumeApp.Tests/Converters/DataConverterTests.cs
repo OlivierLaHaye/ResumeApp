@@ -527,18 +527,21 @@ public sealed class MathOperationConverterTests
     [StaFact]
     public void Convert_ThicknessWithThickness_AddThicknesses()
     {
+        // When the second value is a Thickness the converter treats it as a scalar
+        // (average of all sides) because TryGetPreparedScalar matches first.
         var lConverter = new MathOperationConverter();
         var lT1 = new Thickness( 1, 2, 3, 4 );
         var lT2 = new Thickness( 10, 20, 30, 40 );
+        double lAverage = ( 10.0 + 20.0 + 30.0 + 40.0 ) / 4.0; // 25
 
         var lResult = lConverter.Convert( [(object)lT1, (object)lT2], typeof( Thickness ), "addition", CultureInfo.InvariantCulture );
 
         Assert.IsType<Thickness>( lResult );
         var lResultThickness = (Thickness)lResult;
-        Assert.Equal( 11.0, lResultThickness.Left );
-        Assert.Equal( 22.0, lResultThickness.Top );
-        Assert.Equal( 33.0, lResultThickness.Right );
-        Assert.Equal( 44.0, lResultThickness.Bottom );
+        Assert.Equal( 1.0 + lAverage, lResultThickness.Left );
+        Assert.Equal( 2.0 + lAverage, lResultThickness.Top );
+        Assert.Equal( 3.0 + lAverage, lResultThickness.Right );
+        Assert.Equal( 4.0 + lAverage, lResultThickness.Bottom );
     }
 
     [StaFact]
@@ -720,15 +723,17 @@ public sealed class MathOperationConverterTests
     [StaFact]
     public void Convert_ThicknessInvertedWithAdd()
     {
+        // Second Thickness is reduced to its negated average: -(1+2+3+4)/4 = -2.5
         var lConverter = new MathOperationConverter();
         var lT1 = new Thickness( 10, 20, 30, 40 );
         var lT2 = new Thickness( 1, 2, 3, 4 );
+        double lNegatedAverage = -( 1.0 + 2.0 + 3.0 + 4.0 ) / 4.0; // -2.5
 
         var lResult = lConverter.Convert( [(object)lT1, (object)lT2], typeof( Thickness ), "add inverse", CultureInfo.InvariantCulture );
 
         Assert.IsType<Thickness>( lResult );
         var lResultThickness = (Thickness)lResult;
-        Assert.Equal( 9.0, lResultThickness.Left );
+        Assert.Equal( 10.0 + lNegatedAverage, lResultThickness.Left );
     }
 
     [StaFact]

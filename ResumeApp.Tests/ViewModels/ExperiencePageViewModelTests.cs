@@ -318,7 +318,7 @@ public sealed class ExperiencePageViewModelTests
 
         lViewModel.SelectedDate = lNewDate;
 
-        Assert.Contains( "SelectedDate", lRaisedProperties );
+        Assert.Contains( "SetSelectedDate", lRaisedProperties );
     }
 
     [Fact]
@@ -331,7 +331,7 @@ public sealed class ExperiencePageViewModelTests
 
         lViewModel.SelectedTimeFrame = lViewModel.ExperienceTimeFrames[1];
 
-        Assert.Contains( "SelectedTimeFrame", lRaisedProperties );
+        Assert.Contains( "SetSelectedTimeFrame", lRaisedProperties );
     }
 
     [Fact]
@@ -344,7 +344,7 @@ public sealed class ExperiencePageViewModelTests
 
         lViewModel.SelectedTimelineEntry = lViewModel.TimelineEntries[1];
 
-        Assert.Contains( "SelectedTimelineEntry", lRaisedProperties );
+        Assert.Contains( "SetSelectedTimelineEntry", lRaisedProperties );
     }
 
     [Fact]

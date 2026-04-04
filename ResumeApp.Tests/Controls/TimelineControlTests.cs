@@ -51,7 +51,7 @@ public sealed class TimelineControlTests
     public void SelectedDate_SetAndGet_RoundTrips()
     {
         var lControl = new TimelineControl();
-        var lDate = new DateTime( 2023, 6, 15 );
+        var lDate = DateTime.Today.AddDays( -30 );
 
         lControl.SelectedDate = lDate;
 
@@ -104,7 +104,8 @@ public sealed class TimelineControlTests
     public void ViewportStartTicks_SetAndGet_RoundTrips()
     {
         var lControl = new TimelineControl();
-        var lTicks = (double)new DateTime( 2022, 1, 1 ).Ticks;
+        var lDate = DateTime.Today.AddDays( -30 );
+        var lTicks = (double)lDate.Ticks;
 
         lControl.ViewportStartTicks = lTicks;
 
