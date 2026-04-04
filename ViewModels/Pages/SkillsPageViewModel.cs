@@ -44,7 +44,7 @@ namespace ResumeApp.ViewModels.Pages
 			ResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
 		}
 
-		private static string[] BuildKeys( string pPrefix, int pCount )
+		internal static string[] BuildKeys( string pPrefix, int pCount )
 		{
 			if ( string.IsNullOrWhiteSpace( pPrefix ) )
 			{

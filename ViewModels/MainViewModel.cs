@@ -1,6 +1,7 @@
 // Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using ResumeApp.Infrastructure;
 using ResumeApp.Services;
 using ResumeApp.ViewModels.Pages;
@@ -101,6 +102,7 @@ namespace ResumeApp.ViewModels
 			RaisePropertyChanged( nameof( IsFrenchLanguageActive ) );
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Delegates to ThemeService.ToggleTheme(Application.Current) which requires a running WPF Application." )]
 		private void ToggleTheme()
 		{
 			ThemeService.ToggleTheme( Application.Current );

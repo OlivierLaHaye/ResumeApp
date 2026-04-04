@@ -5,6 +5,7 @@ using ResumeApp.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 
 namespace ResumeApp.ViewModels.Pages
@@ -87,7 +88,7 @@ namespace ResumeApp.ViewModels.Pages
 			ResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
 		}
 
-		private static IEnumerable<string> BuildKeys( string pPrefix, int pCount )
+		internal static IEnumerable<string> BuildKeys( string pPrefix, int pCount )
 		{
 			if ( string.IsNullOrWhiteSpace( pPrefix ) )
 			{
@@ -124,7 +125,7 @@ namespace ResumeApp.ViewModels.Pages
 			OpenUri( lNormalizedUrl );
 		}
 
-		private static string BuildMailtoUri( string pEmailAddress )
+		internal static string BuildMailtoUri( string pEmailAddress )
 		{
 			if ( string.IsNullOrWhiteSpace( pEmailAddress ) )
 			{
@@ -136,7 +137,7 @@ namespace ResumeApp.ViewModels.Pages
 				: MailtoSchemePrefix + pEmailAddress;
 		}
 
-		private static string NormalizeUrl( string pUrl )
+		internal static string NormalizeUrl( string pUrl )
 		{
 			if ( string.IsNullOrWhiteSpace( pUrl ) )
 			{
@@ -152,6 +153,7 @@ namespace ResumeApp.ViewModels.Pages
 			return Uri.TryCreate( lPrefixedUrl, UriKind.Absolute, out Uri? lPrefixedUri ) ? lPrefixedUri.AbsoluteUri : pUrl;
 		}
 
+		[ExcludeFromCodeCoverage( Justification = "Calls Process.Start with UseShellExecute to open external URIs; requires a running desktop shell." )]
 		private static void OpenUri( string pUri )
 		{
 			if ( string.IsNullOrWhiteSpace( pUri ) )

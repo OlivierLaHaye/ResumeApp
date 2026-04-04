@@ -1,12 +1,14 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 
 namespace ResumeApp.Behaviors
 {
+	[ExcludeFromCodeCoverage( Justification = "WPF attached behavior using DoubleAnimation with CubicEase and BeginAnimation on ScrollViewer requiring a running WPF animation system." )]
 	public static class ScrollViewerAnimatedOffsetBehavior
 	{
 		public static readonly DependencyProperty sAnimatedVerticalOffsetProperty =
