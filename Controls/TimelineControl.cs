@@ -177,6 +177,8 @@ namespace ResumeApp.Controls
 
 		private const int ClickMaximumDurationMilliseconds = 320;
 
+		private const int FormattedTextCacheMaxEntries = 256;
+
 		public static readonly DependencyProperty sMinDateProperty =
 			DependencyProperty.Register(
 				nameof( MinDate ),
@@ -1382,6 +1384,11 @@ namespace ResumeApp.Controls
 				return lCached;
 			}
 
+			if ( mFormattedTextCache.Count >= FormattedTextCacheMaxEntries )
+			{
+				mFormattedTextCache.Clear();
+			}
+
 			var lText = new FormattedText(
 				pText,
 				CultureInfo.CurrentCulture,
@@ -2325,10 +2332,25 @@ namespace ResumeApp.Controls
 				return null;
 			}
 
-			return mTimeFrameHitInfos
-				.Where( pHitInfo => pHitInfo.HitRect.Contains( pPosition ) )
-				.OrderByDescending( pHitInfo => pHitInfo.HitRect.Width )
-				.FirstOrDefault();
+			TimeFrameHitInfo? lBest = null;
+			var lBestWidth = double.MaxValue;
+
+			for ( var lIndex = 0; lIndex < mTimeFrameHitInfos.Count; lIndex++ )
+			{
+				var lHitInfo = mTimeFrameHitInfos[ lIndex ];
+				if ( !lHitInfo.HitRect.Contains( pPosition ) )
+				{
+					continue;
+				}
+
+				if ( lBest == null || lHitInfo.HitRect.Width < lBestWidth )
+				{
+					lBest = lHitInfo;
+					lBestWidth = lHitInfo.HitRect.Width;
+				}
+			}
+
+			return lBest;
 		}
 
 		private List<VisibleTimeFrame> BuildVisibleTimeFrames(
