@@ -5250,28 +5250,100 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
-                    <Border
-                        x:Name="mTabItemBorder"
-                        Margin="6"
-                        Background="{TemplateBinding Background}"
-                        CornerRadius="18">
+                    <Grid x:Name="mTabItemRootGrid">
+                        <Border
+                            x:Name="mTabItemBorder"
+                            Margin="6"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="18" />
+
+                        <!--  Hover overlay: fades in smoothly on hover  -->
+                        <Border
+                            x:Name="mTabItemHoverOverlay"
+                            Margin="6"
+                            Background="{DynamicResource OnSurfaceDividerOnDarkBrush}"
+                            CornerRadius="18"
+                            Opacity="0" />
+
+                        <!--  Selected overlay: fades in smoothly on selection  -->
+                        <Border
+                            x:Name="mTabItemSelectedOverlay"
+                            Margin="6"
+                            Background="{DynamicResource OnSurfaceCardStrokeOnDarkBrush}"
+                            CornerRadius="18"
+                            Opacity="0" />
+
                         <ContentPresenter
                             x:Name="mTabItemContentPresenter"
-                            Margin="{TemplateBinding Padding}"
+                            Margin="6"
                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                             ContentSource="Header"
-                            RecognizesAccessKey="True" />
-                    </Border>
+                            RecognizesAccessKey="True">
+                            <ContentPresenter.Margin>
+                                <Thickness
+                                    Bottom="18"
+                                    Left="24"
+                                    Right="24"
+                                    Top="18" />
+                            </ContentPresenter.Margin>
+                        </ContentPresenter>
+                    </Grid>
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="mTabItemBorder" Property="Background" Value="{DynamicResource OnSurfaceDividerOnDarkBrush}" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            EasingFunction="{StaticResource CubicEaseOut}"
+                                            Storyboard.TargetName="mTabItemHoverOverlay"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="1"
+                                            Duration="{StaticResource MicroDuration}" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            EasingFunction="{StaticResource CubicEaseOut}"
+                                            Storyboard.TargetName="mTabItemHoverOverlay"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="{StaticResource SubtleDuration}" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
 
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="mTabItemBorder" Property="Background" Value="{DynamicResource OnSurfaceCardStrokeOnDarkBrush}" />
                             <Setter Property="TextElement.Foreground" Value="{DynamicResource CommonBrush}" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            EasingFunction="{StaticResource CubicEaseOut}"
+                                            Storyboard.TargetName="mTabItemSelectedOverlay"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="1"
+                                            Duration="{StaticResource MicroDuration}" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            EasingFunction="{StaticResource CubicEaseOut}"
+                                            Storyboard.TargetName="mTabItemSelectedOverlay"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="{StaticResource SubtleDuration}" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
 
                         <Trigger Property="IsEnabled" Value="False">
@@ -5413,6 +5485,7 @@
                     </Grid>
 
                     <ControlTemplate.Triggers>
+                        <!--  Hover: keep instant background/border setters but add smooth indicator hint  -->
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="mTabItemBackgroundBorder" Property="Background">
                                 <Setter.Value>
@@ -5457,8 +5530,34 @@
                                     </LinearGradientBrush>
                                 </Setter.Value>
                             </Setter>
+                            <!--  Smooth hover hint on indicator  -->
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            EasingFunction="{StaticResource CubicEaseOut}"
+                                            Storyboard.TargetName="mTabItemSelectedIndicatorBorder"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0.35"
+                                            Duration="{StaticResource MicroDuration}" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            EasingFunction="{StaticResource CubicEaseOut}"
+                                            Storyboard.TargetName="mTabItemSelectedIndicatorBorder"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="{StaticResource SubtleDuration}" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
 
+                        <!--  Selected: animate indicator border in/out smoothly  -->
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="BorderBrush">
                                 <Setter.Value>
@@ -5510,7 +5609,30 @@
                                     </LinearGradientBrush>
                                 </Setter.Value>
                             </Setter>
-                            <Setter TargetName="mTabItemSelectedIndicatorBorder" Property="Opacity" Value="1" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            EasingFunction="{StaticResource CubicEaseOut}"
+                                            Storyboard.TargetName="mTabItemSelectedIndicatorBorder"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="1"
+                                            Duration="{StaticResource MicroDuration}" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            EasingFunction="{StaticResource CubicEaseOut}"
+                                            Storyboard.TargetName="mTabItemSelectedIndicatorBorder"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="{StaticResource SubtleDuration}" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
 
                         <Trigger Property="IsKeyboardFocused" Value="True">
