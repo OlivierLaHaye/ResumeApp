@@ -1133,6 +1133,13 @@ namespace ResumeApp.Controls
 					}
 			}
 
+			if ( pEventArgs.Key is Key.Up or Key.Down )
+			{
+				NavigateTimeFrameByDirection( pEventArgs.Key == Key.Up ? -1 : 1, lContentRect );
+				pEventArgs.Handled = true;
+				return;
+			}
+
 			if ( pEventArgs.Key != Key.Left && pEventArgs.Key != Key.Right )
 			{
 				return;
@@ -2272,6 +2279,49 @@ namespace ResumeApp.Controls
 			}
 
 			return pViewportStart > lLatestStart ? lLatestStart : pViewportStart;
+		}
+
+		private void NavigateTimeFrameByDirection( int pDirection, Rect pContentRect )
+		{
+			var lTimeFrames = TimeFrames;
+			if ( lTimeFrames == null || lTimeFrames.Count == 0 )
+			{
+				return;
+			}
+
+			var lOrdered = lTimeFrames
+				.OrderBy( pItem => pItem.StartDate )
+				.ThenBy( pItem => pItem.Title ?? string.Empty, StringComparer.OrdinalIgnoreCase )
+				.ToList();
+
+			var lCurrentIndex = -1;
+			for ( var lIndex = 0; lIndex < lOrdered.Count; lIndex++ )
+			{
+				if ( ReferenceEquals( lOrdered[ lIndex ], SelectedTimeFrame ) )
+				{
+					lCurrentIndex = lIndex;
+					break;
+				}
+			}
+
+			int lTargetIndex;
+			if ( lCurrentIndex < 0 )
+			{
+				lTargetIndex = pDirection > 0 ? 0 : lOrdered.Count - 1;
+			}
+			else
+			{
+				lTargetIndex = lCurrentIndex + pDirection;
+			}
+
+			if ( lTargetIndex < 0 || lTargetIndex >= lOrdered.Count )
+			{
+				return;
+			}
+
+			var lTarget = lOrdered[ lTargetIndex ];
+			SetSelectedTimeFrameCurrentValue( lTarget );
+			SetSelectedDateFromUserInteraction( lTarget.StartDate, pContentRect );
 		}
 
 		private void EnsureDateVisible( DateTime pDate, Rect pContentRect )

@@ -95,6 +95,36 @@ To add or update images:
 - Place images under the appropriate `Resources\...` folders.
 - Ensure files are included as Resources in the project file and copied to output if needed.
 
+## Experience Timeline
+
+The Experience tab features an interactive timeline control with the following capabilities:
+
+### Features
+- **Pan and zoom**: Click-drag to pan, scroll wheel to zoom. Inertia-based scrolling.
+- **Keyboard navigation**: Left/Right arrows move the selected date. Up/Down arrows navigate between timeframes. Home/End jump to start/end. Ctrl modifies step size.
+- **Hover feedback**: Timeline bars brighten on hover with a subtle stroke outline.
+- **Selection highlight**: Selected bar shows at full opacity with accent glow and white stroke.
+- **Year era bands**: Alternating subtle background bands mark even years for temporal context.
+- **Today marker**: Dashed line with "Today" label marks the current date.
+- **Selected date pill**: Compact pill below the baseline shows the selected date with accent styling.
+- **Scroll sync**: Bidirectional synchronization between timeline selection and experience card list.
+- **Focus outline**: Double-ring focus indicator (inner glow + accent ring) for keyboard users.
+- **Accent left bar**: Each experience card has an accent-colored vertical bar matching its timeline color.
+- **Card selection**: Selected card shows an accent border and enlarged rail dot.
+
+### Performance
+- Custom `DrawingContext` rendering (no visual tree overhead per timeline entry).
+- `FormattedText` cache with 256-entry limit to prevent memory growth.
+- Zero-allocation hit testing with simple for loop.
+- Frozen brushes for cross-thread safety and reduced change-notification overhead.
+- `CompositionTarget.Rendering` subscription only active during pan/zoom/inertia animations.
+
+### Accessibility
+- Full keyboard navigation for dates and timeframes.
+- Visible focus indicators on both timeline and experience cards.
+- High-contrast-compatible accent colors from theme resources.
+- Reduced visual complexity for non-selected items (dimmed to 65% opacity).
+
 ## Troubleshooting
 
 ### Build fails with “ResxCleaner.exe not found”
@@ -205,6 +235,27 @@ Les projets et les albums affichent des images via un contrôle de carrousel.
 Pour ajouter ou mettre à jour des images :
 - Place les images dans les dossiers `Resources\...` appropriés.
 - Assure-toi que les fichiers sont inclus comme Resources dans le projet file et copiés au besoin.
+
+## Ligne du temps d'expérience
+
+L'onglet Expérience comporte un contrôle de ligne du temps interactif :
+
+### Fonctionnalités
+- **Défilement et zoom** : cliquer-glisser pour défiler, molette pour zoomer. Défilement avec inertie.
+- **Navigation clavier** : Gauche/Droite déplacent la date. Haut/Bas naviguent entre les périodes. Début/Fin sautent au début/à la fin. Ctrl modifie la taille du pas.
+- **Survol** : les barres de la ligne du temps s'éclaircissent au survol avec un contour subtil.
+- **Sélection** : la barre sélectionnée s'affiche en pleine opacité avec un halo et un contour blanc.
+- **Bandes d'ère** : bandes de fond alternées subtiles pour les années paires.
+- **Marqueur Aujourd'hui** : ligne pointillée avec étiquette « Today » pour la date du jour.
+- **Pastille de date** : pastille compacte sous la ligne de base affichant la date sélectionnée.
+- **Synchronisation défilement** : synchronisation bidirectionnelle entre la sélection et la liste des cartes.
+- **Barre d'accent** : chaque carte d'expérience a une barre verticale colorée correspondant à sa couleur dans la ligne du temps.
+
+### Performance
+- Rendu par `DrawingContext` (pas d'arbre visuel par entrée).
+- Cache de `FormattedText` avec limite de 256 entrées.
+- Test de collision sans allocation avec boucle simple.
+- Pinceaux gelés pour la sécurité multi-thread.
 
 ## Dépannage
 

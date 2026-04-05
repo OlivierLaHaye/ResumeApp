@@ -275,4 +275,58 @@ public sealed class ExperienceTimelineEntryViewModelTests
 
         Assert.Equal( 4, lGlyphs.Count );
     }
+
+    [Fact]
+    public void IsSelected_DefaultsToFalse()
+    {
+        var lEntry = CreateEntry();
+
+        Assert.False( lEntry.IsSelected );
+    }
+
+    [Fact]
+    public void IsSelected_SetTrue_ReturnsTrue()
+    {
+        var lEntry = CreateEntry();
+
+        lEntry.IsSelected = true;
+
+        Assert.True( lEntry.IsSelected );
+    }
+
+    [Fact]
+    public void IsSelected_SetFalse_ReturnsFalse()
+    {
+        var lEntry = CreateEntry();
+        lEntry.IsSelected = true;
+
+        lEntry.IsSelected = false;
+
+        Assert.False( lEntry.IsSelected );
+    }
+
+    [Fact]
+    public void IsSelected_RaisesPropertyChanged()
+    {
+        var lEntry = CreateEntry();
+        var lRaisedProperties = new List<string?>();
+        lEntry.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
+
+        lEntry.IsSelected = true;
+
+        Assert.Contains( "IsSelected", lRaisedProperties );
+    }
+
+    [Fact]
+    public void IsSelected_SameValue_DoesNotRaisePropertyChanged()
+    {
+        var lEntry = CreateEntry();
+        lEntry.IsSelected = false;
+        var lRaisedProperties = new List<string?>();
+        lEntry.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
+
+        lEntry.IsSelected = false;
+
+        Assert.DoesNotContain( "IsSelected", lRaisedProperties );
+    }
 }
