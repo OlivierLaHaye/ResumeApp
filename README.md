@@ -125,6 +125,51 @@ The Experience tab features an interactive timeline control with the following c
 - High-contrast-compatible accent colors from theme resources.
 - Reduced visual complexity for non-selected items (dimmed to 65% opacity).
 
+## UI Animation and Polish System
+
+The app uses a centralized animation token system defined in `Resources/Tokens.xaml` for consistent interactive feedback across all controls.
+
+### Animation Tokens
+
+| Token | Value | Purpose |
+|-------|-------|---------|
+| `MicroDuration` | 200ms | Fast UI feedback (hover enter, selection) |
+| `SubtleDuration` | 300ms | Smooth transitions (hover leave, page entrance, fade-in) |
+| `FastDuration` | 350ms | Standard interactions (button hover, tooltip) |
+| `NormalDuration` | 550ms | Relaxed return-to-normal animations |
+| `CubicEaseOut` | CubicEase | Smooth easing for subtle transitions |
+| `EaseOut` | QuadraticEase | Standard easing for button/control interactions |
+
+### Scale Tokens
+
+| Token | Value | Purpose |
+|-------|-------|---------|
+| `UniformScaleNormal` | 1.0 | Default state |
+| `UniformScaleSubtleHover` | 1.02 | Cards, chips, panels hover |
+| `UniformScaleHover` | 1.12 | Buttons, interactive controls hover |
+| `UniformScalePressed` | 0.90 | Pressed state feedback |
+
+### Animated UI Areas
+
+- **Tab items**: Smooth overlay fade on hover/selection (both main and default tab styles)
+- **Cards and panels**: Shadow glow animates on hover (`SectionCardStyle`, `CommandItemBorderStyle`)
+- **Experience cards**: Subtle scale on hover, opacity feedback on press
+- **Skill chips**: Shared `ChipBorderStyle` with scale hover animation (used across Skills, Experience, and Projects pages)
+- **Page transitions**: Content fades in (300ms) on each tab switch
+- **Top bar collapse**: Expanded/collapsed content fades in to complement the arrow rotation
+- **Tooltips**: Scale + opacity entrance/exit animations
+- **Scroll bar**: Thumb scales on hover with accent color change
+- **Buttons**: Scale hover/pressed via storyboard tokens
+- **Contact action pills**: VSM-based scale + color transitions
+
+### Guidelines for Adding New Animations
+
+1. Use tokens from `Tokens.xaml` instead of hardcoded durations and easing functions.
+2. Prefer `MicroDuration` for enter animations and `SubtleDuration` for exit/fade-out.
+3. Use `CubicEaseOut` for subtle transitions, `EaseOut` for standard interactions.
+4. Keep animations tasteful and non-distracting. Avoid scale values above 1.05 for cards/panels.
+5. Use `EventTrigger` with `RoutedEvent` for Border/FrameworkElement animations, and `Trigger.EnterActions`/`ExitActions` for control template triggers.
+
 ## Troubleshooting
 
 ### Build fails with “ResxCleaner.exe not found”
@@ -256,6 +301,42 @@ L'onglet Expérience comporte un contrôle de ligne du temps interactif :
 - Cache de `FormattedText` avec limite de 256 entrées.
 - Test de collision sans allocation avec boucle simple.
 - Pinceaux gelés pour la sécurité multi-thread.
+
+## Système d'animation et de finition UI
+
+L'application utilise un système centralisé de jetons d'animation défini dans `Resources/Tokens.xaml` pour un retour interactif cohérent sur tous les contrôles.
+
+### Jetons d'animation
+
+| Jeton | Valeur | Utilisation |
+|-------|--------|-------------|
+| `MicroDuration` | 200ms | Retour rapide (entrée de survol, sélection) |
+| `SubtleDuration` | 300ms | Transitions douces (sortie de survol, entrée de page, fondu) |
+| `FastDuration` | 350ms | Interactions standard (survol de bouton, infobulle) |
+| `NormalDuration` | 550ms | Retour détendu à l'état normal |
+| `CubicEaseOut` | CubicEase | Lissage pour transitions subtiles |
+| `EaseOut` | QuadraticEase | Lissage standard pour boutons/contrôles |
+
+### Jetons d'échelle
+
+| Jeton | Valeur | Utilisation |
+|-------|--------|-------------|
+| `UniformScaleNormal` | 1.0 | État par défaut |
+| `UniformScaleSubtleHover` | 1.02 | Survol de cartes, puces, panneaux |
+| `UniformScaleHover` | 1.12 | Survol de boutons, contrôles interactifs |
+| `UniformScalePressed` | 0.90 | Retour à l'appui |
+
+### Zones UI animées
+
+- **Onglets** : fondu d'overlay au survol/sélection (styles d'onglet principal et par défaut)
+- **Cartes et panneaux** : lueur d'ombre animée au survol
+- **Cartes d'expérience** : échelle subtile au survol, retour d'opacité à l'appui
+- **Puces de compétences** : `ChipBorderStyle` partagé avec animation de survol
+- **Transitions de page** : le contenu apparaît en fondu (300ms) à chaque changement d'onglet
+- **Barre supérieure** : le contenu développé/réduit apparaît en fondu
+- **Infobulles** : animation d'échelle + opacité à l'entrée/sortie
+- **Barre de défilement** : le curseur s'agrandit au survol
+- **Boutons** : échelle au survol/appui via jetons de storyboard
 
 ## Dépannage
 
