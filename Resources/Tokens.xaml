@@ -6,12 +6,20 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
+    <!--  Animation durations  -->
+    <Duration x:Key="MicroDuration">0:0:0.2</Duration>
+    <Duration x:Key="SubtleDuration">0:0:0.3</Duration>
     <Duration x:Key="FastDuration">0:0:0.35</Duration>
     <Duration x:Key="NormalDuration">0:0:0.55</Duration>
     <Duration x:Key="CheckMarkSlideDuration">0:0:0.55</Duration>
-    <QuadraticEase x:Key="EaseOut" EasingMode="EaseOut" />
 
+    <!--  Easing functions  -->
+    <QuadraticEase x:Key="EaseOut" EasingMode="EaseOut" />
+    <CubicEase x:Key="CubicEaseOut" EasingMode="EaseOut" />
+
+    <!--  Scale transform values  -->
     <system:Double x:Key="UniformScaleNormal">1</system:Double>
+    <system:Double x:Key="UniformScaleSubtleHover">1.02</system:Double>
     <system:Double x:Key="UniformScaleHover">1.12</system:Double>
     <system:Double x:Key="UniformScalePressed">0.90</system:Double>
 
@@ -50,6 +58,33 @@
             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
             To="{StaticResource UniformScalePressed}"
             Duration="{StaticResource FastDuration}" />
+    </Storyboard>
+
+    <!--  Subtle scale storyboards for cards and panels  -->
+    <Storyboard x:Key="SbScaleToSubtleHover">
+        <DoubleAnimation
+            EasingFunction="{StaticResource CubicEaseOut}"
+            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+            To="{StaticResource UniformScaleSubtleHover}"
+            Duration="{StaticResource MicroDuration}" />
+        <DoubleAnimation
+            EasingFunction="{StaticResource CubicEaseOut}"
+            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+            To="{StaticResource UniformScaleSubtleHover}"
+            Duration="{StaticResource MicroDuration}" />
+    </Storyboard>
+
+    <Storyboard x:Key="SbScaleFromSubtleHover">
+        <DoubleAnimation
+            EasingFunction="{StaticResource CubicEaseOut}"
+            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+            To="{StaticResource UniformScaleNormal}"
+            Duration="{StaticResource SubtleDuration}" />
+        <DoubleAnimation
+            EasingFunction="{StaticResource CubicEaseOut}"
+            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+            To="{StaticResource UniformScaleNormal}"
+            Duration="{StaticResource SubtleDuration}" />
     </Storyboard>
 
     <Thickness x:Key="CommonBorderThickness">0</Thickness>
