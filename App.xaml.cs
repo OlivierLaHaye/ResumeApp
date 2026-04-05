@@ -1,6 +1,7 @@
 // Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using ResumeApp.Services;
 using ResumeApp.ViewModels;
 using ResumeApp.ViewModels.Pages;
@@ -9,6 +10,7 @@ using System.Windows.Threading;
 
 namespace ResumeApp;
 
+[ExcludeFromCodeCoverage( Justification = "WPF Application entry point: OnStartup, Dispatcher, and async initialization require a running WPF Application instance with message loop." )]
 public partial class App
 {
 	private ThemeService? mThemeService;

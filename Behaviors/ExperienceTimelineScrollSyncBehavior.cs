@@ -1,6 +1,7 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -9,6 +10,7 @@ using System.Windows.Threading;
 
 namespace ResumeApp.Behaviors;
 
+[ExcludeFromCodeCoverage( Justification = "WPF attached behavior with DispatcherTimer debouncing, ScrollViewer event handlers, ItemContainerGenerator visual tree lookups, and TransformToAncestor coordinate transforms requiring a rendered visual tree." )]
 public static class ExperienceTimelineScrollSyncBehavior
 {
 	private sealed class ExperienceTimelineScrollSyncState

@@ -26,7 +26,7 @@ namespace ResumeApp.ViewModels.Pages
 			ResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
 		}
 
-		private static IEnumerable<string> BuildKeys( string pPrefix, int pCount )
+		internal static IEnumerable<string> BuildKeys( string pPrefix, int pCount )
 		{
 			if ( string.IsNullOrWhiteSpace( pPrefix ) || pCount <= 0 )
 			{

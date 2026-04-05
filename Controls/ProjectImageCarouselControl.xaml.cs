@@ -1,6 +1,7 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using ResumeApp.Infrastructure;
 using ResumeApp.Services;
 using ResumeApp.Windows;
@@ -23,6 +24,7 @@ using System.Windows.Threading;
 
 namespace ResumeApp.Controls
 {
+	[ExcludeFromCodeCoverage( Justification = "XAML UserControl code-behind with mouse drag/capture handling, DoubleAnimation transforms, Dispatcher-based collection sync, visual tree traversal, and fullscreen window management requiring a running WPF desktop." )]
 	public partial class ProjectImageCarouselControl
 	{
 		private sealed class ResourcesServicePropertyCacheEntry( PropertyInfo? pPropertyInfo )

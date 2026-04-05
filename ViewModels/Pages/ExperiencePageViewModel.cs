@@ -218,10 +218,25 @@ namespace ResumeApp.ViewModels.Pages
 
 		private void SetSelectedTimelineEntry( ExperienceTimelineEntryViewModel? pSelectedTimelineEntry )
 		{
-			if ( ReferenceEquals( mSelectedTimelineEntry, pSelectedTimelineEntry )
-				 || !SetProperty( ref mSelectedTimelineEntry, pSelectedTimelineEntry )
-				 || pSelectedTimelineEntry == null
-				 || mIsSelectionSynchronizationActive )
+			var lPrevious = mSelectedTimelineEntry;
+
+			if ( ReferenceEquals( lPrevious, pSelectedTimelineEntry )
+				 || !SetProperty( ref mSelectedTimelineEntry, pSelectedTimelineEntry ) )
+			{
+				return;
+			}
+
+			if ( lPrevious != null )
+			{
+				lPrevious.IsSelected = false;
+			}
+
+			if ( pSelectedTimelineEntry != null )
+			{
+				pSelectedTimelineEntry.IsSelected = true;
+			}
+
+			if ( pSelectedTimelineEntry == null || mIsSelectionSynchronizationActive )
 			{
 				return;
 			}

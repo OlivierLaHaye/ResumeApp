@@ -164,13 +164,56 @@
                         RenderOptions.BitmapScalingMode="HighQuality"
                         Source="pack://application:,,,/ResumeApp;component/Resources/ResumeApp.png"
                         Stretch="Uniform"
-                        Visibility="{Binding IsTopBarCollapsed, Mode=OneWay, Converter={StaticResource BoolToCollapseConverter}}" />
+                        Visibility="{Binding IsTopBarCollapsed, Mode=OneWay, Converter={StaticResource BoolToCollapseConverter}}">
+                        <Image.Style>
+                            <Style TargetType="{x:Type Image}">
+                                <Style.Triggers>
+                                    <!--  Fade in when collapsed (IsTopBarCollapsed becomes True)  -->
+                                    <DataTrigger Binding="{Binding IsTopBarCollapsed}" Value="True">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                                                        EasingFunction="{StaticResource CubicEaseOut}"
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        From="0"
+                                                        To="1"
+                                                        Duration="{StaticResource SubtleDuration}" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.EnterActions>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
 
                     <Grid
                         x:Name="mTopBarLayoutGrid"
                         Margin="{StaticResource SmallThickness}"
                         VerticalAlignment="Center"
                         Visibility="{Binding IsTopBarCollapsed, Mode=OneWay, Converter={StaticResource InverseBoolToCollapseConverter}}">
+                        <Grid.Style>
+                            <Style TargetType="{x:Type Grid}">
+                                <Style.Triggers>
+                                    <!--  Fade in when expanded (IsTopBarCollapsed becomes False)  -->
+                                    <DataTrigger Binding="{Binding IsTopBarCollapsed}" Value="False">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                                                        EasingFunction="{StaticResource CubicEaseOut}"
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        From="0"
+                                                        To="1"
+                                                        Duration="{StaticResource SubtleDuration}" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.EnterActions>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />

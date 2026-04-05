@@ -2,6 +2,7 @@
 // All rights reserved.
 
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
@@ -11,6 +12,7 @@ using System.Windows.Shell;
 
 namespace ResumeApp.Windows
 {
+	[ExcludeFromCodeCoverage( Justification = "Window code-behind with P/Invoke, HwndSource hooks, and window chrome management that requires a running Windows desktop and HWND handle." )]
 	public partial class ProjectImageViewerWindow
 	{
 		[StructLayout( LayoutKind.Sequential )]
