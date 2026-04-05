@@ -56,6 +56,12 @@ namespace ResumeApp.ViewModels.Pages
 			private set => SetProperty( ref field, value );
 		}
 
+		public bool IsSelected
+		{
+			get;
+			set => SetProperty( ref field, value );
+		}
+
 		public ExperienceTimelineEntryViewModel(
 			string? pCompanyText,
 			string? pRoleText,

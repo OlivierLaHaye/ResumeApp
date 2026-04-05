@@ -275,6 +275,8 @@ namespace ResumeApp.Controls
 
 		private bool mIsHandCursorActive;
 
+		private TimelineTimeFrameItem? mHoveredTimeFrameItem;
+
 		private string? mTextCacheCultureName;
 		private FontFamily? mTextCacheFontFamily;
 		private FontStyle mTextCacheFontStyle;
@@ -1091,6 +1093,12 @@ namespace ResumeApp.Controls
 		{
 			base.OnMouseLeave( pEventArgs );
 			SetCursorIsHand( false );
+
+			if ( mHoveredTimeFrameItem != null )
+			{
+				mHoveredTimeFrameItem = null;
+				InvalidateVisual();
+			}
 		}
 
 		protected override void OnKeyDown( KeyEventArgs pEventArgs )
@@ -1340,6 +1348,17 @@ namespace ResumeApp.Controls
 			var lContentRect = GetContentRect();
 			var lIsClickable = lContentRect.Contains( pPosition );
 			SetCursorIsHand( lIsClickable );
+
+			var lHitInfo = GetTimeFrameHitInfoAtPosition( pPosition );
+			var lNewHovered = lHitInfo?.Item;
+
+			if ( ReferenceEquals( mHoveredTimeFrameItem, lNewHovered ) )
+			{
+				return;
+			}
+
+			mHoveredTimeFrameItem = lNewHovered;
+			InvalidateVisual();
 		}
 
 		private FormattedText? CreateFormattedTextCached(
@@ -1672,6 +1691,7 @@ namespace ResumeApp.Controls
 			var lDividerBrush = ( TryFindResource( "OnSurfaceDividerOnDarkBrush" ) as Brush ) ?? lForegroundBrush;
 			var lHairlineBrush = TryFindResource( "HairlineTwoToneBrush" ) as Brush;
 			var lAccentBrush = TryFindResource( "CommonBrush" ) as Brush;
+			var lEraBandBrush = CreateOpacityBrush( lForegroundBrush, 0.03 );
 
 			var lEffectiveMinDate = EffectiveMinDate;
 			var lEffectiveMaxDate = DateTime.Today;
@@ -1689,6 +1709,8 @@ namespace ResumeApp.Controls
 			var lLaneTopLimit = pContentRect.Top;
 			var lLaneBottomLimit = lBaselineY - 12.0;
 			var lAvailableLaneHeight = Math.Max( 0.0, lLaneBottomLimit - lLaneTopLimit );
+
+			DrawYearEraBands( pDrawingContext, pContentRect, lViewportStart, lViewportEnd, lLaneTopLimit, lBaselineY, lEraBandBrush );
 
 			var lTimeFrames = TimeFrames ?? Enumerable.Empty<TimelineTimeFrameItem>();
 			var lVisibleTimeFrames = BuildVisibleTimeFrames( lTimeFrames, lEffectiveMinDate, lEffectiveMaxDate, lViewportStart, lViewportEnd, pContentRect );
@@ -1722,15 +1744,50 @@ namespace ResumeApp.Controls
 				var lBarCornerRadius = Math.Min( 10.0, lBarRect.Height * 0.5 );
 				var lBarRadius = new RadiusXy( lBarCornerRadius, lBarCornerRadius );
 
-				DrawRoundedRect( pDrawingContext, lBarRect, lFrameBrush, lBarRadius );
+				var lIsSelected = SelectedTimeFrame != null && ReferenceEquals( SelectedTimeFrame, lFrame.Item );
+				var lIsHovered = mHoveredTimeFrameItem != null && ReferenceEquals( mHoveredTimeFrameItem, lFrame.Item );
+
+				var lEffectiveBarBrush = lFrameBrush;
+				if ( lIsHovered && !lIsSelected )
+				{
+					lEffectiveBarBrush = CreateOpacityBrush( lFrameBrush, 0.85 ) ?? lFrameBrush;
+				}
+				else if ( !lIsSelected )
+				{
+					lEffectiveBarBrush = CreateOpacityBrush( lFrameBrush, 0.65 ) ?? lFrameBrush;
+				}
+
+				DrawRoundedRect( pDrawingContext, lBarRect, lEffectiveBarBrush, lBarRadius );
 				lBarRectsByItem[ lFrame.Item ] = lBarRect;
 
-				var lIsSelected = SelectedTimeFrame != null && ReferenceEquals( SelectedTimeFrame, lFrame.Item );
 				if ( lIsSelected )
 				{
-					var lPen = TryFindResource( "OnSurfaceCardStrokeOnDarkBrush" ) is Brush lStrokeBrush ? new Pen( lStrokeBrush, 1.0 ) : null;
-					if ( lPen != null )
+					var lGlowBrush = CreateOpacityBrush( lFrameBrush, 0.25 );
+					if ( lGlowBrush != null )
 					{
+						var lGlowRect = new Rect(
+							lBarRect.Left - 2.0,
+							lBarRect.Top - 2.0,
+							lBarRect.Width + 4.0,
+							lBarRect.Height + 4.0 );
+						DrawRoundedRect( pDrawingContext, lGlowRect, lGlowBrush, new RadiusXy( lBarCornerRadius + 2.0, lBarCornerRadius + 2.0 ) );
+					}
+
+					DrawRoundedRect( pDrawingContext, lBarRect, lFrameBrush, lBarRadius );
+
+					var lStrokeBrush = TryFindResource( "CommonWhiteBrush" ) as Brush;
+					if ( lStrokeBrush != null )
+					{
+						var lPen = new Pen( CreateOpacityBrush( lStrokeBrush, 0.6 ) ?? lStrokeBrush, 1.5 );
+						pDrawingContext.DrawRoundedRectangle( null, lPen, lBarRect, lBarCornerRadius, lBarCornerRadius );
+					}
+				}
+				else if ( lIsHovered )
+				{
+					var lHoverStrokeBrush = CreateOpacityBrush( lForegroundBrush, 0.2 );
+					if ( lHoverStrokeBrush != null )
+					{
+						var lPen = new Pen( lHoverStrokeBrush, 1.0 );
 						pDrawingContext.DrawRoundedRectangle( null, lPen, lBarRect, lBarCornerRadius, lBarCornerRadius );
 					}
 				}
@@ -1797,6 +1854,17 @@ namespace ResumeApp.Controls
 				lForegroundBrush,
 				lPixelsPerDip );
 
+			DrawTodayMarker(
+				pDrawingContext,
+				pContentRect,
+				lViewportStart,
+				lViewportEnd,
+				lLaneTopLimit,
+				lBaselineY,
+				lAccentBrush,
+				lForegroundBrush,
+				lPixelsPerDip );
+
 			DrawSelectedIndicator(
 				pDrawingContext,
 				pContentRect,
@@ -1805,6 +1873,93 @@ namespace ResumeApp.Controls
 				lAccentBrush,
 				lForegroundBrush,
 				lPixelsPerDip );
+		}
+
+		private void DrawYearEraBands(
+			DrawingContext pDrawingContext,
+			Rect pContentRect,
+			DateTime pViewportStart,
+			DateTime pViewportEnd,
+			double pTopY,
+			double pBottomY,
+			Brush? pBandBrush )
+		{
+			if ( pBandBrush is null || pBottomY <= pTopY )
+			{
+				return;
+			}
+
+			var lFirstYear = pViewportStart.Year;
+			var lLastYear = pViewportEnd.Year;
+
+			for ( var lYear = lFirstYear; lYear <= lLastYear; lYear++ )
+			{
+				if ( ( lYear % 2 ) != 0 )
+				{
+					continue;
+				}
+
+				var lBandStart = new DateTime( lYear, 1, 1 );
+				var lBandEnd = new DateTime( lYear + 1, 1, 1 );
+
+				var lStartX = pContentRect.Left + DateToPixel( lBandStart, pViewportStart, pContentRect );
+				var lEndX = pContentRect.Left + DateToPixel( lBandEnd, pViewportStart, pContentRect );
+
+				lStartX = Math.Max( pContentRect.Left, lStartX );
+				lEndX = Math.Min( pContentRect.Right, lEndX );
+
+				if ( lEndX <= lStartX )
+				{
+					continue;
+				}
+
+				var lBandRect = new Rect( lStartX, pTopY, lEndX - lStartX, pBottomY - pTopY );
+				pDrawingContext.DrawRectangle( pBandBrush, null, lBandRect );
+			}
+		}
+
+		private void DrawTodayMarker(
+			DrawingContext pDrawingContext,
+			Rect pContentRect,
+			DateTime pViewportStart,
+			DateTime pViewportEnd,
+			double pTopY,
+			double pBaselineY,
+			Brush? pAccentBrush,
+			Brush pTextBrush,
+			double pPixelsPerDip )
+		{
+			var lToday = DateTime.Today;
+			if ( lToday < pViewportStart || lToday > pViewportEnd )
+			{
+				return;
+			}
+
+			var lX = pContentRect.Left + DateToPixel( lToday, pViewportStart, pContentRect );
+			var lMarkerBrush = CreateOpacityBrush( pAccentBrush ?? pTextBrush, 0.35 );
+			if ( lMarkerBrush == null )
+			{
+				return;
+			}
+
+			var lPen = new Pen( lMarkerBrush, 1.0 )
+			{
+				DashStyle = new DashStyle( [ 4.0, 3.0 ], 0.0 )
+			};
+
+			pDrawingContext.DrawLine( lPen, new Point( lX, pTopY + 2.0 ), new Point( lX, pBaselineY ) );
+
+			var lTypeface = new Typeface( FontFamily, FontStyle, FontWeight, FontStretch );
+			var lTodayLabelBrush = CreateOpacityBrush( pTextBrush, 0.45 ) ?? pTextBrush;
+			var lText = CreateFormattedTextCached( "Today", lTypeface, 10.0, lTodayLabelBrush, pPixelsPerDip );
+
+			if ( lText != null )
+			{
+				var lTextX = lX - ( lText.WidthIncludingTrailingWhitespace * 0.5 );
+				var lTextY = pTopY - 2.0;
+				lTextX = Math.Max( pContentRect.Left, Math.Min( lTextX, pContentRect.Right - lText.WidthIncludingTrailingWhitespace ) );
+				pDrawingContext.DrawText( lText, new Point( lTextX, lTextY ) );
+			}
 		}
 
 		private void DrawFocusOutlineIfNeeded( DrawingContext pDrawingContext )
@@ -1964,33 +2119,46 @@ namespace ResumeApp.Controls
 
 			if ( pAccentBrush != null )
 			{
-				var lPen = new Pen( pAccentBrush, 2.0 );
-				pDrawingContext.DrawLine( lPen, new Point( lLineX, pContentRect.Top + 6.0 ), new Point( lLineX, pContentRect.Bottom - 10.0 ) );
+				var lLineBrush = CreateOpacityBrush( pAccentBrush, 0.7 );
+				if ( lLineBrush != null )
+				{
+					var lPen = new Pen( lLineBrush, 1.5 );
+					pDrawingContext.DrawLine( lPen, new Point( lLineX, pContentRect.Top + 6.0 ), new Point( lLineX, pContentRect.Bottom - 10.0 ) );
+				}
+
+				pDrawingContext.DrawEllipse( pAccentBrush, null, new Point( lLineX, pBaselineY ), 3.5, 3.5 );
 			}
 
 			var lTypeface = new Typeface( FontFamily, FontStyle, FontWeight, FontStretch );
 
 			var lLabel = lSelected.ToString( "MMM d, yyyy", CultureInfo.CurrentCulture );
-			var lText = CreateFormattedTextCached( lLabel, lTypeface, 12.0, pTextBrush, pPixelsPerDip );
+			var lText = CreateFormattedTextCached( lLabel, lTypeface, 11.0, pTextBrush, pPixelsPerDip );
 
 			if ( lText == null )
 			{
 				return;
 			}
 
-			const double lPillPaddingX = 10.0;
-			const double lPillPaddingY = 5.0;
+			const double lPillPaddingX = 8.0;
+			const double lPillPaddingY = 4.0;
 
 			var lPillWidth = lText.WidthIncludingTrailingWhitespace + ( lPillPaddingX * 2.0 );
 			var lPillHeight = lText.Height + ( lPillPaddingY * 2.0 );
 
 			var lPillX = Math.Max( pContentRect.Left, Math.Min( pContentRect.Right - lPillWidth, lLineX - ( lPillWidth * 0.5 ) ) );
-			var lPillY = pBaselineY - lPillHeight - 12.0;
+			var lPillY = pBaselineY + 2.0;
 
 			var lPillRect = new Rect( lPillX, lPillY, lPillWidth, lPillHeight );
 
-			var lPillBackground = CreateOpacityBrush( pAccentBrush, 0.22 ) ?? ( TryFindResource( "OnSurfaceCardStrokeOnDarkBrush" ) as Brush );
-			DrawRoundedRect( pDrawingContext, lPillRect, lPillBackground, new RadiusXy( 12.0, 12.0 ) );
+			var lPillBackground = CreateOpacityBrush( pAccentBrush, 0.18 ) ?? ( TryFindResource( "OnSurfaceCardStrokeOnDarkBrush" ) as Brush );
+			DrawRoundedRect( pDrawingContext, lPillRect, lPillBackground, new RadiusXy( 8.0, 8.0 ) );
+
+			var lPillStroke = CreateOpacityBrush( pAccentBrush, 0.35 );
+			if ( lPillStroke != null )
+			{
+				var lPillPen = new Pen( lPillStroke, 0.75 );
+				pDrawingContext.DrawRoundedRectangle( null, lPillPen, lPillRect, 8.0, 8.0 );
+			}
 
 			pDrawingContext.DrawText( lText, new Point( lPillRect.Left + lPillPaddingX, lPillRect.Top + lPillPaddingY ) );
 		}
