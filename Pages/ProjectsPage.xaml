@@ -58,11 +58,6 @@
             <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
         </Style>
 
-        <Style x:Key="ChipBorderStyle" TargetType="{x:Type Border}">
-            <Setter Property="Background" Value="{DynamicResource CommonGrayBrush}" />
-            <Setter Property="CornerRadius" Value="{StaticResource ExtraSmallCornerRadius}" />
-            <Setter Property="Margin" Value="{StaticResource ExtraSmallThickness}" />
-        </Style>
     </UserControl.Resources>
 
     <ScrollViewer

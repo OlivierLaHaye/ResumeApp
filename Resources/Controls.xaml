@@ -333,6 +333,53 @@
         </Style.Triggers>
     </Style>
 
+    <!--  Shared chip style with subtle hover feedback  -->
+    <Style x:Key="ChipBorderStyle" TargetType="{x:Type Border}">
+        <Setter Property="Background" Value="{DynamicResource CommonGrayBrush}" />
+        <Setter Property="CornerRadius" Value="{StaticResource ExtraSmallCornerRadius}" />
+        <Setter Property="Margin" Value="{StaticResource ExtraSmallThickness}" />
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <ScaleTransform ScaleX="1" ScaleY="1" />
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <EventTrigger RoutedEvent="MouseEnter">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimation
+                            EasingFunction="{StaticResource CubicEaseOut}"
+                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                            To="1.04"
+                            Duration="{StaticResource MicroDuration}" />
+                        <DoubleAnimation
+                            EasingFunction="{StaticResource CubicEaseOut}"
+                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                            To="1.04"
+                            Duration="{StaticResource MicroDuration}" />
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+            <EventTrigger RoutedEvent="MouseLeave">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <DoubleAnimation
+                            EasingFunction="{StaticResource CubicEaseOut}"
+                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                            To="1"
+                            Duration="{StaticResource SubtleDuration}" />
+                        <DoubleAnimation
+                            EasingFunction="{StaticResource CubicEaseOut}"
+                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                            To="1"
+                            Duration="{StaticResource SubtleDuration}" />
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Style.Triggers>
+    </Style>
+
     <Style x:Key="{x:Type TextBlock}" TargetType="{x:Type TextBlock}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Foreground">
