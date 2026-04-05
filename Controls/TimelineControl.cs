@@ -1758,6 +1758,17 @@ namespace ResumeApp.Controls
 				}
 
 				DrawRoundedRect( pDrawingContext, lBarRect, lEffectiveBarBrush, lBarRadius );
+
+				if ( lBarRect.Height >= 10.0 && lBarRect.Width >= 8.0 )
+				{
+					var lHighlightRect = new Rect( lBarRect.Left + 2.0, lBarRect.Top, lBarRect.Width - 4.0, Math.Max( 1.0, lBarRect.Height * 0.45 ) );
+					var lHighlightBrush = CreateOpacityBrush( lForegroundBrush, 0.08 );
+					if ( lHighlightBrush != null )
+					{
+						DrawRoundedRect( pDrawingContext, lHighlightRect, lHighlightBrush, new RadiusXy( lBarCornerRadius - 1.0, lBarCornerRadius - 1.0 ) );
+					}
+				}
+
 				lBarRectsByItem[ lFrame.Item ] = lBarRect;
 
 				if ( lIsSelected )
@@ -1974,9 +1985,16 @@ namespace ResumeApp.Controls
 				return;
 			}
 
-			var lPen = new Pen( lFocusBrush, 2.0 );
-			var lRect = new Rect( 1.0, 1.0, Math.Max( 0.0, ActualWidth - 2.0 ), Math.Max( 0.0, ActualHeight - 2.0 ) );
+			var lInnerGlow = CreateOpacityBrush( lFocusBrush, 0.12 );
+			if ( lInnerGlow != null )
+			{
+				var lInnerPen = new Pen( lInnerGlow, 4.0 );
+				var lInnerRect = new Rect( 2.0, 2.0, Math.Max( 0.0, ActualWidth - 4.0 ), Math.Max( 0.0, ActualHeight - 4.0 ) );
+				pDrawingContext.DrawRoundedRectangle( null, lInnerPen, lInnerRect, 11.0, 11.0 );
+			}
 
+			var lPen = new Pen( lFocusBrush, 1.5 );
+			var lRect = new Rect( 1.0, 1.0, Math.Max( 0.0, ActualWidth - 2.0 ), Math.Max( 0.0, ActualHeight - 2.0 ) );
 			pDrawingContext.DrawRoundedRectangle( null, lPen, lRect, 12.0, 12.0 );
 		}
 
