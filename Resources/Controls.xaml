@@ -5489,6 +5489,23 @@
                             <ContentPresenter x:Name="mSelectedContentPresenter" ContentSource="SelectedContent" />
                         </Border>
                     </Grid>
+
+                    <!--  Page entrance: fade in content on tab switch  -->
+                    <ControlTemplate.Triggers>
+                        <EventTrigger RoutedEvent="Selector.SelectionChanged">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                        EasingFunction="{StaticResource CubicEaseOut}"
+                                        Storyboard.TargetName="mSelectedContentPresenter"
+                                        Storyboard.TargetProperty="Opacity"
+                                        From="0"
+                                        To="1"
+                                        Duration="{StaticResource SubtleDuration}" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
