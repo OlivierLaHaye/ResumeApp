@@ -5375,7 +5375,6 @@
 
                         <ContentPresenter
                             x:Name="mTabItemContentPresenter"
-                            Margin="6"
                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                             ContentSource="Header"
