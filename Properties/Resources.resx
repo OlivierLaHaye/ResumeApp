@@ -77,7 +77,7 @@
     <value>Volleyball</value>
 </data>
   <data name="AppSubtitle" xml:space="preserve">
-    <value>UI-focused WPF Front-End Profile</value>
+    <value>Senior UI Developer · WPF Desktop</value>
   </data>
   <data name="AppTitle" xml:space="preserve">
     <value>Resume</value>
@@ -179,7 +179,7 @@
     <value>Cégep Limoilou | College Diploma, 3D Animation and Image Synthesis</value>
   </data>
   <data name="EducationPageSubtitle" xml:space="preserve">
-    <value>Degrees and relevant background.</value>
+    <value>Academic background in computer science and visual arts.</value>
   </data>
   <data name="Experience1AccomplishmentsHeader" xml:space="preserve">
     <value>Selected accomplishments:</value>
@@ -335,7 +335,7 @@
     <value>WPF, XAML, C#, MVVM, Visual Studio</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertAcc1" xml:space="preserve">
-    <value>Led UI modernization to WPF during the transition from VXelements to Creaform.OS, delivering a refreshed look and broad visual improvements.</value>
+    <value>Led UI modernization during the transition from VXelements to Creaform.OS, delivering a refreshed visual language and stronger UI consistency across multiple product modules.</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertAcc2" xml:space="preserve">
     <value>Defined and reinforced UI standards (spacing, typography, states, theming rules) to reduce fragmentation and keep the product cohesive.</value>
@@ -488,7 +488,7 @@
     <value>Full remote only, high-trust teams, design-led culture, flexible time off</value>
   </data>
   <data name="HighlightBullet1" xml:space="preserve">
-    <value>Led front-end modernization of a flagship desktop product by migrating the UI to WPF and refreshing the visual language during the transition to Creaform.OS, improving consistency across multiple modules and screens, with strong internal feedback.</value>
+    <value>Led front-end modernization of a flagship desktop product by migrating the UI to WPF and refreshing the visual language during the transition to Creaform.OS — improving visual consistency across multiple modules and screens, well-received across the product team.</value>
   </data>
   <data name="HighlightBullet2" xml:space="preserve">
     <value>Drove UI direction across projects by defining styling rules and interaction patterns, for example reusable card layouts, consistent button and input states, unified window chrome and title bar behavior, and timeline-style navigation patterns, helping teams ship cohesive, polished UI at scale.</value>
@@ -599,7 +599,7 @@
     <value>Open</value>
   </data>
   <data name="PhotographyPageSubtitle" xml:space="preserve">
-    <value>A selection of my work, organized in albums.</value>
+    <value>Sports, events, portraits, and travel — a curated selection across albums.</value>
 </data>
   <data name="Project1Bullet1" xml:space="preserve">
     <value>Migrated the UI to WPF and refreshed styling and visual consistency across the product.</value>
@@ -722,13 +722,13 @@
     <value>Summary</value>
   </data>
   <data name="SectionHeaderVisualCraft" xml:space="preserve">
-    <value>Visual craft (photography)</value>
+    <value>Visual craft</value>
   </data>
   <data name="SectionHeaderWorkPreferences" xml:space="preserve">
     <value>Work preferences</value>
   </data>
   <data name="SkillsPageSubtitle" xml:space="preserve">
-    <value>Scannable skill groups focused on desktop UI, design systems, and WPF delivery.</value>
+    <value>Skill groups organized around desktop UI, design systems, and WPF delivery.</value>
   </data>
   <data name="SkillsSectionCollaborationItem1" xml:space="preserve">
     <value>UI direction and standards</value>
@@ -818,7 +818,7 @@
     <value>Experience: 7+ years in software development, 5+ years focused on WPF desktop UI.</value>
   </data>
   <data name="SummaryText" xml:space="preserve">
-    <value>Senior UI-focused software developer specializing in WPF desktop applications, UI modernization, and design-system execution. I lead UI delivery with a strong standard for consistency, interaction polish, and usability, balancing visual craft with real product constraints. Known for high-fidelity Photoshop mockups that speed up alignment and reduce rework, plus production-ready WPF implementation habits (reusable components, centralized styling, clean interaction patterns, localization-ready structure).</value>
+    <value>Senior UI developer specializing in WPF desktop applications, UI modernization, and design-system execution. I lead front-end delivery to a high standard for visual consistency, interaction polish, and usability — keeping design intent intact through implementation. High-fidelity Photoshop mockups accelerate team alignment and reduce late-cycle rework; reusable WPF components, centralized theming, and localization-ready structure keep the codebase cohesive and the product consistent.</value>
   </data>
   <data name="TabContactTitle" xml:space="preserve">
     <value>Contact</value>
@@ -854,6 +854,6 @@
     <value>Portfolio: https://olhphotographie.com</value>
   </data>
   <data name="VisualCraftText" xml:space="preserve">
-    <value>Professional photographer since 2010 with 20+ years of photo editing experience (since 2001). Visual craft strengthens UI outcomes through disciplined composition, clear visual hierarchy, brand consistency, and detail-level polish.</value>
+    <value>Professional photographer since 2010, with 20+ years of photo editing experience (since 2001). Working daily with composition, light, colour, and framing sharpens the same instincts that matter in UI: cleaner visual hierarchy, more deliberate spacing, and a trained eye for what feels intentional versus accidental.</value>
   </data>
 </root>
