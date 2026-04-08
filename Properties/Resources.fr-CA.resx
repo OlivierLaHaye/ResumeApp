@@ -139,6 +139,9 @@
   <data name="CoreSkillsLine6" xml:space="preserve">
     <value>Collaboration et leadership: guidance UI auprès des développeurs, standards et support en review, alignement inter-équipes, itération avec parties prenantes et QA</value>
   </data>
+  <data name="CoreSkillsLine7" xml:space="preserve">
+    <value>Workflows augmentés par IA: développement assisté par agents (Claude Code, Codex), prompting structuré, recherche multimodale, itération UI accélérée, orchestration d'agents, levier d'exécution</value>
+  </data>
   <data name="DesignSystemBullet1" xml:space="preserve">
     <value>Fondations UI: espacement cohérent, rythme typographique, décisions de couleur, et hiérarchie de layout sur l’ensemble des écrans.</value>
   </data>

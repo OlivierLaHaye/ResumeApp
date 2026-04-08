@@ -35,7 +35,7 @@ public sealed class OverviewPageViewModelTests
         var lViewModel = Create();
 
         Assert.NotNull( lViewModel.CoreSkillsLines );
-        Assert.Equal( 6, lViewModel.CoreSkillsLines.Count );
+        Assert.Equal( 7, lViewModel.CoreSkillsLines.Count );
     }
 
     [Fact]

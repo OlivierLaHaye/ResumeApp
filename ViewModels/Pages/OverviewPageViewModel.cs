@@ -82,7 +82,7 @@ namespace ResumeApp.ViewModels.Pages
 					.Select( pKey => new LocalizedResourceItemViewModel( ResourcesService, pKey ) ) );
 
 			CoreSkillsLines = new ObservableCollection<LocalizedResourceItemViewModel>(
-				BuildKeys( "CoreSkillsLine", 6 )
+				BuildKeys( "CoreSkillsLine", 7 )
 					.Select( pKey => new LocalizedResourceItemViewModel( ResourcesService, pKey ) ) );
 
 			ResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
