@@ -170,6 +170,46 @@ The app uses a centralized animation token system defined in `Resources/Tokens.x
 4. Keep animations tasteful and non-distracting. Avoid scale values above 1.05 for cards/panels.
 5. Use `EventTrigger` with `RoutedEvent` for Border/FrameworkElement animations, and `Trigger.EnterActions`/`ExitActions` for control template triggers.
 
+## Content Strategy and Recruiter Positioning
+
+### Target positioning
+
+The app is designed to position Olivier La Haye as a **senior UI developer** with strong front-end, UI/UX, and product-polish credentials, primarily targeting WPF desktop roles in Canada.
+
+### Overview page section order
+
+The Resume tab (Overview page) sections are ordered for recruiter scanning efficiency:
+
+1. **Header** — name, target titles, contact
+2. **Summary** — 3-sentence positioning statement (~63 words)
+3. **Core Skills** — categorized technical keywords (ATS + human scan)
+4. **UI/UX Highlights** — 5 achievement bullets with specific context
+5. **Design System and UI Development** — supporting capability bullets
+
+Skills appear before highlights so that technical keyword scanning succeeds before the reader reaches narrative content.
+
+### Content strategy principles
+
+- Lead with value, not feelings. No "passionate about", no "results-driven".
+- Replace vague claims with specific context ("well-received across the product team" not "strong internal feedback").
+- Em-dash constructions separate the action from its impact for better scannability.
+- Summary length: ~60–65 words in English, equivalent in French.
+
+### Bilingual requirements
+
+- French and English versions carry the same core meaning but are written independently for each language.
+- French version targets professional Québec French: avoid colloquialisms (e.g., no "le beau"), use nominalized constructions, avoid overly literal translations.
+- The `ExperienceCreaformUiUxExpert*`, `ExperienceCreaformSoftwareDeveloper*`, `ExperienceArcane*`, and `ExperienceIa*` experience keys have full French translations in `Resources.fr-CA.resx`. Earlier versions of these keys had English fallback text.
+
+### Known follow-up recommendations (out of scope)
+
+- Add portfolio link annotation near the header (e.g., "5 WPF projects including full MVVM redesign").
+- Consider surfacing a brief bilingual language proficiency indicator (e.g., "Français natif · English full professional").
+- The `Experience1*`, `Experience2*`, `Experience3*`, `Experience4*` keys in both `.resx` files are legacy keys not used by any ViewModel — they can be removed in a future cleanup pass.
+- `SummaryExperienceLine` resource key is defined in both files but not currently bound to any UI element.
+
+---
+
 ## Troubleshooting
 
 ### Build fails with “ResxCleaner.exe not found”
@@ -337,6 +377,32 @@ L'application utilise un système centralisé de jetons d'animation défini dans
 - **Infobulles** : animation d'échelle + opacité à l'entrée/sortie
 - **Barre de défilement** : le curseur s'agrandit au survol
 - **Boutons** : échelle au survol/appui via jetons de storyboard
+
+## Stratégie de contenu et positionnement recruteur
+
+### Positionnement cible
+
+L'application positionne Olivier La Haye comme **développeur UI senior** avec de solides compétences en front-end, UI/UX et finition produit, principalement pour des rôles WPF desktop au Canada.
+
+### Ordre des sections dans l'onglet CV
+
+Les sections de la page Aperçu sont ordonnées pour faciliter le scan recruteur :
+
+1. **En-tête** — nom, titres ciblés, coordonnées
+2. **Résumé** — texte de positionnement (~60 mots)
+3. **Compétences clés** — catégories techniques (ATS + scan humain)
+4. **Faits saillants UI/UX** — 5 réalisations avec contexte spécifique
+5. **Design system et développement UI** — points de capacité
+
+Les compétences précèdent les réalisations pour que le scan de mots-clés techniques soit complété avant la lecture narrative.
+
+### Bilinguisme
+
+- Les versions française et anglaise portent le même sens de base mais sont rédigées indépendamment pour chaque langue.
+- La version française cible le français professionnel québécois : pas de colloquialismes, pas de traductions trop littérales de l'anglais.
+- Les clés d'expérience `ExperienceCreaformUiUxExpert*`, `ExperienceCreaformSoftwareDeveloper*`, `ExperienceArcane*` et `ExperienceIa*` ont des traductions françaises complètes dans `Resources.fr-CA.resx`.
+
+---
 
 ## Dépannage
 
