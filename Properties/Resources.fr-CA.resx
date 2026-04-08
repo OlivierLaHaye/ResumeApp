@@ -77,7 +77,7 @@
     <value>Volleyball</value>
 </data>
   <data name="AppSubtitle" xml:space="preserve">
-    <value>Profil WPF front-end orienté UI</value>
+    <value>Développeur UI senior · WPF Desktop</value>
   </data>
   <data name="AppTitle" xml:space="preserve">
     <value>Curriculum vitae</value>
@@ -179,7 +179,7 @@
     <value>Cégep Limoilou | DEC, Animation 3D et synthèse d’images</value>
   </data>
   <data name="EducationPageSubtitle" xml:space="preserve">
-    <value>Diplômes et parcours pertinent.</value>
+    <value>Formation en informatique et en arts visuels.</value>
   </data>
   <data name="Experience1AccomplishmentsHeader" xml:space="preserve">
     <value>Réalisations:</value>
@@ -275,13 +275,13 @@
     <value>iA Groupe financier (Industrielle Alliance) | Stagiaire en développement logiciel</value>
   </data>
   <data name="ExperienceArcaneAcc1" xml:space="preserve">
-    <value>Built and maintained front-end interfaces using React, JavaScript, and Redux, focusing on clear UI structure and maintainable patterns.</value>
+    <value>Développé et maintenu des interfaces front-end avec React, JavaScript et Redux, en visant clarté de la structure UI et maintenabilité.</value>
   </data>
   <data name="ExperienceArcaneAcc2" xml:space="preserve">
-    <value>Created visual assets using Photoshop and Illustrator, supporting product UI and marketing needs.</value>
+    <value>Conçu des assets visuels avec Photoshop et Illustrator pour soutenir l'UI produit et les besoins marketing.</value>
   </data>
   <data name="ExperienceArcaneAcc3" xml:space="preserve">
-    <value>Worked on image processing and media pipelines as needed.</value>
+    <value>Travaillé au besoin sur les volets traitement d'image et pipelines médias.</value>
   </data>
   <data name="ExperienceArcaneCompany" xml:space="preserve">
     <value>Arcane Technologies</value>
@@ -296,7 +296,7 @@
     <value>Software Developer</value>
   </data>
   <data name="ExperienceArcaneScope" xml:space="preserve">
-    <value>Built front-end interfaces and contributed to visual production.</value>
+    <value>UI front-end et production visuelle.</value>
   </data>
   <data name="ExperienceArcaneStartIso" xml:space="preserve">
     <value>2018-05-01</value>
@@ -305,13 +305,13 @@
     <value>React, JavaScript, Redux, C#, Unity, C++, OpenCV, Libraw, Adobe Photoshop, Illustrator, After Effects</value>
   </data>
   <data name="ExperienceCreaformSoftwareDeveloperAcc1" xml:space="preserve">
-    <value>Designed and delivered a new user interface for peel.OS, improving workflow clarity and overall UI consistency.</value>
+    <value>Conçu et livré une nouvelle interface pour peel.OS, en améliorant la clarté des workflows et la cohérence UI globale.</value>
   </data>
   <data name="ExperienceCreaformSoftwareDeveloperAcc2" xml:space="preserve">
-    <value>Contributed to peel 3 by Creaform and the peel project team, recognized with the AMETEK Innovation Award 2022.</value>
+    <value>Contribué à peel 3 by Creaform et à l'équipe du projet peel, reconnu par l'AMETEK Innovation Award 2022.</value>
   </data>
   <data name="ExperienceCreaformSoftwareDeveloperAcc3" xml:space="preserve">
-    <value>Shipped WPF UI features with a high standard for usability, visual hierarchy, and interaction polish.</value>
+    <value>Livré des fonctionnalités UI WPF avec un standard élevé d'utilisabilité, de hiérarchie visuelle et de finition d'interaction.</value>
   </data>
   <data name="ExperienceCreaformSoftwareDeveloperCompany" xml:space="preserve">
     <value>Creaform</value>
@@ -326,7 +326,7 @@
     <value>Software Developer</value>
   </data>
   <data name="ExperienceCreaformSoftwareDeveloperScope" xml:space="preserve">
-    <value>Front-end focused software development with emphasis on UI design and WPF implementation.</value>
+    <value>Développement logiciel axé front-end, avec un accent sur le design UI et l'intégration WPF.</value>
   </data>
   <data name="ExperienceCreaformSoftwareDeveloperStartIso" xml:space="preserve">
     <value>2020-02-01</value>
@@ -335,16 +335,16 @@
     <value>WPF, XAML, C#, MVVM, Visual Studio</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertAcc1" xml:space="preserve">
-    <value>Led UI modernization to WPF during the transition from VXelements to Creaform.OS, delivering a refreshed look and broad visual improvements.</value>
+    <value>Mené la modernisation UI dans la transition de VXelements vers Creaform.OS, en livrant un langage visuel modernisé et une cohérence UI renforcée sur plusieurs modules du produit.</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertAcc2" xml:space="preserve">
-    <value>Defined and reinforced UI standards (spacing, typography, states, theming rules) to reduce fragmentation and keep the product cohesive.</value>
+    <value>Défini et renforcé des standards UI (espacement, typographie, états, règles de thème) pour réduire la fragmentation et garder un produit cohérent.</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertAcc3" xml:space="preserve">
-    <value>Produced high-fidelity Photoshop mockups and prototype-ready visuals to validate direction early and reduce late-stage UI churn.</value>
+    <value>Produit des maquettes Photoshop haute fidélité et des visuels prêts à prototyper pour valider tôt la direction et réduire le rework UI en fin de cycle.</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertAcc4" xml:space="preserve">
-    <value>Supported developers with styling decisions and interaction details to raise overall UI polish and consistency.</value>
+    <value>Accompagné les développeurs sur les décisions de style et les détails d'interaction pour rehausser la finition UI et la cohérence globale.</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertCompany" xml:space="preserve">
     <value>Creaform</value>
@@ -368,10 +368,10 @@
     <value> à </value>
   </data>
   <data name="ExperienceIaAcc1" xml:space="preserve">
-    <value>Delivered features in C# and VB.NET and contributed to unit testing for long-term stability.</value>
+    <value>Développé des fonctionnalités en C# et VB.NET et contribué aux tests unitaires pour la stabilité à long terme.</value>
   </data>
   <data name="ExperienceIaAcc2" xml:space="preserve">
-    <value>Supported Scrum delivery and data workflows using SQL.</value>
+    <value>Soutenu la livraison Scrum et les besoins de données via SQL.</value>
   </data>
   <data name="ExperienceIaCompany" xml:space="preserve">
     <value>iA Groupe financier (Industrielle Alliance)</value>
@@ -386,7 +386,7 @@
     <value>Software Development Intern</value>
   </data>
   <data name="ExperienceIaScope" xml:space="preserve">
-    <value>Internship focused on feature delivery and team support.</value>
+    <value>Stage axé sur la livraison de fonctionnalités et le soutien d'équipe.</value>
   </data>
   <data name="ExperienceIaStartIso" xml:space="preserve">
     <value>2017-05-01</value>
@@ -443,7 +443,7 @@
     <value>Adobe Lightroom, Adobe Photoshop, outils personnalisés en C# / WPF.</value>
   </data>
   <data name="ExperiencePageSubtitle" xml:space="preserve">
-    <value>Timeline des rôles avec portée, faits saillants et stack technologique.</value>
+    <value>Timeline des rôles : portée, faits saillants et technologies utilisées.</value>
   </data>
   <data name="GlyphBullet" xml:space="preserve">
     <value>•</value>
@@ -488,13 +488,13 @@
     <value>100% à distance, équipes basées sur la confiance, culture produit orientée design, vacances flexibles</value>
   </data>
   <data name="HighlightBullet1" xml:space="preserve">
-    <value>Mené la modernisation front-end d’un logiciel desktop principal en migrant l’UI vers WPF et en rafraîchissant le langage visuel dans la transition vers Creaform.OS, en améliorant la cohérence visuelle sur plusieurs modules et écrans, avec des retours internes très positifs.</value>
+    <value>Mené la modernisation front-end d’un logiciel desktop principal en migrant l’UI vers WPF et en rafraîchissant le langage visuel dans la transition vers Creaform.OS — avec une cohérence visuelle nettement améliorée sur plusieurs modules et écrans, et des retours très positifs de l’équipe produit.</value>
   </data>
   <data name="HighlightBullet2" xml:space="preserve">
-    <value>Donner la direction UI sur plusieurs projets en définissant les règles de style et les patterns d’interaction, par exemple des cards réutilisables, des états cohérents pour boutons et champs, un comportement de fenêtre (WindowChrome et title bar) uniforme, et des patterns de navigation de type timeline, pour livrer une UI cohérente et soignée à grande échelle.</value>
+    <value>Donné la direction UI sur plusieurs projets en définissant les règles de style et les patterns d’interaction — cards réutilisables, états cohérents pour boutons et champs, comportement de fenêtre uniforme (WindowChrome et title bar), patterns de navigation de type timeline — pour livrer une UI cohérente et soignée à grande échelle.</value>
   </data>
   <data name="HighlightBullet3" xml:space="preserve">
-    <value>Produire des maquettes UI Photoshop haute fidélité et des prototypes cliquables pour le marketing et le développement, permettant de valider tôt la direction et de réduire le rework en fin de cycle.</value>
+    <value>Produit des maquettes UI Photoshop haute fidélité et des prototypes cliquables pour le marketing et le développement, validant tôt la direction et réduisant le rework en fin de cycle.</value>
   </data>
   <data name="HighlightBullet4" xml:space="preserve">
     <value>Conçu et livré une nouvelle interface pour peel.OS et contribué à peel 3 by Creaform, avec un focus sur la hiérarchie d’information, la clarté de navigation, et des patterns WPF réutilisables (styles, templates, états).</value>
@@ -599,7 +599,7 @@
     <value>Ouvrir</value>
   </data>
   <data name="PhotographyPageSubtitle" xml:space="preserve">
-    <value>Une sélection de mon travail, organisée en albums.</value>
+    <value>Sport, événements, portraits et voyage — une sélection organisée en albums.</value>
 </data>
   <data name="Project1Bullet1" xml:space="preserve">
     <value>Migration UI vers WPF et amélioration de la cohérence visuelle à travers le produit.</value>
@@ -722,13 +722,13 @@
     <value>Résumé</value>
   </data>
   <data name="SectionHeaderVisualCraft" xml:space="preserve">
-    <value>Savoir-faire visuel (photographie)</value>
+    <value>Savoir-faire visuel</value>
   </data>
   <data name="SectionHeaderWorkPreferences" xml:space="preserve">
     <value>Préférences de travail</value>
   </data>
   <data name="SkillsPageSubtitle" xml:space="preserve">
-    <value>Groupes de compétences faciles à scanner, axés sur l’UI desktop, le design system et la livraison WPF.</value>
+    <value>Groupes de compétences axés sur l’UI desktop, le design system et la livraison WPF.</value>
   </data>
   <data name="SkillsSectionCollaborationItem1" xml:space="preserve">
     <value>Direction UI et standards</value>
@@ -818,7 +818,7 @@
     <value>Expérience: 7+ ans en développement logiciel, 5+ ans axés sur l’UI desktop WPF.</value>
   </data>
   <data name="SummaryText" xml:space="preserve">
-    <value>Développeur logiciel senior orienté UI, spécialisé en applications desktop WPF, modernisation UI, et exécution design system. Je mène la livraison UI avec un standard élevé de cohérence, de finition d’interaction, et d’utilisabilité, en gardant l’équilibre entre le beau et les contraintes réelles du produit. Reconnu pour des maquettes Photoshop haute fidélité qui accélèrent l’alignement et réduisent le rework, ainsi que des habitudes d’intégration WPF solides (composants réutilisables, style centralisé, patterns d’interaction propres, structure prête pour la localisation).</value>
+    <value>Développeur logiciel senior orienté UI, spécialisé en applications desktop WPF, modernisation UI et exécution de design system. Je mène la livraison front-end avec un standard élevé de cohérence visuelle, de finition d’interaction et d’utilisabilité — en gardant l’intention du design intacte jusqu’à l’intégration. Maquettes Photoshop haute fidélité pour accélérer l’alignement d’équipe et réduire le rework en fin de cycle ; composants WPF réutilisables, style centralisé et structure localisable pour garder le code cohérent et l’expérience homogène.</value>
   </data>
   <data name="TabContactTitle" xml:space="preserve">
     <value>Contact</value>
@@ -854,6 +854,6 @@
     <value>Portfolio: https://olhphotographie.com</value>
   </data>
   <data name="VisualCraftText" xml:space="preserve">
-    <value>Photographe professionnel depuis 2010, avec plus de 20 ans d’expérience en retouche photo (depuis 2001). Le savoir-faire visuel renforce les résultats UI via une composition disciplinée, une hiérarchie visuelle claire, une cohérence de marque, et une finition attentive aux détails.</value>
+    <value>Photographe professionnel depuis 2010, avec plus de 20 ans d’expérience en retouche photo (depuis 2001). Travailler quotidiennement avec la composition, la lumière, la couleur et le cadrage affûte les mêmes instincts qui comptent en UI : hiérarchie visuelle plus nette, espacement plus délibéré, et un œil formé à reconnaître ce qui paraît intentionnel plutôt qu’accidentel.</value>
   </data>
 </root>

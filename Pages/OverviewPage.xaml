@@ -308,7 +308,7 @@
 
             <Border
                 x:Name="mHighlightsSectionBorder"
-                Grid.Row="2"
+                Grid.Row="3"
                 Style="{StaticResource SubSectionCardBorderStyle}">
                 <StackPanel
                     x:Name="mHighlightsStackPanel"
@@ -345,7 +345,7 @@
 
             <Border
                 x:Name="mDesignSystemSectionBorder"
-                Grid.Row="3"
+                Grid.Row="4"
                 Style="{StaticResource SubSectionCardBorderStyle}">
                 <StackPanel
                     x:Name="mDesignSystemStackPanel"
@@ -382,7 +382,7 @@
 
             <Border
                 x:Name="mCoreSkillsSectionBorder"
-                Grid.Row="4"
+                Grid.Row="2"
                 Style="{StaticResource SubSectionCardBorderStyle}">
                 <StackPanel
                     x:Name="mCoreSkillsStackPanel"
