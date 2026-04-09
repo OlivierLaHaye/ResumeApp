@@ -1,417 +1,150 @@
 # ResumeApp
 
-A Windows WPF application that presents an interactive resume and portfolio with tab navigation, light and dark themes, and bilingual UI (en-CA / fr-CA).
+A bilingual WPF desktop resume and portfolio that presents a CV like a polished product instead of a static document.
 
-## Overview
+English first. Version française plus bas.
 
-ResumeApp includes the following tabs:
-- Resume (overview and contact)
-- Experience
-- Skills
-- Projects (image carousels)
-- Photography (albums with image carousels)
-- Education
+![Hero screenshot of ResumeApp showing the overview screen in English dark mode, captured from the real application window on a horizontal 4K display](docs/readme-assets/screenshots/hero-overview-en-dark-horizontal.png)
 
-Theme and language can be changed from the UI and are remembered between launches.
+## English
 
-## Requirements (users)
+### Why this project is interesting
 
-- Windows 10 or Windows 11
-- A built Release build (for example `ResumeApp.exe`)
+- It is a real desktop portfolio piece, not a PDF viewer wrapped in a shell.
+- The experience page uses a custom timeline with synchronized role cards for a much stronger scan-and-explore flow.
+- Light and dark themes, plus English and French UI, are part of the actual product surface.
+- The project and photography sections show both software work and visual craft inside the same app.
+- The README screenshots are captured from the real application window on both horizontal and vertical 4K setups.
 
-## How to run
+### What the app does
 
-1. Launch `ResumeApp.exe`.
-2. Use the top controls to switch:
-   - Theme: Light or Dark
-   - Language: English (Canada) or French (Canada)
-3. Navigate between tabs:
-   Resume, Experience, Skills, Projects, Photography, Education
+ResumeApp brings together my profile, experience, skills, software projects, photography work, and education in a single Windows desktop application. Visitors can move through dedicated tabs, switch theme and language from the top bar, and explore project and photo galleries without leaving the app.
 
-## Saved settings
+### Why I built it
 
-ResumeApp saves:
-- Theme (`Light` / `Dark`)
-- Language (`EnglishCanada` / `FrenchCanada`)
+I wanted something stronger than “here is my resume as a PDF.” This project lets me demonstrate UI engineering, localization, information hierarchy, interaction polish, and product presentation in one artifact that people can actually explore.
 
-These values are stored in the Windows registry:
-- `HKEY_CURRENT_USER\Software\ResumeApp`
-  - `Theme`
-  - `Language`
+### Additional screenshots
 
-### Reset settings
+These are window-only captures from the real app, with rounded corners preserved.
 
-To reset to defaults:
-- Remove `Theme` and `Language` (or delete the `ResumeApp` key) under `HKCU\Software\ResumeApp`
-- Relaunch the application
+#### Experience timeline
 
-## Build from source (developers)
+![Experience timeline view in English light mode, captured from the real app window on a vertical 4K display](docs/readme-assets/screenshots/experience-en-light-vertical.png)
 
-### Prerequisites
+English · Light mode · Vertical 4K capture
 
-Recommended:
-- Visual Studio 2026
-- Workload: .NET desktop development
-- .NET SDK: .NET 10 (Windows)
+#### Project case studies
 
-Visual Studio 2022 option:
-- Visual Studio 2022
-- Workload: .NET desktop development
-- Recommended target: .NET 9 (Windows)
+![Projects tab in French dark mode, captured from the real app window on a horizontal 4K display](docs/readme-assets/screenshots/projects-fr-dark-horizontal.png)
 
-Note about Visual Studio 2022:
-- If the solution targets .NET 10, VS2022 may not fully support the project system and tooling.
-- A workaround is to retarget the project to .NET 9 (Windows), for example `net9.0-windows`.
-- This should work in many cases, but it is not guaranteed depending on your dependencies and features used.
+French · Dark mode · Horizontal 4K capture
 
-### Build
+#### Photography gallery
 
-1. Open the solution in Visual Studio.
-2. Build in Debug or Release.
+![Photography tab in French light mode, captured from the real app window on a vertical 4K display](docs/readme-assets/screenshots/photography-fr-light-vertical.png)
 
-### Pre-build step (ResxCleaner.exe)
+French · Light mode · Vertical 4K capture
 
-The project uses a pre-build event that calls `ResxCleaner.exe`.
+<details>
+<summary>More screens</summary>
 
-If you do not have `ResxCleaner.exe` at the expected location, builds will fail. Options:
-- Provide the executable in the project directory, or
-- Disable the pre-build event in Project Properties > Build Events.
+#### Skills overview
 
-## Customizing content
+![Skills tab in English light mode, captured from the real app window on a horizontal 4K display](docs/readme-assets/screenshots/skills-en-light-horizontal.png)
 
-### Text and localization
+English · Light mode · Horizontal 4K capture
 
-The UI uses resource keys (`.resx`) and a runtime language switch.
+#### Education
 
-To update content:
-- Edit the resource files (English and French).
-- Keep the same keys in both languages.
+![Education tab in French dark mode, captured from the real app window on a vertical 4K display](docs/readme-assets/screenshots/education-fr-dark-vertical.png)
 
-### Images (Projects and Photography)
+French · Dark mode · Vertical 4K capture
 
-Projects and albums display images through a carousel control.
+</details>
 
-To add or update images:
-- Place images under the appropriate `Resources\...` folders.
-- Ensure files are included as Resources in the project file and copied to output if needed.
+### Tech stack
 
-## Experience Timeline
+- .NET 10
+- C# 14
+- WPF and XAML
+- ResourceDictionary-based theming, styling, and animation tokens
+- `.resx` localization for `en-CA` and `fr-CA`
+- Custom controls for the experience timeline and image carousels
+- xUnit tests for view models, services, controls, converters, and helpers
 
-The Experience tab features an interactive timeline control with the following capabilities:
+### How to run it locally
 
-### Features
-- **Pan and zoom**: Click-drag to pan, scroll wheel to zoom. Inertia-based scrolling.
-- **Keyboard navigation**: Left/Right arrows move the selected date. Up/Down arrows navigate between timeframes. Home/End jump to start/end. Ctrl modifies step size.
-- **Hover feedback**: Timeline bars brighten on hover with a subtle stroke outline.
-- **Selection highlight**: Selected bar shows at full opacity with accent glow and white stroke.
-- **Year era bands**: Alternating subtle background bands mark even years for temporal context.
-- **Today marker**: Dashed line with "Today" label marks the current date.
-- **Selected date pill**: Compact pill below the baseline shows the selected date with accent styling.
-- **Scroll sync**: Bidirectional synchronization between timeline selection and experience card list.
-- **Focus outline**: Double-ring focus indicator (inner glow + accent ring) for keyboard users.
-- **Accent left bar**: Each experience card has an accent-colored vertical bar matching its timeline color.
-- **Card selection**: Selected card shows an accent border and enlarged rail dot.
-
-### Performance
-- Custom `DrawingContext` rendering (no visual tree overhead per timeline entry).
-- `FormattedText` cache with 256-entry limit to prevent memory growth.
-- Zero-allocation hit testing with simple for loop.
-- Frozen brushes for cross-thread safety and reduced change-notification overhead.
-- `CompositionTarget.Rendering` subscription only active during pan/zoom/inertia animations.
+Windows is required because this is a WPF desktop application.
 
-### Accessibility
-- Full keyboard navigation for dates and timeframes.
-- Visible focus indicators on both timeline and experience cards.
-- High-contrast-compatible accent colors from theme resources.
-- Reduced visual complexity for non-selected items (dimmed to 65% opacity).
+```powershell
+dotnet build ResumeApp.sln -c Release
+dotnet run --project ResumeApp.csproj -c Release
+```
 
-## UI Animation and Polish System
+If you prefer to launch the built executable directly:
 
-The app uses a centralized animation token system defined in `Resources/Tokens.xaml` for consistent interactive feedback across all controls.
+```text
+bin/Release/net10.0-windows/ResumeApp.exe
+```
 
-### Animation Tokens
+The repository already includes `ResxCleaner.exe`, which is used by the project pre-build step.
 
-| Token | Value | Purpose |
-|-------|-------|---------|
-| `MicroDuration` | 200ms | Fast UI feedback (hover enter, selection) |
-| `SubtleDuration` | 300ms | Smooth transitions (hover leave, page entrance, fade-in) |
-| `FastDuration` | 350ms | Standard interactions (button hover, tooltip) |
-| `NormalDuration` | 550ms | Relaxed return-to-normal animations |
-| `CubicEaseOut` | CubicEase | Smooth easing for subtle transitions |
-| `EaseOut` | QuadraticEase | Standard easing for button/control interactions |
+### Quick evaluation notes
 
-### Scale Tokens
+- The best place to start is the overview screen, then the experience timeline, then the projects tab.
+- The UI is intentionally bilingual and theme-aware because localization and presentation are part of the point of the project.
+- The photography section is there on purpose: it shows visual judgment and presentation craft, not only coding.
+- If you are evaluating this as a portfolio piece, focus on shell design, interaction polish, content structure, and the custom timeline control.
 
-| Token | Value | Purpose |
-|-------|-------|---------|
-| `UniformScaleNormal` | 1.0 | Default state |
-| `UniformScaleSubtleHover` | 1.02 | Cards, chips, panels hover |
-| `UniformScaleHover` | 1.12 | Buttons, interactive controls hover |
-| `UniformScalePressed` | 0.90 | Pressed state feedback |
+## Français (Québec)
 
-### Animated UI Areas
+### Pourquoi ce projet vaut le détour
 
-- **Tab items**: Smooth overlay fade on hover/selection (both main and default tab styles)
-- **Cards and panels**: Shadow glow animates on hover (`SectionCardStyle`, `CommandItemBorderStyle`)
-- **Experience cards**: Subtle scale on hover, opacity feedback on press
-- **Skill chips**: Shared `ChipBorderStyle` with scale hover animation (used across Skills, Experience, and Projects pages)
-- **Page transitions**: Content fades in (300ms) on each tab switch
-- **Top bar collapse**: Expanded/collapsed content fades in to complement the arrow rotation
-- **Tooltips**: Scale + opacity entrance/exit animations
-- **Scroll bar**: Thumb scales on hover with accent color change
-- **Buttons**: Scale hover/pressed via storyboard tokens
-- **Contact action pills**: VSM-based scale + color transitions
+- Ce n’est pas un CV PDF déguisé en application.
+- L’onglet Expérience repose sur une ligne du temps personnalisée, synchronisée avec les cartes de rôles.
+- Les thèmes clair et sombre, ainsi que l’interface bilingue, font partie de l’expérience elle-même.
+- Les sections Projets et Photographie montrent à la fois le travail logiciel et le souci de présentation visuelle.
+- Les captures du README viennent de la vraie fenêtre de l’application, sur des écrans 4K horizontal et vertical.
 
-### Guidelines for Adding New Animations
+### Ce que l’application fait
 
-1. Use tokens from `Tokens.xaml` instead of hardcoded durations and easing functions.
-2. Prefer `MicroDuration` for enter animations and `SubtleDuration` for exit/fade-out.
-3. Use `CubicEaseOut` for subtle transitions, `EaseOut` for standard interactions.
-4. Keep animations tasteful and non-distracting. Avoid scale values above 1.05 for cards/panels.
-5. Use `EventTrigger` with `RoutedEvent` for Border/FrameworkElement animations, and `Trigger.EnterActions`/`ExitActions` for control template triggers.
+ResumeApp regroupe mon profil, mon parcours, mes compétences, mes projets logiciels, mon travail photo et ma formation dans une seule application Windows. On peut passer d’un onglet à l’autre, changer le thème et la langue depuis la barre du haut, puis parcourir les projets et les galeries d’images directement dans l’interface.
 
-## Content Strategy and Recruiter Positioning
+### Pourquoi je l’ai construite
 
-### Target positioning
+Je voulais quelque chose de plus parlant que « voici mon CV en PDF ». Ce projet me permet de montrer, dans un seul objet, ma façon d’aborder l’ingénierie UI, la localisation, la hiérarchie visuelle, la finition d’interaction et la présentation produit en WPF.
 
-The app is designed to position Olivier La Haye as a **senior UI developer** with strong front-end, UI/UX, and product-polish credentials, primarily targeting WPF desktop roles in Canada.
+### Stack technique
 
-### Overview page section order
+- .NET 10
+- C# 14
+- WPF et XAML
+- Dictionnaires de ressources pour les thèmes, les styles et les jetons d’animation
+- Localisation `en-CA` et `fr-CA` avec des fichiers `.resx`
+- Contrôles sur mesure pour la ligne du temps d’expérience et les carrousels d’images
+- Projet de tests xUnit pour les view models, services, contrôles, convertisseurs et helpers
 
-The Resume tab (Overview page) sections are ordered for recruiter scanning efficiency:
+### Lancer le projet localement
 
-1. **Header** — name, target titles, contact
-2. **Summary** — 3-sentence positioning statement (~63 words)
-3. **Core Skills** — categorized technical keywords (ATS + human scan)
-4. **UI/UX Highlights** — 5 achievement bullets with specific context
-5. **Design System and UI Development** — supporting capability bullets
+Windows est requis, puisque l’application est construite en WPF.
 
-Skills appear before highlights so that technical keyword scanning succeeds before the reader reaches narrative content.
+```powershell
+dotnet build ResumeApp.sln -c Release
+dotnet run --project ResumeApp.csproj -c Release
+```
 
-### Content strategy principles
+Tu peux aussi lancer directement l’exécutable généré :
 
-- Lead with value, not feelings. No "passionate about", no "results-driven".
-- Replace vague claims with specific context ("well-received across the product team" not "strong internal feedback").
-- Em-dash constructions separate the action from its impact for better scannability.
-- Summary length: ~60–65 words in English, equivalent in French.
+```text
+bin/Release/net10.0-windows/ResumeApp.exe
+```
 
-### Bilingual requirements
+Le dépôt inclut déjà `ResxCleaner.exe`, utilisé à l’étape de pré-build.
 
-- French and English versions carry the same core meaning but are written independently for each language.
-- French version targets professional Québec French: avoid colloquialisms (e.g., no "le beau"), use nominalized constructions, avoid overly literal translations.
-- The `ExperienceCreaformUiUxExpert*`, `ExperienceCreaformSoftwareDeveloper*`, `ExperienceArcane*`, and `ExperienceIa*` experience keys have full French translations in `Resources.fr-CA.resx`. Earlier versions of these keys had English fallback text.
+### Points à regarder rapidement
 
-### Known follow-up recommendations (out of scope)
-
-- Add portfolio link annotation near the header (e.g., "5 WPF projects including full MVVM redesign").
-- Consider surfacing a brief bilingual language proficiency indicator (e.g., "Français natif · English full professional").
-- The `Experience1*`, `Experience2*`, `Experience3*`, `Experience4*` keys in both `.resx` files are legacy keys not used by any ViewModel — they can be removed in a future cleanup pass.
-- `SummaryExperienceLine` resource key is defined in both files but not currently bound to any UI element.
-
----
-
-## Troubleshooting
-
-### Build fails with “ResxCleaner.exe not found”
-- Provide `ResxCleaner.exe` or disable the pre-build event.
-
-### Theme or language is stuck on a previous choice
-- Clear `HKCU\Software\ResumeApp` and restart the app.
-
-## License
-
-No license is included yet. Add a `LICENSE` file if you want to define usage and redistribution terms.
-
----
-
-# ResumeApp (Français)
-
-Application Windows WPF qui présente un CV et un portfolio interactifs avec navigation par onglets, thème clair et sombre, et interface bilingue (en-CA / fr-CA).
-
-## Aperçu
-
-ResumeApp inclut les onglets suivants :
-- CV (aperçu et contact)
-- Expérience
-- Compétences
-- Projets (carrousels d’images)
-- Photographie (albums avec carrousels d’images)
-- Éducation
-
-Le thème et la langue peuvent être changés dans l’interface et sont mémorisés entre les ouvertures.
-
-## Prérequis (utilisateurs)
-
-- Windows 10 ou Windows 11
-- Une build Release (par exemple `ResumeApp.exe`)
-
-## Démarrage
-
-1. Lance `ResumeApp.exe`.
-2. Utilise les contrôles en haut pour changer :
-   - Thème : clair ou sombre
-   - Langue : anglais (Canada) ou français (Canada)
-3. Navigue entre les onglets :
-   CV, Expérience, Compétences, Projets, Photographie, Éducation
-
-## Préférences sauvegardées
-
-ResumeApp sauvegarde :
-- Le thème (`Light` / `Dark`)
-- La langue (`EnglishCanada` / `FrenchCanada`)
-
-Ces valeurs sont stockées dans le registre Windows :
-- `HKEY_CURRENT_USER\Software\ResumeApp`
-  - `Theme`
-  - `Language`
-
-### Réinitialiser les préférences
-
-Pour revenir aux valeurs par défaut :
-- Supprime `Theme` et `Language` (ou la clé `ResumeApp`) sous `HKCU\Software\ResumeApp`
-- Relance l’application
-
-## Compilation (développeurs)
-
-### Prérequis
-
-Recommandé :
-- Visual Studio 2026
-- Workload : .NET desktop development
-- .NET SDK : .NET 10 (Windows)
-
-Option Visual Studio 2022 :
-- Visual Studio 2022
-- Workload : .NET desktop development
-- Cible recommandée : .NET 9 (Windows)
-
-Note pour Visual Studio 2022 :
-- Si la solution cible .NET 10, VS2022 peut ne pas supporter complètement le projet et l’outillage.
-- Un contournement est de retargeter le projet vers .NET 9 (Windows), par exemple `net9.0-windows`.
-- Ça peut fonctionner dans beaucoup de cas, mais ce n’est pas garanti selon tes dépendances et les features utilisées.
-
-### Build
-
-1. Ouvre la solution dans Visual Studio.
-2. Compile en Debug ou Release.
-
-### Étape pre-build (ResxCleaner.exe)
-
-Le projet utilise un événement pre-build qui appelle `ResxCleaner.exe`.
-
-Si tu n’as pas `ResxCleaner.exe` au bon emplacement, la compilation va échouer. Options :
-- Fournir l’exécutable dans le répertoire du projet, ou
-- Désactiver l’événement pre-build dans Project Properties > Build Events.
-
-## Personnaliser le contenu
-
-### Textes et traduction
-
-L’interface utilise des clés de ressources (`.resx`) et un changement de langue à l’exécution.
-
-Pour modifier le contenu :
-- Mets à jour les fichiers de ressources (anglais et français).
-- Conserve les mêmes clés dans les deux langues.
-
-### Images (Projets et Photographie)
-
-Les projets et les albums affichent des images via un contrôle de carrousel.
-
-Pour ajouter ou mettre à jour des images :
-- Place les images dans les dossiers `Resources\...` appropriés.
-- Assure-toi que les fichiers sont inclus comme Resources dans le projet file et copiés au besoin.
-
-## Ligne du temps d'expérience
-
-L'onglet Expérience comporte un contrôle de ligne du temps interactif :
-
-### Fonctionnalités
-- **Défilement et zoom** : cliquer-glisser pour défiler, molette pour zoomer. Défilement avec inertie.
-- **Navigation clavier** : Gauche/Droite déplacent la date. Haut/Bas naviguent entre les périodes. Début/Fin sautent au début/à la fin. Ctrl modifie la taille du pas.
-- **Survol** : les barres de la ligne du temps s'éclaircissent au survol avec un contour subtil.
-- **Sélection** : la barre sélectionnée s'affiche en pleine opacité avec un halo et un contour blanc.
-- **Bandes d'ère** : bandes de fond alternées subtiles pour les années paires.
-- **Marqueur Aujourd'hui** : ligne pointillée avec étiquette « Today » pour la date du jour.
-- **Pastille de date** : pastille compacte sous la ligne de base affichant la date sélectionnée.
-- **Synchronisation défilement** : synchronisation bidirectionnelle entre la sélection et la liste des cartes.
-- **Barre d'accent** : chaque carte d'expérience a une barre verticale colorée correspondant à sa couleur dans la ligne du temps.
-
-### Performance
-- Rendu par `DrawingContext` (pas d'arbre visuel par entrée).
-- Cache de `FormattedText` avec limite de 256 entrées.
-- Test de collision sans allocation avec boucle simple.
-- Pinceaux gelés pour la sécurité multi-thread.
-
-## Système d'animation et de finition UI
-
-L'application utilise un système centralisé de jetons d'animation défini dans `Resources/Tokens.xaml` pour un retour interactif cohérent sur tous les contrôles.
-
-### Jetons d'animation
-
-| Jeton | Valeur | Utilisation |
-|-------|--------|-------------|
-| `MicroDuration` | 200ms | Retour rapide (entrée de survol, sélection) |
-| `SubtleDuration` | 300ms | Transitions douces (sortie de survol, entrée de page, fondu) |
-| `FastDuration` | 350ms | Interactions standard (survol de bouton, infobulle) |
-| `NormalDuration` | 550ms | Retour détendu à l'état normal |
-| `CubicEaseOut` | CubicEase | Lissage pour transitions subtiles |
-| `EaseOut` | QuadraticEase | Lissage standard pour boutons/contrôles |
-
-### Jetons d'échelle
-
-| Jeton | Valeur | Utilisation |
-|-------|--------|-------------|
-| `UniformScaleNormal` | 1.0 | État par défaut |
-| `UniformScaleSubtleHover` | 1.02 | Survol de cartes, puces, panneaux |
-| `UniformScaleHover` | 1.12 | Survol de boutons, contrôles interactifs |
-| `UniformScalePressed` | 0.90 | Retour à l'appui |
-
-### Zones UI animées
-
-- **Onglets** : fondu d'overlay au survol/sélection (styles d'onglet principal et par défaut)
-- **Cartes et panneaux** : lueur d'ombre animée au survol
-- **Cartes d'expérience** : échelle subtile au survol, retour d'opacité à l'appui
-- **Puces de compétences** : `ChipBorderStyle` partagé avec animation de survol
-- **Transitions de page** : le contenu apparaît en fondu (300ms) à chaque changement d'onglet
-- **Barre supérieure** : le contenu développé/réduit apparaît en fondu
-- **Infobulles** : animation d'échelle + opacité à l'entrée/sortie
-- **Barre de défilement** : le curseur s'agrandit au survol
-- **Boutons** : échelle au survol/appui via jetons de storyboard
-
-## Stratégie de contenu et positionnement recruteur
-
-### Positionnement cible
-
-L'application positionne Olivier La Haye comme **développeur UI senior** avec de solides compétences en front-end, UI/UX et finition produit, principalement pour des rôles WPF desktop au Canada.
-
-### Ordre des sections dans l'onglet CV
-
-Les sections de la page Aperçu sont ordonnées pour faciliter le scan recruteur :
-
-1. **En-tête** — nom, titres ciblés, coordonnées
-2. **Résumé** — texte de positionnement (~60 mots)
-3. **Compétences clés** — catégories techniques (ATS + scan humain)
-4. **Faits saillants UI/UX** — 5 réalisations avec contexte spécifique
-5. **Design system et développement UI** — points de capacité
-
-Les compétences précèdent les réalisations pour que le scan de mots-clés techniques soit complété avant la lecture narrative.
-
-### Bilinguisme
-
-- Les versions française et anglaise portent le même sens de base mais sont rédigées indépendamment pour chaque langue.
-- La version française cible le français professionnel québécois : pas de colloquialismes, pas de traductions trop littérales de l'anglais.
-- Les clés d'expérience `ExperienceCreaformUiUxExpert*`, `ExperienceCreaformSoftwareDeveloper*`, `ExperienceArcane*` et `ExperienceIa*` ont des traductions françaises complètes dans `Resources.fr-CA.resx`.
-
----
-
-## Dépannage
-
-### La compilation échoue avec “ResxCleaner.exe not found”
-- Fournis `ResxCleaner.exe` ou désactive l’événement pre-build.
-
-### Thème ou langue bloqués sur un ancien choix
-- Efface `HKCU\Software\ResumeApp` puis relance l’app.
-
-## Licence
-
-Aucune licence n’est incluse pour l’instant. Ajoute un fichier `LICENSE` si tu veux définir les conditions d’utilisation et de redistribution.
+- Commence par l’aperçu, puis passe à la ligne du temps dans l’onglet Expérience, puis aux Projets.
+- Le bilinguisme et les thèmes ne sont pas décoratifs : ils font partie de la démonstration.
+- La section Photographie est là pour montrer le jugement visuel et la qualité de présentation, pas seulement le code.
+- Si tu regardes ce dépôt comme pièce de portfolio, porte surtout attention au shell, à la finition UI, à la structure du contenu et à la ligne du temps personnalisée.
