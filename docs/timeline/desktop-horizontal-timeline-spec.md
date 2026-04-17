@@ -326,3 +326,64 @@ Each phase ships behind `UseHorizontalTimelineV2` until P5.
 ## 13. Change log
 
 - 2026-04-16 — Initial spec on branch `docs/timeline-horizontal-spec`.
+- 2026-04-16 — **Phase P0 implemented** on branch `feat/timeline-horizontal-v2-p0`. See §14.
+
+## 14. Implementation notes — Phase P0 (2026-04-16)
+
+### 14.1 Scope shipped
+
+- Localized Today / Présent pill (resx key `TimelineLabelTodayMarker`).
+- `TimelineTimeFrameItem.SubtitleText` INPC property (additive, default empty).
+- `ExperiencePageViewModel.CreateTimeFrameForEntry` now sets `SubtitleText = pEntry.RoleText` (role carried alongside company into each bar item).
+- `TimelineControl.TodayMarkerText` dependency property (AffectsRender, default `"Today"`); `DrawTodayMarker` reads it with a whitespace fallback to `"Today"`.
+- XAML binding `TodayMarkerText="{Binding ResourcesService[TimelineLabelTodayMarker]}"` on `ExperiencePage.xaml`.
+
+### 14.2 Files changed
+
+- `Models/TimelineTimeFrameItem.cs` — added `SubtitleText` INPC property + 5-arg ctor (4-arg ctor preserved for back-compat).
+- `ViewModels/Pages/ExperiencePageViewModel.cs` — `CreateTimeFrameForEntry` now passes `pEntry.RoleText` as `pSubtitleText`.
+- `Properties/Resources.resx` — new `TimelineLabelTodayMarker = "Today"`.
+- `Properties/Resources.fr-CA.resx` — new `TimelineLabelTodayMarker = "Aujourd'hui"`.
+- `Controls/TimelineControl.cs` — new `sTodayMarkerTextProperty` DP + `TodayMarkerText` wrapper; `DrawTodayMarker` replaces hardcoded `"Today"` with DP + whitespace fallback.
+- `Pages/ExperiencePage.xaml` — bound `TodayMarkerText` to `ResourcesService[TimelineLabelTodayMarker]`.
+- `ResumeApp.Tests/Models/TimelineTimeFrameItemTests.cs` — added 5 tests covering subtitle default/round-trip/INPC/null-coalesce.
+- `ResumeApp.Tests/ViewModels/ExperiencePageViewModelTests.cs` — added test asserting title carries company and subtitle carries role across all frames.
+- `ResumeApp.Tests/Controls/TimelineControlTests.cs` — added 3 `StaFact` tests for the `TodayMarkerText` DP (default, round-trip, null-coalesce to `"Today"`).
+
+### 14.3 Rendering decisions
+
+- `DrawTodayMarker` call-order unchanged (background → era → bars → labels → baseline → ticks → today → selected → focus).
+- DP default `"Today"` guarantees a visible label even if the XAML binding fails, the resource is missing, or the control is instantiated outside a DI-supplied `DataContext` (e.g. test host).
+- Wrapper coerces null assignments to `"Today"` so callers can never drive the label to `null`.
+- `AffectsRender` metadata only — no hit-testing impact, no layout invalidation.
+
+### 14.4 Validation evidence
+
+- `dotnet build ResumeApp.sln -c Debug` → 0 warnings, 0 errors.
+- `dotnet test ResumeApp.sln -c Debug` → **523 passed / 0 failed / 0 skipped** (baseline was 514 before P0; +9 new tests, no regressions).
+- Build runs observed: resx linter normalized both resx files in place. The new `TimelineLabelTodayMarker` entry is preserved (sorted alongside `TimelineControlInteractionsHelpText`).
+
+### 14.5 Validation gaps (deferred — require interactive Windows session)
+
+This phase was implemented from a headless shell. The following items from §8 of this spec and the validation plan require an interactive WPF host and were not executed here:
+
+- Screenshot captures at en-CA / fr-CA × Compact / Comfortable × 100 % / 125 % / 150 % / 200 % DPI.
+- Visual diff vs. the reference mockup.
+- Narrow-window (560 CSS px) and wide-window (1920 CSS px) clipping checks.
+- High-contrast mode visual pass.
+- `inspect.exe` AutomationPeer verification (out of P0 scope).
+
+P5 of the phased plan (§10) gathers these into a single visual-parity sweep; they stay deferred until P1-P4 land.
+
+### 14.6 Remaining limitations
+
+- Two-line label (role + company inside the bar) still not rendered — deferred to P1.
+- `AutomationPeer`, focus-on-bar, hover tooltip, reduced-motion guard, density toggle — all deferred to P2-P4 per §10.
+- `UseHorizontalTimelineV2` flag from §7 was not added in P0 because nothing in P0 is visually invasive: the Today pill still reads `"Today"` under `en-CA`, and the new `SubtitleText` is not yet consumed by the renderer. The flag will be introduced when P1 lands the two-line label.
+- 8 unrelated photography JPG binaries remain modified in the working tree (pre-existing change — carried onto the P0 branch, intentionally not committed).
+
+### 14.7 Git state
+
+- Branch: `feat/timeline-horizontal-v2-p0` (branched from `docs/timeline-horizontal-spec`).
+- Commit scope: code + tests + this docs update. Photography JPG mods not included.
+- Push target: `origin/feat/timeline-horizontal-v2-p0`.

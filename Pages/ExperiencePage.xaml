@@ -149,7 +149,8 @@
                     MinDate="{Binding TimelineMinDate}"
                     SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     SelectedTimeFrame="{Binding SelectedTimeFrame, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TimeFrames="{Binding ExperienceTimeFrames}" />
+                    TimeFrames="{Binding ExperienceTimeFrames}"
+                    TodayMarkerText="{Binding ResourcesService[TimelineLabelTodayMarker]}" />
             </Grid>
         </Border>
 

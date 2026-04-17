@@ -243,6 +243,15 @@ namespace ResumeApp.Controls
 					OnViewportStartTicksChanged,
 					CoerceViewportStartTicks ) );
 
+		public static readonly DependencyProperty sTodayMarkerTextProperty =
+			DependencyProperty.Register(
+				nameof( TodayMarkerText ),
+				typeof( string ),
+				typeof( TimelineControl ),
+				new FrameworkPropertyMetadata(
+					"Today",
+					FrameworkPropertyMetadataOptions.AffectsRender ) );
+
 		private readonly List<TimeFrameHitInfo> mTimeFrameHitInfos;
 		private readonly List<PanSample> mPanSamples;
 
@@ -333,6 +342,12 @@ namespace ResumeApp.Controls
 		{
 			get => new( Math.Max( 0L, ( long )ViewportStartTicks ) );
 			set => ViewportStartTicks = value.Ticks;
+		}
+
+		public string TodayMarkerText
+		{
+			get => ( GetValue( sTodayMarkerTextProperty ) as string ) ?? "Today";
+			set => SetCurrentValue( sTodayMarkerTextProperty, value ?? "Today" );
 		}
 
 		private DateTime EffectiveMinDate => GetEffectiveMinDate();
@@ -1976,7 +1991,12 @@ namespace ResumeApp.Controls
 
 			var lTypeface = new Typeface( FontFamily, FontStyle, FontWeight, FontStretch );
 			var lTodayLabelBrush = CreateOpacityBrush( pTextBrush, 0.45 ) ?? pTextBrush;
-			var lText = CreateFormattedTextCached( "Today", lTypeface, 10.0, lTodayLabelBrush, pPixelsPerDip );
+			string lTodayLabel = TodayMarkerText;
+			if ( string.IsNullOrWhiteSpace( lTodayLabel ) )
+			{
+				lTodayLabel = "Today";
+			}
+			var lText = CreateFormattedTextCached( lTodayLabel, lTypeface, 10.0, lTodayLabelBrush, pPixelsPerDip );
 
 			if ( lText != null )
 			{

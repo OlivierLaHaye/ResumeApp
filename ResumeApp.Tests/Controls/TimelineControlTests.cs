@@ -130,4 +130,32 @@ public sealed class TimelineControlTests
 
         Assert.Null( lException );
     }
+
+    [StaFact]
+    public void TodayMarkerText_DefaultsToToday()
+    {
+        var lControl = new TimelineControl();
+
+        Assert.Equal( "Today", lControl.TodayMarkerText );
+    }
+
+    [StaFact]
+    public void TodayMarkerText_SetAndGet_RoundTrips()
+    {
+        var lControl = new TimelineControl();
+
+        lControl.TodayMarkerText = "Aujourd'hui";
+
+        Assert.Equal( "Aujourd'hui", lControl.TodayMarkerText );
+    }
+
+    [StaFact]
+    public void TodayMarkerText_NullAssignment_CoalescesToToday()
+    {
+        var lControl = new TimelineControl();
+
+        lControl.TodayMarkerText = null!;
+
+        Assert.Equal( "Today", lControl.TodayMarkerText );
+    }
 }
