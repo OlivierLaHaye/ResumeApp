@@ -3,6 +3,7 @@
 [Oo]bj/
 [Dd]ebug*/
 [Rr]elease*/
+!docs/releases/
 x64/
 x86/
 [Aa]rm/

@@ -14,6 +14,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture( "" )]
 [assembly: ComVisible( false )]
 [assembly: Guid( "80F5FC88-4E2F-4F1D-AFEE-19041B3539C6" )]
-[assembly: AssemblyVersion( "1.0.0.0" )]
-[assembly: AssemblyFileVersion( "1.0.0.0" )]
+[assembly: AssemblyVersion( "3.2.0.0" )]
+[assembly: AssemblyFileVersion( "3.2.0.0" )]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo( "ResumeApp.Tests" )]
