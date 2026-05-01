@@ -77,7 +77,7 @@
     <value>Volleyball</value>
 </data>
   <data name="AppSubtitle" xml:space="preserve">
-    <value>Senior UI Developer · WPF Desktop</value>
+    <value>Senior Design Engineer · AI-Native · Agent Orchestrator</value>
   </data>
   <data name="AppTitle" xml:space="preserve">
     <value>Resume</value>
@@ -140,7 +140,7 @@
     <value>Collaboration and Leadership: UI guidance to developers, standards and review support, cross-team alignment, iterative refinement with stakeholders and QA</value>
   </data>
   <data name="CoreSkillsLine7" xml:space="preserve">
-    <value>Applied AI Workflows: agent-assisted development (Claude Code, Codex), structured prompting, multimodal research, UI iteration acceleration, agent orchestration, execution leverage</value>
+    <value>AI-Native Engineering and Agent Orchestration: agent orchestration as a primary engineering practice (Claude Code, Codex, Copilot CLI), structured prompting, problem framing, architecture cadrage, agent output evaluation and steering, multi-agent coordination, Model Context Protocol (MCP), iterative refinement loops; deliver production-quality work in unfamiliar stacks by combining strong product judgment with agent velocity</value>
   </data>
   <data name="DesignSystemBullet1" xml:space="preserve">
     <value>UI foundations: consistent spacing, typography rhythm, color decisions, and layout hierarchy across screens.</value>
@@ -314,7 +314,7 @@
     <value>Shipped WPF UI features with a high standard for usability, visual hierarchy, and interaction polish.</value>
   </data>
   <data name="ExperienceCreaformSoftwareDeveloperCompany" xml:space="preserve">
-    <value>Creaform</value>
+    <value>FARO Creaform</value>
   </data>
   <data name="ExperienceCreaformSoftwareDeveloperEndIso" xml:space="preserve">
     <value>2024-03-01</value>
@@ -335,7 +335,7 @@
     <value>WPF, XAML, C#, MVVM, Visual Studio</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertAcc1" xml:space="preserve">
-    <value>Led UI modernization during the transition from VXelements to Creaform.OS, delivering a refreshed visual language and stronger UI consistency across multiple product modules.</value>
+    <value>Led the complete visual frontend migration of a flagship desktop product from WinForms to WPF during the transition from VXelements to Creaform.OS, defining design direction, producing mockups, and refreshing the visual language across the entire product.</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertAcc2" xml:space="preserve">
     <value>Defined and reinforced UI standards (spacing, typography, states, theming rules) to reduce fragmentation and keep the product cohesive.</value>
@@ -344,10 +344,10 @@
     <value>Produced high-fidelity Photoshop mockups and prototype-ready visuals to validate direction early and reduce late-stage UI churn.</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertAcc4" xml:space="preserve">
-    <value>Supported developers with styling decisions and interaction details to raise overall UI polish and consistency.</value>
+    <value>Acted as the internal UI/UX consultant for a development team of 10+, leading design reviews and supporting styling decisions, interaction details, and design-to-code handoff.</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertCompany" xml:space="preserve">
-    <value>Creaform</value>
+    <value>FARO Creaform</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertLocation" xml:space="preserve">
     <value>Lévis, QC, Canada (Hybrid)</value>
@@ -476,7 +476,7 @@
     <value>https://www.linkedin.com/in/olivier-la-haye/</value>
   </data>
   <data name="HeaderLocationValue" xml:space="preserve">
-    <value>Québec City, QC, Canada</value>
+    <value>Québec City, QC, Canada · Available for full remote (NA)</value>
   </data>
   <data name="HeaderPortfolioValue" xml:space="preserve">
     <value>https://olhphotographie.com</value>
@@ -818,7 +818,7 @@
     <value>Experience: 7+ years in software development, 5+ years focused on WPF desktop UI.</value>
   </data>
   <data name="SummaryText" xml:space="preserve">
-    <value>Senior UI developer specializing in WPF desktop applications, UI modernization, and design-system execution. I lead front-end delivery to a high standard for visual consistency, interaction polish, and usability — keeping design intent intact through implementation. High-fidelity Photoshop mockups accelerate team alignment and reduce late-cycle rework; reusable WPF components, centralized theming, and localization-ready structure keep the codebase cohesive and the product consistent.</value>
+    <value>Senior Design Engineer with 7+ years bridging visual craft and shipped code. I deliver production-quality UI in any stack by orchestrating coding agents (Claude Code, Codex, Copilot CLI) with strong design judgment. Deep expertise in WPF, .NET, and MVVM, paired with 25 years of visual craft (Adobe Photoshop since 2001, professional photography since 2010). Recently shipped end-to-end web applications in TypeScript, Astro, and Cloudflare without prior web framework experience by framing problems precisely, evaluating agent output critically, and iterating to polish. Trusted by designers and marketing teams as the engineering voice on UI/UX decisions, with proposals consistently validated and adopted.</value>
   </data>
   <data name="TabContactTitle" xml:space="preserve">
     <value>Contact</value>

@@ -77,7 +77,7 @@
     <value>Volleyball</value>
 </data>
   <data name="AppSubtitle" xml:space="preserve">
-    <value>Développeur UI senior · WPF Desktop</value>
+    <value>Concepteur-développeur senior · Natif IA · Orchestrateur d’agents</value>
   </data>
   <data name="AppTitle" xml:space="preserve">
     <value>Curriculum vitae</value>
@@ -140,7 +140,7 @@
     <value>Collaboration et leadership: guidance UI auprès des développeurs, standards et support en review, alignement inter-équipes, itération avec parties prenantes et QA</value>
   </data>
   <data name="CoreSkillsLine7" xml:space="preserve">
-    <value>Workflows augmentés par IA: développement assisté par agents (Claude Code, Codex), prompting structuré, recherche multimodale, itération UI accélérée, orchestration d'agents, levier d'exécution</value>
+    <value>Ingénierie native IA et orchestration d’agents : orchestration d’agents comme pratique d’ingénierie principale (Claude Code, Codex, Copilot CLI), prompting structuré, cadrage de problèmes, cadrage architectural, évaluation et pilotage des sorties d’agents, coordination multi-agents, Model Context Protocol (MCP), boucles de raffinement itératif ; livrer un travail de qualité production dans des stacks inconnues en combinant un jugement produit fort et la vélocité des agents</value>
   </data>
   <data name="DesignSystemBullet1" xml:space="preserve">
     <value>Fondations UI: espacement cohérent, rythme typographique, décisions de couleur, et hiérarchie de layout sur l’ensemble des écrans.</value>
@@ -314,7 +314,7 @@
     <value>Livré des fonctionnalités UI WPF avec un standard élevé d'utilisabilité, de hiérarchie visuelle et de finition d'interaction.</value>
   </data>
   <data name="ExperienceCreaformSoftwareDeveloperCompany" xml:space="preserve">
-    <value>Creaform</value>
+    <value>FARO Creaform</value>
   </data>
   <data name="ExperienceCreaformSoftwareDeveloperEndIso" xml:space="preserve">
     <value>2024-03-01</value>
@@ -335,7 +335,7 @@
     <value>WPF, XAML, C#, MVVM, Visual Studio</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertAcc1" xml:space="preserve">
-    <value>Mené la modernisation UI dans la transition de VXelements vers Creaform.OS, en livrant un langage visuel modernisé et une cohérence UI renforcée sur plusieurs modules du produit.</value>
+    <value>Mené la migration visuelle complète du frontend d’un produit desktop phare de WinForms vers WPF dans la transition de VXelements vers Creaform.OS, en définissant la direction design, en produisant les maquettes et en rafraîchissant le langage visuel à travers tout le produit.</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertAcc2" xml:space="preserve">
     <value>Défini et renforcé des standards UI (espacement, typographie, états, règles de thème) pour réduire la fragmentation et garder un produit cohérent.</value>
@@ -344,10 +344,10 @@
     <value>Produit des maquettes Photoshop haute fidélité et des visuels prêts à prototyper pour valider tôt la direction et réduire le rework UI en fin de cycle.</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertAcc4" xml:space="preserve">
-    <value>Accompagné les développeurs sur les décisions de style et les détails d'interaction pour rehausser la finition UI et la cohérence globale.</value>
+    <value>Agi comme consultant UI/UX interne pour une équipe de développement de plus de 10 personnes, en menant les revues de design et en accompagnant les décisions de style, les détails d’interaction et le passage du design au code.</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertCompany" xml:space="preserve">
-    <value>Creaform</value>
+    <value>FARO Creaform</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertLocation" xml:space="preserve">
     <value>Lévis, QC, Canada (Hybrid)</value>
@@ -476,7 +476,7 @@
     <value>https://www.linkedin.com/in/olivier-la-haye/</value>
   </data>
   <data name="HeaderLocationValue" xml:space="preserve">
-    <value>Québec, QC, Canada</value>
+    <value>Ville de Québec, QC, Canada · Disponible 100 % à distance (Amérique du Nord)</value>
   </data>
   <data name="HeaderPortfolioValue" xml:space="preserve">
     <value>https://olhphotographie.com</value>
@@ -818,7 +818,7 @@
     <value>Expérience: 7+ ans en développement logiciel, 5+ ans axés sur l’UI desktop WPF.</value>
   </data>
   <data name="SummaryText" xml:space="preserve">
-    <value>Développeur logiciel senior orienté UI, spécialisé en applications desktop WPF, modernisation UI et exécution de design system. Je mène la livraison front-end avec un standard élevé de cohérence visuelle, de finition d’interaction et d’utilisabilité — en gardant l’intention du design intacte jusqu’à l’intégration. Maquettes Photoshop haute fidélité pour accélérer l’alignement d’équipe et réduire le rework en fin de cycle ; composants WPF réutilisables, style centralisé et structure localisable pour garder le code cohérent et l’expérience homogène.</value>
+    <value>Concepteur-développeur senior cumulant plus de 7 ans à allier le savoir-faire visuel et la livraison de code en production. Je livre une UI de qualité production dans n’importe quelle stack technique en orchestrant des agents de code (Claude Code, Codex, Copilot CLI) avec un jugement design fort. Expertise approfondie en WPF, .NET et MVVM, jumelée à 25 ans de savoir-faire visuel (Adobe Photoshop depuis 2001, photographie professionnelle depuis 2010). Récemment, j’ai livré de bout en bout des applications web en TypeScript, Astro et Cloudflare sans expérience préalable de ces cadriciels, en cadrant les problèmes avec précision, en évaluant les sorties des agents de manière critique et en itérant jusqu’au fini. Reconnu par les équipes de design et de marketing comme la voix d’ingénierie sur les décisions UI/UX, avec des propositions constamment validées et adoptées.</value>
   </data>
   <data name="TabContactTitle" xml:space="preserve">
     <value>Contact</value>
