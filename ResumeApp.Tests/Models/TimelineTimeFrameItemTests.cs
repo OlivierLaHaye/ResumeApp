@@ -119,4 +119,51 @@ public sealed class TimelineTimeFrameItemTests
 
         Assert.Equal( new DateTime( 2020, 6, 15 ), lItem.StartDate );
     }
+
+    [Fact]
+    public void Constructor_FourArgs_DefaultsSubtitleToEmpty()
+    {
+        var lItem = new TimelineTimeFrameItem( DateTime.Today, DateTime.Today, "Job", "Blue" );
+
+        Assert.Equal( string.Empty, lItem.SubtitleText );
+    }
+
+    [Fact]
+    public void Constructor_FiveArgs_SetsSubtitleText()
+    {
+        var lItem = new TimelineTimeFrameItem( DateTime.Today, DateTime.Today, "CompanyX", "Blue", "Senior Engineer" );
+
+        Assert.Equal( "Senior Engineer", lItem.SubtitleText );
+        Assert.Equal( "CompanyX", lItem.Title );
+    }
+
+    [Fact]
+    public void Constructor_NullSubtitle_DefaultsToEmpty()
+    {
+        var lItem = new TimelineTimeFrameItem( DateTime.Today, DateTime.Today, "Job", "Blue", null );
+
+        Assert.Equal( string.Empty, lItem.SubtitleText );
+    }
+
+    [Fact]
+    public void SetSubtitleText_RaisesPropertyChanged()
+    {
+        var lItem = new TimelineTimeFrameItem( DateTime.Today, DateTime.Today, "Job", "Blue", "Old" );
+        string? lRaisedName = null;
+        lItem.PropertyChanged += ( _, pArgs ) => lRaisedName = pArgs.PropertyName;
+
+        lItem.SubtitleText = "New";
+
+        Assert.Equal( "SubtitleText", lRaisedName );
+    }
+
+    [Fact]
+    public void SetSubtitleText_NullCoalescesToEmpty()
+    {
+        var lItem = new TimelineTimeFrameItem( DateTime.Today, DateTime.Today, "Job", "Blue", "Seed" );
+
+        lItem.SubtitleText = null!;
+
+        Assert.Equal( string.Empty, lItem.SubtitleText );
+    }
 }

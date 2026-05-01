@@ -107,7 +107,8 @@ namespace ResumeApp.ViewModels.Pages
 				pStartDate: pEntry.StartDate.Date,
 				pEndDate: lEndDate,
 				pTitle: pEntry.CompanyText,
-				pAccentColorKey: lAccentKey );
+				pAccentColorKey: lAccentKey,
+				pSubtitleText: pEntry.RoleText );
 		}
 
 		private static string GetAccentKeyForPaletteIndex( int pPaletteIndex )

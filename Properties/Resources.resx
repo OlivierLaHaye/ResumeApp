@@ -847,6 +847,9 @@
   <data name="TimelineControlInteractionsHelpText" xml:space="preserve">
     <value>Click the timeline, use the mouse wheel to zoom, drag to pan with inertia, click a bar or anywhere on the timeline to select a date.</value>
   </data>
+  <data name="TimelineLabelTodayMarker" xml:space="preserve">
+    <value>Today</value>
+  </data>
   <data name="ValueFullRemoteOnly" xml:space="preserve">
     <value>Full remote only</value>
   </data>

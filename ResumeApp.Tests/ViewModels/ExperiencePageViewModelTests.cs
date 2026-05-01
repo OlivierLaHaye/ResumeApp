@@ -30,6 +30,23 @@ public sealed class ExperiencePageViewModelTests
     }
 
     [Fact]
+    public void ExperienceTimeFrames_CarryRoleAsSubtitleAndCompanyAsTitle()
+    {
+        var lViewModel = Create();
+
+        Assert.NotEmpty( lViewModel.ExperienceTimeFrames );
+
+        for ( int lIndex = 0; lIndex < lViewModel.ExperienceTimeFrames.Count; lIndex++ )
+        {
+            var lFrame = lViewModel.ExperienceTimeFrames[ lIndex ];
+            var lEntry = lViewModel.TimelineEntries[ lIndex ];
+
+            Assert.Equal( lEntry.CompanyText, lFrame.Title );
+            Assert.Equal( lEntry.RoleText, lFrame.SubtitleText );
+        }
+    }
+
+    [Fact]
     public void TimelineMinDate_IsSet()
     {
         var lViewModel = Create();

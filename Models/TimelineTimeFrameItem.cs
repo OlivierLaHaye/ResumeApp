@@ -1,4 +1,4 @@
-﻿// Copyright (C) Olivier La Haye
+// Copyright (C) Olivier La Haye
 // All rights reserved.
 
 using ResumeApp.Infrastructure;
@@ -35,7 +35,19 @@ namespace ResumeApp.Models
 			set => SetProperty( ref mAccentColorKey, value );
 		}
 
+		private string mSubtitleText;
+		public string SubtitleText
+		{
+			get => mSubtitleText;
+			set => SetProperty( ref mSubtitleText, value ?? string.Empty );
+		}
+
 		public TimelineTimeFrameItem( DateTime pStartDate, DateTime pEndDate, string? pTitle, string? pAccentColorKey )
+			: this( pStartDate, pEndDate, pTitle, pAccentColorKey, null )
+		{
+		}
+
+		public TimelineTimeFrameItem( DateTime pStartDate, DateTime pEndDate, string? pTitle, string? pAccentColorKey, string? pSubtitleText )
 		{
 			DateTime lStartDate = pStartDate.Date;
 			DateTime lEndDate = pEndDate.Date;
@@ -49,6 +61,7 @@ namespace ResumeApp.Models
 			mEndDate = lEndDate;
 			mTitle = pTitle ?? string.Empty;
 			mAccentColorKey = pAccentColorKey ?? string.Empty;
+			mSubtitleText = pSubtitleText ?? string.Empty;
 		}
 	}
 }
