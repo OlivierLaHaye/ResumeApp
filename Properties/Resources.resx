@@ -77,7 +77,7 @@
     <value>Volleyball</value>
 </data>
   <data name="AppSubtitle" xml:space="preserve">
-    <value>Senior Design Engineer · AI-Native · Agent Orchestrator</value>
+    <value>Senior UI/UX Developer · AI-Native · Agent Orchestrator</value>
   </data>
   <data name="AppTitle" xml:space="preserve">
     <value>Resume</value>
@@ -140,7 +140,7 @@
     <value>Collaboration and Leadership: UI guidance to developers, standards and review support, cross-team alignment, iterative refinement with stakeholders and QA</value>
   </data>
   <data name="CoreSkillsLine7" xml:space="preserve">
-    <value>AI-Native Engineering and Agent Orchestration: agent orchestration as a primary engineering practice (Claude Code, Codex, Copilot CLI), structured prompting, problem framing, architecture cadrage, agent output evaluation and steering, multi-agent coordination, Model Context Protocol (MCP), iterative refinement loops; deliver production-quality work in unfamiliar stacks by combining strong product judgment with agent velocity</value>
+    <value>AI-Native Development and Agent Orchestration: agent orchestration as a primary development practice (Claude Code, Codex, Copilot CLI), structured prompting, problem framing, architecture cadrage, agent output evaluation and steering, multi-agent coordination, Model Context Protocol (MCP), iterative refinement loops; deliver production-quality work in unfamiliar stacks by combining strong product judgment with agent velocity</value>
   </data>
   <data name="DesignSystemBullet1" xml:space="preserve">
     <value>UI foundations: consistent spacing, typography rhythm, color decisions, and layout hierarchy across screens.</value>
@@ -818,7 +818,7 @@
     <value>Experience: 7+ years in software development, 5+ years focused on WPF desktop UI.</value>
   </data>
   <data name="SummaryText" xml:space="preserve">
-    <value>Senior Design Engineer with 7+ years bridging visual craft and shipped code. I deliver production-quality UI in any stack by orchestrating coding agents (Claude Code, Codex, Copilot CLI) with strong design judgment. Deep expertise in WPF, .NET, and MVVM, paired with 25 years of visual craft (Adobe Photoshop since 2001, professional photography since 2010). Recently shipped end-to-end web applications in TypeScript, Astro, and Cloudflare without prior web framework experience by framing problems precisely, evaluating agent output critically, and iterating to polish. Trusted by designers and marketing teams as the engineering voice on UI/UX decisions, with proposals consistently validated and adopted.</value>
+    <value>Senior UI/UX Developer with 7+ years bridging visual craft and shipped code, targeting senior Design Engineer, UI Engineer, and Frontend roles at design-led product companies. I deliver production-quality UI in any stack by orchestrating coding agents (Claude Code, Codex, Copilot CLI) with strong design judgment. Deep expertise in WPF, .NET, and MVVM, paired with 25 years of visual craft (Adobe Photoshop since 2001, professional photography since 2010). Recently shipped end-to-end web applications in TypeScript, Astro, and Cloudflare without prior web framework experience by framing problems precisely, evaluating agent output critically, and iterating to polish. Trusted by designers and marketing teams as the development voice on UI/UX decisions, with proposals consistently validated and adopted.</value>
   </data>
   <data name="TabContactTitle" xml:space="preserve">
     <value>Contact</value>
