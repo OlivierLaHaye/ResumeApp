@@ -40,3 +40,8 @@ TestResults/
 
 ## Publish
 publish/
+
+# Graphify generated output (machine-local knowledge graph).
+# A project may still commit graphify-out/GRAPH_REPORT.md deliberately for fresh-clone orientation;
+# already-tracked files stay tracked, so this rule is safe to add anywhere.
+graphify-out/
