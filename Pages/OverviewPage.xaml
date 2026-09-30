@@ -139,10 +139,43 @@
                                 Style="{StaticResource LabelTextBlockStyle}"
                                 Text="{Binding ResourcesService[LabelWorkPreference]}" />
                             <TextBlock
-                                x:Name="mWorkPreferenceValueTextBlock"
+                                    x:Name="mWorkPreferenceValueTextBlock"
                                 Margin="{StaticResource ExtraSmallThickness}"
                                 Style="{StaticResource ValueTextBlockStyle}"
                                 Text="{Binding WorkPreferenceText}" />
+                            <Button
+                                x:Name="mPrintableResumeButtonControl"
+                                Margin="{StaticResource SmallThickness}"
+                                HorizontalAlignment="Left"
+                                Focusable="True"
+                                Height="Auto"
+                                MinHeight="44"
+                                AutomationProperties.Name="{Binding PrintableResumeButtonText}"
+                                Command="{Binding OpenUrlCommand}"
+                                CommandParameter="{Binding PrintableResumeUrl}"
+                                Style="{StaticResource ContactActionPillButtonStyle}">
+                                <Button.FocusVisualStyle>
+                                    <Style>
+                                        <Setter Property="Control.Template">
+                                            <Setter.Value>
+                                                <ControlTemplate>
+                                                    <Border
+                                                        Margin="-3"
+                                                        BorderBrush="{DynamicResource CommonBrush}"
+                                                        BorderThickness="2"
+                                                        CornerRadius="{StaticResource CommonCornerRadius}" />
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </Button.FocusVisualStyle>
+                                <TextBlock
+                                    x:Name="mPrintableResumeButtonTextControl"
+                                    Margin="{StaticResource SmallThickness}"
+                                    FontSize="{StaticResource SmallFontSize}"
+                                    Text="{Binding PrintableResumeButtonText}"
+                                    TextWrapping="Wrap" />
+                            </Button>
                         </StackPanel>
 
                         <StackPanel

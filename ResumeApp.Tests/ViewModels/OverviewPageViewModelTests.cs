@@ -164,6 +164,25 @@ public sealed class OverviewPageViewModelTests
     }
 
     [Fact]
+    public void PrintableResume_LanguageChange_UpdatesDestinationAndLabel()
+    {
+        var lResourcesService = new ResourcesService();
+        var lViewModel = new OverviewPageViewModel( lResourcesService, new ThemeService() );
+        var lRaisedProperties = new List<string?>();
+        lViewModel.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
+
+        Assert.Equal( "https://www.olhphotographie.com/en-ca/resume", lViewModel.PrintableResumeUrl );
+        Assert.Equal( "Open online printable résumé", lViewModel.PrintableResumeButtonText );
+
+        lResourcesService.SetLanguage( AppLanguage.FrenchCanada );
+
+        Assert.Equal( "https://www.olhphotographie.com/fr-ca/resume", lViewModel.PrintableResumeUrl );
+        Assert.Equal( "Ouvrir le CV imprimable en ligne", lViewModel.PrintableResumeButtonText );
+        Assert.Contains( nameof( OverviewPageViewModel.PrintableResumeUrl ), lRaisedProperties );
+        Assert.Contains( nameof( OverviewPageViewModel.PrintableResumeButtonText ), lRaisedProperties );
+    }
+
+    [Fact]
     public void BuildKeys_EmptyPrefix_ReturnsEmpty()
     {
         Assert.Empty( OverviewPageViewModel.BuildKeys( "", 5 ) );

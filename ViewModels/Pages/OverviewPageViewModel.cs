@@ -67,6 +67,10 @@ namespace ResumeApp.ViewModels.Pages
 
 		public string SummaryText => ResourcesService[ "SummaryText" ];
 
+		public string PrintableResumeButtonText => ResourcesService[ "OverviewPrintableResumeButtonText" ];
+
+		public string PrintableResumeUrl => ResourcesService[ "OverviewPrintableResumeUrl" ];
+
 		public OverviewPageViewModel( ResourcesService pResourcesService, ThemeService pThemeService )
 			: base( pResourcesService, pThemeService )
 		{
@@ -190,6 +194,8 @@ namespace ResumeApp.ViewModels.Pages
 			RaisePropertyChanged( nameof( GitHubText ) );
 			RaisePropertyChanged( nameof( PortfolioText ) );
 			RaisePropertyChanged( nameof( SummaryText ) );
+			RaisePropertyChanged( nameof( PrintableResumeButtonText ) );
+			RaisePropertyChanged( nameof( PrintableResumeUrl ) );
 		}
 	}
 }

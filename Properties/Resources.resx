@@ -77,7 +77,7 @@
     <value>Volleyball</value>
 </data>
   <data name="AppSubtitle" xml:space="preserve">
-    <value>Senior UI/UX Developer · AI-Native · Agent Orchestrator</value>
+    <value>Senior UI/UX Developer · UI design and product development</value>
   </data>
   <data name="AppTitle" xml:space="preserve">
     <value>Resume</value>
@@ -140,7 +140,7 @@
     <value>Collaboration and Leadership: UI guidance to developers, standards and review support, cross-team alignment, iterative refinement with stakeholders and QA</value>
   </data>
   <data name="CoreSkillsLine7" xml:space="preserve">
-    <value>AI-Native Development and Agent Orchestration: agent orchestration as a primary development practice (Claude Code, Codex, Copilot CLI), structured prompting, problem framing, architecture cadrage, agent output evaluation and steering, multi-agent coordination, Model Context Protocol (MCP), iterative refinement loops; deliver production-quality work in unfamiliar stacks by combining strong product judgment with agent velocity</value>
+    <value>Coding-agent production workflow: product and interaction definition, task direction, code review and validation with Claude Code and Codex.</value>
   </data>
   <data name="DesignSystemBullet1" xml:space="preserve">
     <value>UI foundations: consistent spacing, typography rhythm, color decisions, and layout hierarchy across screens.</value>
@@ -185,10 +185,10 @@
     <value>Selected accomplishments:</value>
   </data>
   <data name="Experience1Bullet1" xml:space="preserve">
-    <value>Led UI modernization to WPF during the transition from VXelements to Creaform.OS, delivering a refreshed look and stronger visual consistency across multiple modules and screens.</value>
+    <value>Modernized Creaform.OS interfaces in WPF, improving visual consistency across modules and screens.</value>
   </data>
   <data name="Experience1Bullet2" xml:space="preserve">
-    <value>Defined and reinforced UI standards (spacing, typography, states, theming rules) to reduce fragmentation and keep the product cohesive.</value>
+    <value>Designed reusable UI components and standards for spacing, typography, interaction states and themes.</value>
   </data>
   <data name="Experience1Bullet3" xml:space="preserve">
     <value>Produced high-fidelity Photoshop mockups and prototype-ready visuals to validate direction early and reduce late-stage UI churn.</value>
@@ -212,10 +212,10 @@
     <value>Selected accomplishments:</value>
   </data>
   <data name="Experience2Bullet1" xml:space="preserve">
-    <value>Designed and delivered a new user interface for peel.OS, improving workflow clarity through simplified navigation, clearer screen structure, and standardized reusable UI patterns.</value>
+    <value>Designed and implemented nearly all of the new peel.OS interface, including navigation, screen structure and reusable UI patterns.</value>
   </data>
   <data name="Experience2Bullet2" xml:space="preserve">
-    <value>Contributed to peel 3 by Creaform and the peel project team, recognized with the AMETEK Innovation Award 2022, focusing on WPF UI delivery, visual consistency, and interaction polish.</value>
+    <value>Contributed WPF UI design and implementation to peel 3 and the peel project team, which received the AMETEK Innovation Award 2022.</value>
   </data>
   <data name="Experience2Bullet3" xml:space="preserve">
     <value>Shipped WPF UI features with a high standard for usability, visual hierarchy, and interaction polish.</value>
@@ -476,16 +476,16 @@
     <value>https://www.linkedin.com/in/olivier-la-haye/</value>
   </data>
   <data name="HeaderLocationValue" xml:space="preserve">
-    <value>Québec City, QC, Canada · Available for full remote (NA)</value>
+    <value>Québec City, QC, Canada</value>
   </data>
   <data name="HeaderPortfolioValue" xml:space="preserve">
     <value>https://olhphotographie.com</value>
   </data>
   <data name="HeaderTargetTitlesValue" xml:space="preserve">
-    <value>Senior WPF UI Developer | UI/UX Developer (Desktop Applications) | Front-End Developer, UI Platform (Desktop)</value>
+    <value>UI/UX Developer | UI Developer | Product Developer</value>
   </data>
   <data name="HeaderWorkPreferenceValue" xml:space="preserve">
-    <value>Full remote only, high-trust teams, design-led culture, flexible time off</value>
+    <value>Permanent full-time, 100% remote from Québec; occasional offsites welcome. Authorized to work in Canada without sponsorship.</value>
   </data>
   <data name="HighlightBullet1" xml:space="preserve">
     <value>Led front-end modernization of a flagship desktop product by migrating the UI to WPF and refreshing the visual language during the transition to Creaform.OS — improving visual consistency across multiple modules and screens, well-received across the product team.</value>
@@ -597,6 +597,12 @@
   </data>
   <data name="OverviewContactOpenUrlButtonText" xml:space="preserve">
     <value>Open</value>
+  </data>
+  <data name="OverviewPrintableResumeButtonText" xml:space="preserve">
+    <value>Open online printable résumé</value>
+  </data>
+  <data name="OverviewPrintableResumeUrl" xml:space="preserve">
+    <value>https://www.olhphotographie.com/en-ca/resume</value>
   </data>
   <data name="PhotographyPageSubtitle" xml:space="preserve">
     <value>Sports, events, portraits, and travel — a curated selection across albums.</value>
@@ -815,10 +821,10 @@
     <value>WPF and MVVM</value>
   </data>
   <data name="SummaryExperienceLine" xml:space="preserve">
-    <value>Experience: 7+ years in software development, 5+ years focused on WPF desktop UI.</value>
+    <value>Professional software development since 2018; WPF desktop UI at Creaform since 2020.</value>
   </data>
   <data name="SummaryText" xml:space="preserve">
-    <value>Senior UI/UX Developer with 7+ years bridging visual craft and shipped code, targeting senior Design Engineer, UI Engineer, and Frontend roles at design-led product companies. I deliver production-quality UI in any stack by orchestrating coding agents (Claude Code, Codex, Copilot CLI) with strong design judgment. Deep expertise in WPF, .NET, and MVVM, paired with 25 years of visual craft (Adobe Photoshop since 2001, professional photography since 2010). Recently shipped end-to-end web applications in TypeScript, Astro, and Cloudflare without prior web framework experience by framing problems precisely, evaluating agent output critically, and iterating to polish. Trusted by designers and marketing teams as the development voice on UI/UX decisions, with proposals consistently validated and adopted.</value>
+    <value>UI/UX developer shipping software since 2018, with deep C#, WPF, .NET, XAML and MVVM experience. At Creaform, I modernize Creaform.OS interfaces and reusable UI components; I designed and implemented nearly all of the new peel.OS interface. Professional photography since 2010 and Photoshop practice since 2001 inform my visual judgment. For personal products, including this website and Prompt Prisme, Claude Code and Codex are my main implementation tools: I define the product and interactions, direct the work, review the code and validate the result. My web work uses Astro, TypeScript and Cloudflare; React, JavaScript and Redux experience comes from Arcane (2018–2020). Seeking hands-on UI/UX and product development roles that combine design responsibility with coding-agent production workflows.</value>
   </data>
   <data name="TabContactTitle" xml:space="preserve">
     <value>Contact</value>
