@@ -1,6 +1,7 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using ResumeApp.Controls;
 using ResumeApp.Helpers;
 using System.Globalization;
 using System.Windows;
@@ -55,6 +56,8 @@ namespace ResumeApp.Converters
 	[ValueConversion( typeof( int ), typeof( Brush ) )]
 	public sealed class PaletteIndexToBrushConverter : IValueConverter
 	{
+		public const string EdgeParameter = "Edge";
+
 		private static Brush? TryFindBrushOrNull( string pBrushKey )
 		{
 			if ( string.IsNullOrWhiteSpace( pBrushKey ) )
@@ -83,6 +86,13 @@ namespace ResumeApp.Converters
 			int lNormalizedIndex = lPaletteIndex < 0 ? 0 : lPaletteIndex;
 			string lBrushKey = lAccentBrushKeys[ lNormalizedIndex % lAccentBrushKeys.Length ];
 
+			if ( string.Equals( pParameter as string, EdgeParameter, StringComparison.Ordinal ) )
+			{
+				return TryFindBrushOrNull( TimelineLayoutHelper.GetEdgeBrushKey( lBrushKey ) ?? string.Empty )
+					?? TryFindBrushOrNull( lBrushKey )
+					?? Brushes.Transparent;
+			}
+
 			return TryFindBrushOrNull( lBrushKey )
 				?? TryFindBrushOrNull( "CommonBlueBrush" )
 				?? Brushes.Transparent;
@@ -91,6 +101,23 @@ namespace ResumeApp.Converters
 		public object ConvertBack( object pValue, Type pTargetType, object pParameter, CultureInfo pCulture )
 		{
 			return Binding.DoNothing;
+		}
+	}
+
+	public sealed class PaletteIndexToBrushMultiConverter : IMultiValueConverter
+	{
+		private readonly PaletteIndexToBrushConverter mBrushConverter = new();
+
+		public object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
+		{
+			object? lPaletteIndex = pValues is { Length: > 0 } ? pValues[ 0 ] : null;
+
+			return mBrushConverter.Convert( lPaletteIndex!, pTargetType, pParameter, pCulture );
+		}
+
+		public object[] ConvertBack( object pValue, Type[] pTargetTypes, object pParameter, CultureInfo pCulture )
+		{
+			throw new NotSupportedException();
 		}
 	}
 }

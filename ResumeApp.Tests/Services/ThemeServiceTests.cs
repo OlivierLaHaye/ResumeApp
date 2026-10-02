@@ -1,3 +1,5 @@
+using System.Windows.Media;
+using ResumeApp.Helpers;
 using ResumeApp.Services;
 using Xunit;
 
@@ -78,5 +80,170 @@ public sealed class ThemeServiceTests
         var lService = new ThemeService();
 
         Assert.Throws<ArgumentNullException>( () => lService.ToggleTheme( null! ) );
+    }
+
+    [Theory]
+    [InlineData( "TextPrimaryColor", "TextPrimaryBrush" )]
+    [InlineData( "CommonWhiteColor", "CommonWhiteBrush" )]
+    [InlineData( "AccentText", "AccentTextBrush" )]
+    public void GetBrushKeyForColorKey_MapsColorKeyToBrushKey( string pColorKey, string pExpectedBrushKey )
+    {
+        Assert.Equal( pExpectedBrushKey, ThemeService.GetBrushKeyForColorKey( pColorKey ) );
+    }
+
+    [StaFact]
+    public void CreateHighContrastDictionary_MapsEverySemanticKeyToSystemColorRoles()
+    {
+        Color lWindow = Colors.Black;
+        Color lWindowText = Colors.White;
+        Color lHighlight = Colors.Cyan;
+        Color lHighlightText = Colors.Navy;
+        Color lHotTrack = Colors.Yellow;
+
+        var lDictionary = ThemeService.CreateHighContrastDictionary( lWindow, lWindowText, lHighlight, lHighlightText, lHotTrack );
+
+        AssertRole( lDictionary, ThemeService.HighContrastSurfaceColorKeys, lWindow );
+        AssertRole( lDictionary, ThemeService.HighContrastTextColorKeys, lWindowText );
+        AssertRole( lDictionary, ThemeService.HighContrastHighlightColorKeys, lHighlight );
+        AssertRole( lDictionary, ThemeService.HighContrastHighlightTextColorKeys, lHighlightText );
+        AssertRole( lDictionary, ThemeService.HighContrastHotTrackColorKeys, lHotTrack );
+    }
+
+    private static string[] GetAllHighContrastColorKeys() =>
+    [
+        .. ThemeService.HighContrastSurfaceColorKeys,
+        .. ThemeService.HighContrastTextColorKeys,
+        .. ThemeService.HighContrastHighlightColorKeys,
+        .. ThemeService.HighContrastHighlightTextColorKeys,
+        .. ThemeService.HighContrastHotTrackColorKeys
+    ];
+
+    [Fact]
+    public void HighContrastKeys_CoverSemanticTokens()
+    {
+        string[] lAllKeys = GetAllHighContrastColorKeys();
+
+        string[] lSemanticKeys = [ "TextPrimaryColor", "TextSecondaryColor", "AccentColor", "AccentTextColor", "FocusRingColor", "BorderSubtleColor", "SurfaceHoverColor", "SurfaceSelectedColor", "TextOnSelectedColor" ];
+
+        Assert.All( lSemanticKeys, pKey => Assert.Contains( pKey, lAllKeys ) );
+        Assert.Equal( lAllKeys.Length, lAllKeys.Distinct( StringComparer.Ordinal ).Count() );
+    }
+
+    [StaFact]
+    public void HighContrastKeys_ExistAsColorAndBrushInBothThemeDictionaries()
+    {
+        string[] lThemeFileNames = [ "Theme.Dark.xaml", "Theme.Light.xaml" ];
+
+        foreach ( string lThemeFileName in lThemeFileNames )
+        {
+            var lDictionary = Assert.IsType<System.Windows.ResourceDictionary>(
+                System.Windows.Application.LoadComponent( new Uri( $"/ResumeApp;component/Resources/{lThemeFileName}", UriKind.Relative ) ) );
+
+            Assert.All( GetAllHighContrastColorKeys(), pColorKey =>
+            {
+                Assert.IsType<Color>( lDictionary[ pColorKey ] );
+                Assert.IsType<SolidColorBrush>( lDictionary[ ThemeService.GetBrushKeyForColorKey( pColorKey ) ] );
+            } );
+        }
+    }
+
+    [Fact]
+    public void HighContrastKeys_MapShellPillTokensToReadableRoles()
+    {
+        Assert.Contains( "SurfacePillSelectedColor", ThemeService.HighContrastSurfaceColorKeys );
+        Assert.Contains( "SurfacePillSelectedBorderColor", ThemeService.HighContrastHighlightColorKeys );
+        Assert.Contains( "BorderStrongColor", ThemeService.HighContrastTextColorKeys );
+    }
+
+    [Fact]
+    public void HighContrastHighlightKeys_IncludeEveryTimelineLaneColor()
+    {
+        Assert.Equal( ColorHelper.sAccentBrushKeys.Length, ColorHelper.sAccentColorKeys.Length );
+
+        for ( int lIndex = 0; lIndex < ColorHelper.sAccentBrushKeys.Length; lIndex++ )
+        {
+            string lColorKey = ColorHelper.sAccentColorKeys[ lIndex ];
+
+            Assert.EndsWith( "Color", lColorKey );
+            Assert.Equal( ColorHelper.sAccentBrushKeys[ lIndex ], ThemeService.GetBrushKeyForColorKey( lColorKey ) );
+            Assert.Contains( lColorKey, ThemeService.HighContrastHighlightColorKeys );
+        }
+    }
+
+    [StaFact]
+    public void CreateHighContrastDictionary_OverridesEveryTimelineLaneBrushWithHighlight()
+    {
+        Color lHighlight = Colors.Cyan;
+
+        var lDictionary = ThemeService.CreateHighContrastDictionary( Colors.Black, Colors.White, lHighlight, Colors.Navy, Colors.Yellow );
+
+        Assert.All( ColorHelper.sAccentBrushKeys, pBrushKey =>
+        {
+            var lBrush = Assert.IsType<SolidColorBrush>( lDictionary[ pBrushKey ] );
+            Assert.Equal( lHighlight, lBrush.Color );
+        } );
+    }
+
+    private static void AssertRole( System.Windows.ResourceDictionary pDictionary, IEnumerable<string> pColorKeys, Color pExpected )
+    {
+        foreach ( string lColorKey in pColorKeys )
+        {
+            Assert.Equal( pExpected, Assert.IsType<Color>( pDictionary[ lColorKey ] ) );
+            var lBrush = Assert.IsType<SolidColorBrush>( pDictionary[ ThemeService.GetBrushKeyForColorKey( lColorKey ) ] );
+            Assert.Equal( pExpected, lBrush.Color );
+            Assert.True( lBrush.IsFrozen );
+        }
+    }
+
+    private static readonly string[] sTimelineHueNames = [ "Blue", "Green", "Yellow", "Red", "Purple", "Orange", "Cyan", "Pink" ];
+
+    private static System.Windows.ResourceDictionary LoadThemeDictionary( string pThemeFileName ) =>
+        Assert.IsType<System.Windows.ResourceDictionary>(
+            System.Windows.Application.LoadComponent( new Uri( $"/ResumeApp;component/Resources/{pThemeFileName}", UriKind.Relative ) ) );
+
+    [Fact]
+    public void HighContrastTextKeys_IncludeEveryTimelineEdgeColor()
+    {
+        Assert.All( sTimelineHueNames, pHue => Assert.Contains( $"Common{pHue}EdgeColor", ThemeService.HighContrastTextColorKeys ) );
+    }
+
+    [StaFact]
+    public void ThemeDictionaries_DefineEdgeColorAndBrushForEveryHue()
+    {
+        foreach ( string lThemeFileName in new[] { "Theme.Dark.xaml", "Theme.Light.xaml" } )
+        {
+            var lDictionary = LoadThemeDictionary( lThemeFileName );
+
+            Assert.All( sTimelineHueNames, pHue =>
+            {
+                var lColor = Assert.IsType<Color>( lDictionary[ $"Common{pHue}EdgeColor" ] );
+                var lBrush = Assert.IsType<SolidColorBrush>( lDictionary[ $"Common{pHue}EdgeBrush" ] );
+                Assert.Equal( lColor, lBrush.Color );
+            } );
+        }
+    }
+
+    [StaFact]
+    public void DarkTheme_EdgeColorsEqualTheHueColors()
+    {
+        var lDictionary = LoadThemeDictionary( "Theme.Dark.xaml" );
+
+        Assert.All( sTimelineHueNames, pHue => Assert.Equal( lDictionary[ $"Common{pHue}Color" ], lDictionary[ $"Common{pHue}EdgeColor" ] ) );
+    }
+
+    [StaFact]
+    public void LightTheme_EdgeColorsEqualTheDarkThemeStrongColors()
+    {
+        var lDark = LoadThemeDictionary( "Theme.Dark.xaml" );
+        var lLight = LoadThemeDictionary( "Theme.Light.xaml" );
+
+        Assert.All( sTimelineHueNames, pHue => Assert.Equal( lDark[ $"Common{pHue}StrongColor" ], lLight[ $"Common{pHue}EdgeColor" ] ) );
+    }
+
+    [StaFact]
+    public void ThemeDictionaries_DefineTheInactiveBarOpacity()
+    {
+        Assert.Equal( 0.72, Assert.IsType<double>( LoadThemeDictionary( "Theme.Dark.xaml" )[ "TimelineInactiveBarOpacity" ] ) );
+        Assert.Equal( 1.0, Assert.IsType<double>( LoadThemeDictionary( "Theme.Light.xaml" )[ "TimelineInactiveBarOpacity" ] ) );
     }
 }

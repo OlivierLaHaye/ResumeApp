@@ -10,121 +10,59 @@
     UseLayoutRounding="True">
 
     <UserControl.Resources>
-        <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
-            <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
-            <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
-            <Setter Property="TextWrapping" Value="Wrap" />
-        </Style>
-
         <Style
-            x:Key="PageTitleTextBlockStyle"
-            BasedOn="{StaticResource {x:Type TextBlock}}"
+            x:Key="EducationMetaTextBlockStyle"
+            BasedOn="{StaticResource PageBodyTextBlockStyle}"
             TargetType="{x:Type TextBlock}">
-            <Setter Property="FontSize" Value="{StaticResource LargeFontSize}" />
-        </Style>
-
-        <Style
-            x:Key="PageSubtitleTextBlockStyle"
-            BasedOn="{StaticResource {x:Type TextBlock}}"
-            TargetType="{x:Type TextBlock}">
-            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
-            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
-        </Style>
-
-        <Style
-            x:Key="ItemTitleTextBlockStyle"
-            BasedOn="{StaticResource {x:Type TextBlock}}"
-            TargetType="{x:Type TextBlock}">
-            <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}" />
-            <Setter Property="FontSize" Value="{StaticResource CommonFontSize}" />
-        </Style>
-
-        <Style
-            x:Key="ItemMetaTextBlockStyle"
-            BasedOn="{StaticResource {x:Type TextBlock}}"
-            TargetType="{x:Type TextBlock}">
-            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
-            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
-        </Style>
-
-        <Style
-            x:Key="ItemNotesTextBlockStyle"
-            BasedOn="{StaticResource {x:Type TextBlock}}"
-            TargetType="{x:Type TextBlock}">
-            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
-            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
         </Style>
     </UserControl.Resources>
 
-    <ScrollViewer
-        x:Name="mEducationScrollViewer"
-        HorizontalScrollBarVisibility="Disabled"
-        VerticalScrollBarVisibility="Auto">
-        <ScrollViewer.OpacityMask>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Offset="0" Color="Transparent" />
-                <GradientStop Color="Black">
-                    <GradientStop.Offset>
-                        <MultiBinding Converter="{StaticResource GradientOffsetTopConverter}" ConverterParameter="{StaticResource PageGradientOffsetPixels}">
-                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                            <Binding Path="VerticalOffset" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                        </MultiBinding>
-                    </GradientStop.Offset>
-                </GradientStop>
-                <GradientStop Color="Black">
-                    <GradientStop.Offset>
-                        <MultiBinding Converter="{StaticResource GradientOffsetBottomConverter}" ConverterParameter="{StaticResource PageGradientOffsetPixels}">
-                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                            <Binding Path="VerticalOffset" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                            <Binding Path="ScrollableHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                        </MultiBinding>
-                    </GradientStop.Offset>
-                </GradientStop>
-                <GradientStop Offset="1" Color="Transparent" />
-            </LinearGradientBrush>
-        </ScrollViewer.OpacityMask>
-        <StackPanel x:Name="mEducationLayoutRoot" Margin="{StaticResource LargeThickness}">
-            <Border x:Name="mEducationHeaderBorder" Style="{StaticResource SubSectionCardBorderStyle}">
-                <StackPanel x:Name="mEducationHeaderStackPanel" Margin="{StaticResource CommonThickness}">
+    <ScrollViewer x:Name="mEducationScrollViewer" Style="{StaticResource PageScrollViewerStyle}">
+        <Grid x:Name="mEducationContentHostGrid">
+            <StackPanel x:Name="mEducationLayoutRoot" HorizontalAlignment="Stretch" Style="{StaticResource PageContentPanelStyle}">
+                <StackPanel x:Name="mEducationHeaderStackPanel" Orientation="Vertical">
                     <TextBlock
                         x:Name="mEducationTitleTextBlock"
                         Style="{StaticResource PageTitleTextBlockStyle}"
                         Text="{Binding PageTitleText}" />
                     <TextBlock
                         x:Name="mEducationSubtitleTextBlock"
-                        Margin="{StaticResource SmallThickness}"
                         Style="{StaticResource PageSubtitleTextBlockStyle}"
                         Text="{Binding PageSubtitleText}" />
                 </StackPanel>
-            </Border>
 
-            <ItemsControl x:Name="mEducationItemsControl" ItemsSource="{Binding Items}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border x:Name="mEducationItemBorder" Style="{StaticResource SubSectionCardBorderStyle}">
-                            <StackPanel x:Name="mEducationItemStackPanel" Margin="{StaticResource CommonThickness}">
-                                <TextBlock
-                                    x:Name="mEducationItemTitleTextBlock"
-                                    Style="{StaticResource ItemTitleTextBlockStyle}"
-                                    Text="{Binding TitleText}" />
+                <ItemsControl
+                    x:Name="mEducationItemsControl"
+                    Focusable="False"
+                    ItemsSource="{Binding Items}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="mEducationItemBorder" Style="{StaticResource ContentGroupBorderStyle}">
+                                <StackPanel x:Name="mEducationItemStackPanel" Orientation="Vertical">
+                                    <TextBlock
+                                        x:Name="mEducationItemTitleTextBlock"
+                                        Margin="0,0,0,4"
+                                        Style="{StaticResource PageSectionTitleTextBlockStyle}"
+                                        Text="{Binding TitleText}" />
 
-                                <TextBlock
-                                    x:Name="mEducationItemLocationDatesTextBlock"
-                                    Margin="{StaticResource SmallThickness}"
-                                    Style="{StaticResource ItemMetaTextBlockStyle}"
-                                    Text="{Binding LocationDatesText}" />
+                                    <TextBlock
+                                        x:Name="mEducationItemLocationDatesTextBlock"
+                                        Style="{StaticResource EducationMetaTextBlockStyle}"
+                                        Text="{Binding LocationDatesText}" />
 
-                                <TextBlock
-                                    x:Name="mEducationItemNotesTextBlock"
-                                    Margin="{StaticResource SmallThickness}"
-                                    Style="{StaticResource ItemNotesTextBlockStyle}"
-                                    Text="{Binding NotesText}"
-                                    Visibility="{Binding HasNotes, Converter={StaticResource BoolToCollapseConverter}}" />
-                            </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
+                                    <TextBlock
+                                        x:Name="mEducationItemNotesTextBlock"
+                                        Margin="0,12,0,0"
+                                        Style="{StaticResource PageBodyTextBlockStyle}"
+                                        Text="{Binding NotesText}"
+                                        Visibility="{Binding HasNotes, Converter={StaticResource BoolToCollapseConverter}}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Grid>
     </ScrollViewer>
 </UserControl>

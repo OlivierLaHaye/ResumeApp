@@ -1,11 +1,31 @@
+using System.Windows;
 using System.Windows.Controls;
 using ResumeApp.Behaviors;
+using ResumeApp.Services;
+using ResumeApp.Tests.Services;
 using Xunit;
 
 namespace ResumeApp.Tests.Behaviors;
 
+[Collection( MotionPolicyCollection.Name )]
 public sealed class ScrollViewerAnimatedOffsetBehaviorTests
 {
+    private static ScrollViewer CreateMeasuredScrollViewer()
+    {
+        var lScrollViewer = new ScrollViewer
+        {
+            Width = 200,
+            Height = 200,
+            Content = new Border { Width = 100, Height = 1000 }
+        };
+
+        lScrollViewer.Measure( new Size( 200, 200 ) );
+        lScrollViewer.Arrange( new Rect( 0, 0, 200, 200 ) );
+        lScrollViewer.UpdateLayout();
+
+        return lScrollViewer;
+    }
+
     [StaFact]
     public void sAnimatedVerticalOffsetProperty_IsRegistered()
     {
@@ -75,5 +95,66 @@ public sealed class ScrollViewerAnimatedOffsetBehaviorTests
             ScrollViewerAnimatedOffsetBehavior.AnimateVerticalOffset( lScrollViewer, -10, 200 ) );
 
         Assert.Null( lException );
+    }
+
+    [StaFact]
+    public void AnimateVerticalOffset_WhenMotionReduced_SnapsWithoutAnimation()
+    {
+        try
+        {
+            MotionPolicy.SetAnimationEnabledOverride( false );
+            ScrollViewer lScrollViewer = CreateMeasuredScrollViewer();
+
+            ScrollViewerAnimatedOffsetBehavior.AnimateVerticalOffset( lScrollViewer, 300, 220 );
+            lScrollViewer.UpdateLayout();
+
+            Assert.False( lScrollViewer.HasAnimatedProperties );
+            Assert.Equal( 300.0, ( double )lScrollViewer.GetValue( ScrollViewerAnimatedOffsetBehavior.sAnimatedVerticalOffsetProperty ) );
+            Assert.Equal( 300.0, lScrollViewer.VerticalOffset );
+        }
+        finally
+        {
+            MotionPolicy.SetAnimationEnabledOverride( null );
+        }
+    }
+
+    [StaFact]
+    public void AnimateVerticalOffset_WhenMotionEnabled_StartsAnimation()
+    {
+        try
+        {
+            MotionPolicy.SetAnimationEnabledOverride( true );
+            ScrollViewer lScrollViewer = CreateMeasuredScrollViewer();
+
+            ScrollViewerAnimatedOffsetBehavior.AnimateVerticalOffset( lScrollViewer, 300, 220 );
+
+            Assert.True( lScrollViewer.HasAnimatedProperties );
+        }
+        finally
+        {
+            MotionPolicy.SetAnimationEnabledOverride( null );
+        }
+    }
+
+    [StaFact]
+    public void AnimateVerticalOffset_WhenMotionBecomesReducedMidAnimation_CancelsAnimationAndSnaps()
+    {
+        try
+        {
+            MotionPolicy.SetAnimationEnabledOverride( true );
+            ScrollViewer lScrollViewer = CreateMeasuredScrollViewer();
+            ScrollViewerAnimatedOffsetBehavior.AnimateVerticalOffset( lScrollViewer, 300, 220 );
+
+            MotionPolicy.SetAnimationEnabledOverride( false );
+            ScrollViewerAnimatedOffsetBehavior.AnimateVerticalOffset( lScrollViewer, 500, 220 );
+            lScrollViewer.UpdateLayout();
+
+            Assert.False( lScrollViewer.HasAnimatedProperties );
+            Assert.Equal( 500.0, lScrollViewer.VerticalOffset );
+        }
+        finally
+        {
+            MotionPolicy.SetAnimationEnabledOverride( null );
+        }
     }
 }

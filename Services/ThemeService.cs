@@ -3,9 +3,12 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Win32;
+using ResumeApp.Helpers;
 using ResumeApp.Infrastructure;
 using System.Runtime.Versioning;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Media;
 
 namespace ResumeApp.Services
 {
@@ -24,10 +27,110 @@ namespace ResumeApp.Services
 
 		public bool IsDarkThemeActive => ActiveTheme == AppTheme.Dark;
 
+		public bool IsHighContrastActive
+		{
+			get => mIsHighContrastActive;
+			private set => SetProperty( ref mIsHighContrastActive, value );
+		}
+
+		internal static IReadOnlyList<string> HighContrastSurfaceColorKeys { get; } =
+		[
+			"CommonBlackColor",
+			"CommonDarkerGrayColor",
+			"CommonDarkGrayColor",
+			"CommonGrayColor",
+			"SurfaceHoverColor",
+			"SurfacePillSelectedColor"
+		];
+
+		internal static IReadOnlyList<string> HighContrastTextColorKeys { get; } =
+		[
+			"CommonWhiteColor",
+			"CommonLightGrayColor",
+			"TextPrimaryColor",
+			"TextSecondaryColor",
+			"BorderSubtleColor",
+			"BorderStrongColor",
+			"CaptionCloseHoverGlyphColor",
+			"CommonBlueEdgeColor",
+			"CommonGreenEdgeColor",
+			"CommonYellowEdgeColor",
+			"CommonRedEdgeColor",
+			"CommonPurpleEdgeColor",
+			"CommonOrangeEdgeColor",
+			"CommonCyanEdgeColor",
+			"CommonPinkEdgeColor"
+		];
+
+		internal static IReadOnlyList<string> HighContrastHighlightColorKeys { get; } =
+		[
+			"CommonColor",
+			"CommonBlueColor",
+			"AccentColor",
+			"FocusRingColor",
+			"SurfaceSelectedColor",
+			"CaptionCloseHoverColor",
+			"SurfacePillSelectedBorderColor",
+			.. ColorHelper.sAccentColorKeys
+		];
+
+		internal static IReadOnlyList<string> HighContrastHighlightTextColorKeys { get; } =
+		[
+			"TextOnSelectedColor"
+		];
+
+		internal static IReadOnlyList<string> HighContrastHotTrackColorKeys { get; } =
+		[
+			"AccentTextColor"
+		];
+
+		private Application? mApplication;
+		private ResourceDictionary? mHighContrastDictionary;
+		private bool mIsHighContrastActive;
+
 		public ThemeService()
 		{
 			mActiveTheme = AppTheme.Light;
 			Instance ??= this;
+		}
+
+		internal static ResourceDictionary CreateHighContrastDictionary(
+			Color pWindowColor,
+			Color pWindowTextColor,
+			Color pHighlightColor,
+			Color pHighlightTextColor,
+			Color pHotTrackColor )
+		{
+			var lDictionary = new ResourceDictionary();
+
+			AddColorAndBrush( lDictionary, HighContrastSurfaceColorKeys, pWindowColor );
+			AddColorAndBrush( lDictionary, HighContrastTextColorKeys, pWindowTextColor );
+			AddColorAndBrush( lDictionary, HighContrastHighlightColorKeys, pHighlightColor );
+			AddColorAndBrush( lDictionary, HighContrastHighlightTextColorKeys, pHighlightTextColor );
+			AddColorAndBrush( lDictionary, HighContrastHotTrackColorKeys, pHotTrackColor );
+
+			return lDictionary;
+		}
+
+		internal static string GetBrushKeyForColorKey( string pColorKey )
+		{
+			ArgumentException.ThrowIfNullOrWhiteSpace( pColorKey );
+
+			return pColorKey.EndsWith( "Color", StringComparison.Ordinal )
+				? string.Concat( pColorKey.AsSpan( 0, pColorKey.Length - "Color".Length ), "Brush" )
+				: pColorKey + "Brush";
+		}
+
+		private static void AddColorAndBrush( ResourceDictionary pDictionary, IEnumerable<string> pColorKeys, Color pColor )
+		{
+			foreach ( string lColorKey in pColorKeys )
+			{
+				var lBrush = new SolidColorBrush( pColor );
+				lBrush.Freeze();
+
+				pDictionary[ lColorKey ] = pColor;
+				pDictionary[ GetBrushKeyForColorKey( lColorKey ) ] = lBrush;
+			}
 		}
 
 		[ExcludeFromCodeCoverage( Justification = "Creates ResourceDictionary from XAML Source URI requiring compiled BAML resources." )]
@@ -119,6 +222,10 @@ namespace ResumeApp.Services
 		{
 			ArgumentNullException.ThrowIfNull( pApplication );
 
+			mApplication = pApplication;
+			SystemParameters.StaticPropertyChanged -= OnSystemParametersStaticPropertyChanged;
+			SystemParameters.StaticPropertyChanged += OnSystemParametersStaticPropertyChanged;
+
 			if ( RegistrySettingsService.TryLoadTheme( out AppTheme lSavedTheme ) )
 			{
 				ApplyTheme( pApplication, lSavedTheme, true );
@@ -126,6 +233,14 @@ namespace ResumeApp.Services
 			}
 
 			ApplyTheme( pApplication, DetectWindowsAppTheme(), true );
+		}
+
+		[ExcludeFromCodeCoverage( Justification = "Applies the requested theme to Application via ResourceDictionary replacement requiring a running WPF Application; null-guard tested separately." )]
+		public void SetTheme( Application pApplication, AppTheme pTheme )
+		{
+			ArgumentNullException.ThrowIfNull( pApplication );
+
+			ApplyTheme( pApplication, pTheme, false );
 		}
 
 		[ExcludeFromCodeCoverage( Justification = "Applies toggled theme to Application via ResourceDictionary replacement requiring a running WPF Application; null-guard tested separately." )]
@@ -152,10 +267,48 @@ namespace ResumeApp.Services
 			}
 
 			ReplaceMergedDictionary( pApplication, lThemeDictionary, IsThemeDictionary );
+			ApplyHighContrastOverrides( pApplication );
 
 			ActiveTheme = pTheme;
 			RaisePropertyChanged( nameof( IsDarkThemeActive ) );
 			RegistrySettingsService.SaveTheme( pTheme );
+		}
+
+		[ExcludeFromCodeCoverage( Justification = "Reads SystemParameters.HighContrast and SystemColors and mutates Application.Resources requiring a running WPF Application." )]
+		private void ApplyHighContrastOverrides( Application pApplication )
+		{
+			if ( mHighContrastDictionary != null )
+			{
+				pApplication.Resources.MergedDictionaries.Remove( mHighContrastDictionary );
+				mHighContrastDictionary = null;
+			}
+
+			bool lIsHighContrast = SystemParameters.HighContrast;
+
+			if ( lIsHighContrast )
+			{
+				mHighContrastDictionary = CreateHighContrastDictionary(
+					SystemColors.WindowColor,
+					SystemColors.WindowTextColor,
+					SystemColors.HighlightColor,
+					SystemColors.HighlightTextColor,
+					SystemColors.HotTrackColor );
+
+				pApplication.Resources.MergedDictionaries.Add( mHighContrastDictionary );
+			}
+
+			IsHighContrastActive = lIsHighContrast;
+		}
+
+		[ExcludeFromCodeCoverage( Justification = "Reacts to SystemParameters.StaticPropertyChanged raised by the WPF system-settings listener." )]
+		private void OnSystemParametersStaticPropertyChanged( object? pSender, PropertyChangedEventArgs pEventArgs )
+		{
+			if ( pEventArgs.PropertyName != nameof( SystemParameters.HighContrast ) || mApplication is not Application lApplication )
+			{
+				return;
+			}
+
+			lApplication.Dispatcher.BeginInvoke( () => ApplyHighContrastOverrides( lApplication ) );
 		}
 	}
 }

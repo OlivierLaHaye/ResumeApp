@@ -17,7 +17,9 @@ public sealed class ExperienceTimelineEntryViewModelTests
         string? pTechText = "C#, WPF",
         DateTime? pStartDate = null,
         DateTime? pEndDate = null,
-        ObservableCollection<string>? pAccomplishments = null )
+        ObservableCollection<string>? pAccomplishments = null,
+        ResourcesService? pResourcesService = null,
+        DateTime? pToday = null )
     {
         return new ExperienceTimelineEntryViewModel(
             pCompanyText: pCompanyText,
@@ -28,8 +30,18 @@ public sealed class ExperienceTimelineEntryViewModelTests
             pStartDate: pStartDate ?? new DateTime( 2020, 1, 1 ),
             pEndDate: pEndDate,
             pAccomplishments: pAccomplishments,
-            pResourcesService: CreateResourcesService() );
+            pResourcesService: pResourcesService ?? CreateResourcesService(),
+            pTodayProvider: pToday.HasValue ? () => pToday.Value : null );
     }
+
+    private static ResourcesService CreateFrenchResourcesService()
+    {
+        var lResourcesService = new ResourcesService();
+        lResourcesService.SetLanguage( AppLanguage.FrenchCanada );
+        return lResourcesService;
+    }
+
+    private static readonly DateTime sToday = new( 2026, 10, 2 );
 
     [Fact]
     public void Constructor_NullResourcesService_ThrowsArgumentNullException()
@@ -98,11 +110,35 @@ public sealed class ExperienceTimelineEntryViewModelTests
     }
 
     [Fact]
-    public void TechItems_SplitsVariousSeparators()
+    public void TechItems_SplitOnlyOnCommaAndSpace()
     {
-        var lEntry = CreateEntry( pTechText: "A / B•C·D|E;F" );
+        var lEntry = CreateEntry( pTechText: "A,B; C|D•E·F, G" );
 
-        Assert.True( lEntry.TechItems.Count >= 6 );
+        Assert.Equal( new[] { "A,B; C|D•E·F", "G" }, lEntry.TechItems.ToArray() );
+    }
+
+    [Fact]
+    public void TechItems_KeepSlashInsideASingleChip()
+    {
+        var lEntry = CreateEntry( pTechText: "WPF, custom C# / WPF tools." );
+
+        Assert.Equal( new[] { "WPF", "custom C# / WPF tools" }, lEntry.TechItems.ToArray() );
+    }
+
+    [Fact]
+    public void TechItems_TrimTrailingPeriodFromEveryChip()
+    {
+        var lEntry = CreateEntry( pTechText: "C#., XAML. , Node.js." );
+
+        Assert.Equal( new[] { "C#", "XAML", "Node.js" }, lEntry.TechItems.ToArray() );
+    }
+
+    [Fact]
+    public void TechItems_FrenchLegacyTechTextKeepsCustomToolsAsOneChip()
+    {
+        var lEntry = CreateEntry( pTechText: "Adobe Photoshop, outils personnalisés en C# / WPF." );
+
+        Assert.Equal( new[] { "Adobe Photoshop", "outils personnalisés en C# / WPF" }, lEntry.TechItems.ToArray() );
     }
 
     [Fact]
@@ -233,6 +269,105 @@ public sealed class ExperienceTimelineEntryViewModelTests
         var lEntry = CreateEntry( pEndDate: null );
 
         Assert.NotNull( lEntry.DateRangeText );
+    }
+
+    [Fact]
+    public void DateRangeText_English_UsesIsoMonthsAndEnDash()
+    {
+        var lEntry = CreateEntry( pStartDate: new DateTime( 2020, 2, 1 ), pEndDate: new DateTime( 2024, 3, 1 ) );
+
+        Assert.Equal( "2020-02 – 2024-03", lEntry.DateRangeText );
+    }
+
+    [Fact]
+    public void DateRangeText_English_OpenEndUsesPresent()
+    {
+        var lEntry = CreateEntry( pStartDate: new DateTime( 2024, 3, 1 ), pEndDate: null );
+
+        Assert.Equal( "2024-03 – Present", lEntry.DateRangeText );
+    }
+
+    [Fact]
+    public void DateRangeText_French_UsesIsoMonthsAndEnDash()
+    {
+        var lEntry = CreateEntry(
+            pStartDate: new DateTime( 2020, 2, 1 ),
+            pEndDate: new DateTime( 2024, 3, 1 ),
+            pResourcesService: CreateFrenchResourcesService() );
+
+        Assert.Equal( "2020-02 – 2024-03", lEntry.DateRangeText );
+    }
+
+    [Fact]
+    public void DateRangeText_French_OpenEndUsesLowercaseAujourdhui()
+    {
+        var lEntry = CreateEntry(
+            pStartDate: new DateTime( 2024, 3, 1 ),
+            pEndDate: null,
+            pResourcesService: CreateFrenchResourcesService() );
+
+        Assert.Equal( "2024-03 – aujourd'hui", lEntry.DateRangeText );
+    }
+
+    [Theory]
+    [InlineData( 2024, 3, null, null, "2 yrs 7 mos", "2 ans 7 mois" )]
+    [InlineData( 2020, 2, 2024, 3, "4 yrs 1 mo", "4 ans 1 mois" )]
+    [InlineData( 2018, 5, 2020, 2, "1 yr 9 mos", "1 an 9 mois" )]
+    [InlineData( 2017, 5, 2017, 8, "3 mos", "3 mois" )]
+    [InlineData( 2010, 6, null, null, "16 yrs 4 mos", "16 ans 4 mois" )]
+    [InlineData( 2025, 10, null, null, "1 yr", "1 an" )]
+    [InlineData( 2024, 10, null, null, "2 yrs", "2 ans" )]
+    [InlineData( 2026, 9, null, null, "1 mo", "1 mois" )]
+    [InlineData( 2025, 9, 2026, 10, "1 yr 1 mo", "1 an 1 mois" )]
+    [InlineData( 2026, 10, null, null, "", "" )]
+    [InlineData( 2020, 5, 2020, 5, "", "" )]
+    public void DurationText_CountsWholeMonthsAndFormatsPerLanguage(
+        int pStartYear,
+        int pStartMonth,
+        int? pEndYear,
+        int? pEndMonth,
+        string pExpectedEnglish,
+        string pExpectedFrench )
+    {
+        var lStart = new DateTime( pStartYear, pStartMonth, 1 );
+        DateTime? lEnd = pEndYear.HasValue ? new DateTime( pEndYear.Value, pEndMonth!.Value, 1 ) : null;
+
+        var lEnglish = CreateEntry( pStartDate: lStart, pEndDate: lEnd, pToday: sToday );
+        var lFrench = CreateEntry( pStartDate: lStart, pEndDate: lEnd, pResourcesService: CreateFrenchResourcesService(), pToday: sToday );
+
+        Assert.Equal( pExpectedEnglish, lEnglish.DurationText );
+        Assert.Equal( pExpectedFrench, lFrench.DurationText );
+    }
+
+    [Fact]
+    public void DurationText_IgnoresTheDayOfMonth()
+    {
+        var lEntry = CreateEntry(
+            pStartDate: new DateTime( 2020, 1, 31 ),
+            pEndDate: new DateTime( 2020, 3, 1 ),
+            pToday: sToday );
+
+        Assert.Equal( "2 mos", lEntry.DurationText );
+    }
+
+    [Fact]
+    public void DurationText_EndBeforeStart_IsEmpty()
+    {
+        var lEntry = CreateEntry(
+            pStartDate: new DateTime( 2020, 6, 1 ),
+            pEndDate: new DateTime( 2019, 1, 1 ),
+            pToday: sToday );
+
+        Assert.Equal( string.Empty, lEntry.DurationText );
+    }
+
+    [Fact]
+    public void DurationText_WithoutInjectedClock_UsesToday()
+    {
+        var lStart = new DateTime( DateTime.Today.Year - 1, DateTime.Today.Month, 1 );
+        var lEntry = CreateEntry( pStartDate: lStart, pEndDate: null );
+
+        Assert.Equal( "1 yr", lEntry.DurationText );
     }
 
     [Fact]

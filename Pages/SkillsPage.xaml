@@ -5,129 +5,103 @@
     x:Class="ResumeApp.Pages.SkillsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:attachedProperties="clr-namespace:ResumeApp.AttachedProperties"
     x:Name="mSkillsPageRoot"
     SnapsToDevicePixels="True"
     UseLayoutRounding="True">
 
     <UserControl.Resources>
-        <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
-            <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
-            <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
-            <Setter Property="TextWrapping" Value="Wrap" />
-        </Style>
-
-        <Style
-            x:Key="PageTitleTextBlockStyle"
-            BasedOn="{StaticResource {x:Type TextBlock}}"
-            TargetType="{x:Type TextBlock}">
-            <Setter Property="FontSize" Value="{StaticResource LargeFontSize}" />
-        </Style>
-
-        <Style
-            x:Key="PageSubtitleTextBlockStyle"
-            BasedOn="{StaticResource {x:Type TextBlock}}"
-            TargetType="{x:Type TextBlock}">
-            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
-            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
-        </Style>
-
-        <Style
-            x:Key="SectionTitleTextBlockStyle"
-            BasedOn="{StaticResource {x:Type TextBlock}}"
-            TargetType="{x:Type TextBlock}">
-            <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}" />
-            <Setter Property="FontSize" Value="{StaticResource CommonFontSize}" />
-            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
-        </Style>
-
-        <Style
-            x:Key="ChipTextBlockStyle"
-            BasedOn="{StaticResource {x:Type TextBlock}}"
-            TargetType="{x:Type TextBlock}">
-            <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}" />
-            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+        <Style x:Key="SkillSectionsItemsControlStyle" TargetType="{x:Type ItemsControl}">
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Margin" Value="0,0,-16,0" />
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <UniformGrid x:Name="mSkillSectionsRegularUniformGrid" Columns="2" />
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="ItemsPanel">
+                        <Setter.Value>
+                            <ItemsPanelTemplate>
+                                <UniformGrid x:Name="mSkillSectionsCompactUniformGrid" Columns="1" />
+                            </ItemsPanelTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Wide">
+                    <Setter Property="ItemsPanel">
+                        <Setter.Value>
+                            <ItemsPanelTemplate>
+                                <UniformGrid x:Name="mSkillSectionsWideUniformGrid" Columns="2" />
+                            </ItemsPanelTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
     </UserControl.Resources>
 
-    <ScrollViewer
-        x:Name="mSkillsScrollViewer"
-        HorizontalScrollBarVisibility="Disabled"
-        VerticalScrollBarVisibility="Auto">
-        <ScrollViewer.OpacityMask>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Offset="0" Color="Transparent" />
-                <GradientStop Color="Black">
-                    <GradientStop.Offset>
-                        <MultiBinding Converter="{StaticResource GradientOffsetTopConverter}" ConverterParameter="{StaticResource PageGradientOffsetPixels}">
-                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                            <Binding Path="VerticalOffset" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                        </MultiBinding>
-                    </GradientStop.Offset>
-                </GradientStop>
-                <GradientStop Color="Black">
-                    <GradientStop.Offset>
-                        <MultiBinding Converter="{StaticResource GradientOffsetBottomConverter}" ConverterParameter="{StaticResource PageGradientOffsetPixels}">
-                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                            <Binding Path="VerticalOffset" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                            <Binding Path="ScrollableHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                        </MultiBinding>
-                    </GradientStop.Offset>
-                </GradientStop>
-                <GradientStop Offset="1" Color="Transparent" />
-            </LinearGradientBrush>
-        </ScrollViewer.OpacityMask>
-        <StackPanel x:Name="mSkillsLayoutRoot" Margin="{StaticResource LargeThickness}">
-            <Border x:Name="mSkillsHeaderBorder" Style="{StaticResource SubSectionCardBorderStyle}">
-                <StackPanel x:Name="mSkillsHeaderStackPanel" Margin="{StaticResource CommonThickness}">
+    <ScrollViewer x:Name="mSkillsScrollViewer" Style="{StaticResource PageScrollViewerStyle}">
+        <Grid x:Name="mSkillsContentHostGrid">
+            <StackPanel x:Name="mSkillsLayoutRoot" HorizontalAlignment="Stretch" Style="{StaticResource PageContentPanelStyle}">
+                <StackPanel x:Name="mSkillsHeaderStackPanel" Orientation="Vertical">
                     <TextBlock
                         x:Name="mSkillsTitleTextBlock"
                         Style="{StaticResource PageTitleTextBlockStyle}"
                         Text="{Binding PageTitleText}" />
                     <TextBlock
                         x:Name="mSkillsSubtitleTextBlock"
-                        Margin="{StaticResource SmallThickness}"
                         Style="{StaticResource PageSubtitleTextBlockStyle}"
                         Text="{Binding PageSubtitleText}" />
                 </StackPanel>
-            </Border>
 
-            <ItemsControl x:Name="mSkillSectionsItemsControl" ItemsSource="{Binding Sections}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border x:Name="mSkillSectionBorder" Style="{StaticResource SubSectionCardBorderStyle}">
-                            <StackPanel x:Name="mSkillSectionStackPanel" Margin="{StaticResource CommonThickness}">
-                                <TextBlock
-                                    x:Name="mSkillSectionTitleTextBlock"
-                                    Style="{StaticResource SectionTitleTextBlockStyle}"
-                                    Text="{Binding TitleText}" />
+                <ItemsControl
+                    x:Name="mSkillSectionsItemsControl"
+                    ItemsSource="{Binding Sections}"
+                    Style="{StaticResource SkillSectionsItemsControlStyle}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                x:Name="mSkillSectionBorder"
+                                Margin="0,0,16,16"
+                                Style="{StaticResource ContentGroupBorderStyle}">
+                                <StackPanel x:Name="mSkillSectionStackPanel" Orientation="Vertical">
+                                    <TextBlock
+                                        x:Name="mSkillSectionTitleTextBlock"
+                                        Margin="0,0,0,12"
+                                        Style="{StaticResource PageSectionTitleTextBlockStyle}"
+                                        Text="{Binding TitleText}" />
 
-                                <ItemsControl
-                                    x:Name="mSkillChipsItemsControl"
-                                    Margin="{StaticResource SmallThickness}"
-                                    ItemsSource="{Binding Items}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel x:Name="mSkillWrapPanel" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl
+                                        x:Name="mSkillChipsItemsControl"
+                                        Focusable="False"
+                                        ItemsSource="{Binding Items}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel x:Name="mSkillWrapPanel" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
 
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border x:Name="mSkillChipBorder" Style="{StaticResource ChipBorderStyle}">
-                                                <TextBlock
-                                                    x:Name="mSkillChipTextBlock"
-                                                    Margin="{StaticResource SmallThickness}"
-                                                    Style="{StaticResource ChipTextBlockStyle}"
-                                                    Text="{Binding DisplayText}" />
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border x:Name="mSkillChipBorder" Style="{StaticResource ChipBorderStyle}">
+                                                    <TextBlock
+                                                        x:Name="mSkillChipTextBlock"
+                                                        Style="{StaticResource ChipTextBlockStyle}"
+                                                        Text="{Binding DisplayText}" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Grid>
     </ScrollViewer>
 </UserControl>

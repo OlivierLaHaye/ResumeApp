@@ -7,7 +7,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:ResumeApp.Controls"
     x:Name="mProjectImageViewerWindowRoot"
-    MinWidth="1400"
+    MinWidth="960"
+    MinHeight="640"
     AllowsTransparency="False"
     Background="{DynamicResource CommonBlackBrush}"
     BorderThickness="0"
@@ -20,20 +21,10 @@
 
     <Border
         x:Name="mWindowFrameBorder"
-        BorderBrush="{DynamicResource CommonLightGrayBrush}"
-        CornerRadius="40"
+        BorderBrush="{DynamicResource BorderStrongBrush}"
+        BorderThickness="0"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True">
-        <Border.Style>
-            <Style TargetType="{x:Type Border}">
-                <Setter Property="BorderThickness" Value="{StaticResource ExtraSmallThickness}" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
-                        <Setter Property="BorderThickness" Value="0" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Border.Style>
 
         <Grid x:Name="mProjectImageViewerWindowLayoutRootGrid">
             <controls:ProjectImageCarouselControl
@@ -41,6 +32,7 @@
                 Images="{Binding Images, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                 IsFullscreen="True"
                 PlaceholderText=""
+                ResourcesService="{Binding ResourcesService, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                 SelectedIndex="{Binding SelectedIndex, RelativeSource={RelativeSource AncestorType={x:Type Window}}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <Grid
@@ -56,22 +48,19 @@
                     MouseLeftButtonDown="OnCustomTitleBarDragSurfaceBorderMouseLeftButtonDown"
                     WindowChrome.IsHitTestVisibleInChrome="True" />
 
-                <Border
-                    x:Name="mCaptionButtonsCapsuleBorder"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Top"
-                    WindowChrome.IsHitTestVisibleInChrome="True">
+                <Border x:Name="mCaptionButtonsCapsuleBorder" Style="{StaticResource CaptionCapsuleBorderStyle}">
 
                     <Grid x:Name="mCaptionButtonsGrid">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="45" />
-                            <ColumnDefinition Width="45" />
-                            <ColumnDefinition Width="45" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <Button
                             x:Name="mMinimizeWindowButton"
                             Grid.Column="0"
+                            AutomationProperties.Name="{Binding ResourcesService[AutomationWindowMinimize], ElementName=mProjectImageViewerWindowRoot}"
                             Click="OnMinimizeWindowButtonClick"
                             Style="{StaticResource MinimizeButtonStyle}"
                             WindowChrome.IsHitTestVisibleInChrome="True" />
@@ -79,6 +68,7 @@
                         <Grid x:Name="mMaximizeRestoreButtonsGrid" Grid.Column="1">
                             <Button
                                 x:Name="mMaximizeWindowButton"
+                                AutomationProperties.Name="{Binding ResourcesService[AutomationWindowMaximize], ElementName=mProjectImageViewerWindowRoot}"
                                 Click="OnMaximizeRestoreWindowButtonClick"
                                 WindowChrome.IsHitTestVisibleInChrome="True">
                                 <Button.Style>
@@ -95,6 +85,7 @@
 
                             <Button
                                 x:Name="mRestoreWindowButton"
+                                AutomationProperties.Name="{Binding ResourcesService[AutomationWindowRestore], ElementName=mProjectImageViewerWindowRoot}"
                                 Click="OnMaximizeRestoreWindowButtonClick"
                                 WindowChrome.IsHitTestVisibleInChrome="True">
                                 <Button.Style>
@@ -113,6 +104,7 @@
                         <Button
                             x:Name="mCloseWindowButton"
                             Grid.Column="2"
+                            AutomationProperties.Name="{Binding ResourcesService[AutomationViewerClose], ElementName=mProjectImageViewerWindowRoot}"
                             Click="OnCloseWindowButtonClick"
                             Style="{StaticResource CloseButtonStyle}"
                             WindowChrome.IsHitTestVisibleInChrome="True" />

@@ -82,6 +82,33 @@
   <data name="AppTitle" xml:space="preserve">
     <value>Curriculum vitae</value>
   </data>
+  <data name="AutomationCarouselImagePosition" xml:space="preserve">
+    <value>Image {0} sur {1}</value>
+  </data>
+  <data name="AutomationCarouselNext" xml:space="preserve">
+    <value>Image suivante</value>
+  </data>
+  <data name="AutomationCarouselPrevious" xml:space="preserve">
+    <value>Image précédente</value>
+  </data>
+  <data name="AutomationMainNavigation" xml:space="preserve">
+    <value>Sections du CV</value>
+  </data>
+  <data name="AutomationViewerClose" xml:space="preserve">
+    <value>Fermer la visionneuse</value>
+  </data>
+  <data name="AutomationWindowClose" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="AutomationWindowMaximize" xml:space="preserve">
+    <value>Agrandir</value>
+  </data>
+  <data name="AutomationWindowMinimize" xml:space="preserve">
+    <value>Réduire</value>
+  </data>
+  <data name="AutomationWindowRestore" xml:space="preserve">
+    <value>Restaurer</value>
+  </data>
   <data name="ButtonCopyEmail" xml:space="preserve">
     <value>Copier le courriel</value>
   </data>
@@ -350,13 +377,13 @@
     <value>FARO CREAFORM</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertLocation" xml:space="preserve">
-    <value>Lévis, QC, Canada (Hybrid)</value>
+    <value>Lévis, QC, Canada (Hybride)</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertRole" xml:space="preserve">
     <value>UI/UX Expert Software Developer</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertScope" xml:space="preserve">
-    <value>Lead UI/UX and front-end delivery across projects, ensuring consistent, high-quality desktop UI.</value>
+    <value>Leadership UI/UX et livraison front-end sur plusieurs projets, en assurant une UI desktop cohérente et de haute qualité.</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertStartIso" xml:space="preserve">
     <value>2024-03-01</value>
@@ -364,8 +391,23 @@
   <data name="ExperienceCreaformUiUxExpertTech" xml:space="preserve">
     <value>WPF, XAML, C# 7.3, MVVM, Visual Studio, Adobe Photoshop</value>
   </data>
+  <data name="ExperienceDateRangeOpenEnd" xml:space="preserve">
+    <value>aujourd'hui</value>
+  </data>
   <data name="ExperienceDateRangeSeparator" xml:space="preserve">
-    <value> à </value>
+    <value> – </value>
+  </data>
+  <data name="ExperienceDurationMonthMany" xml:space="preserve">
+    <value>{0} mois</value>
+  </data>
+  <data name="ExperienceDurationMonthOne" xml:space="preserve">
+    <value>{0} mois</value>
+  </data>
+  <data name="ExperienceDurationYearMany" xml:space="preserve">
+    <value>{0} ans</value>
+  </data>
+  <data name="ExperienceDurationYearOne" xml:space="preserve">
+    <value>{0} an</value>
   </data>
   <data name="ExperienceIaAcc1" xml:space="preserve">
     <value>Développé des fonctionnalités en C# et VB.NET et contribué aux tests unitaires pour la stabilité à long terme.</value>
@@ -503,10 +545,10 @@
     <value>Développé un outil personnel WPF pour accélérer le workflow de retouche photo, utilisé comme terrain de jeu UI (theming, localisation, contrôles interactifs), incluant l’import en batch, le renommage guidé, et des actions rapides orientées productivité.</value>
   </data>
   <data name="HintProjectImageCarouselDragOnly" xml:space="preserve">
-    <value>Glissez vers la gauche ou vers la droite pour changer d’image.</value>
+    <value>Utilisez les flèches ou glissez vers la gauche ou la droite pour changer d’image.</value>
 </data>
   <data name="HintProjectImageCarouselExpandAndDrag" xml:space="preserve">
-    <value>Double-cliquez pour agrandir, ou glissez vers la gauche ou la droite pour changer d’image.</value>
+    <value>Appuyez sur Entrée ou double-cliquez pour agrandir. Utilisez les flèches ou glissez pour changer d’image.</value>
 </data>
   <data name="LabelAccomplishments" xml:space="preserve">
     <value>Réalisations</value>
@@ -531,6 +573,15 @@
   </data>
   <data name="LabelGitHub" xml:space="preserve">
     <value>GitHub</value>
+  </data>
+  <data name="LabelImagesLoadFailed" xml:space="preserve">
+    <value>Impossible de charger les images.</value>
+  </data>
+  <data name="LabelImagesLoading" xml:space="preserve">
+    <value>Chargement des images…</value>
+  </data>
+  <data name="LabelLanguage" xml:space="preserve">
+    <value>Langue</value>
   </data>
   <data name="LabelLinkedIn" xml:space="preserve">
     <value>LinkedIn</value>
@@ -565,6 +616,9 @@
   <data name="LabelProjectLinks" xml:space="preserve">
     <value>Liens</value>
   </data>
+  <data name="LabelProjectNoImagesYet" xml:space="preserve">
+    <value>Aucune image pour l’instant.</value>
+  </data>
   <data name="LabelProjectWhatIBuilt" xml:space="preserve">
     <value>Ce que j’ai fait</value>
   </data>
@@ -582,6 +636,9 @@
   </data>
   <data name="LabelTech" xml:space="preserve">
     <value>Tech</value>
+  </data>
+  <data name="LabelTheme" xml:space="preserve">
+    <value>Thème</value>
   </data>
   <data name="LabelWorkPreference" xml:space="preserve">
     <value>Préférence de travail</value>
@@ -733,6 +790,18 @@
   <data name="SectionHeaderWorkPreferences" xml:space="preserve">
     <value>Préférences de travail</value>
   </data>
+  <data name="SegmentLanguageEnglishShort" xml:space="preserve">
+    <value>EN</value>
+  </data>
+  <data name="SegmentLanguageFrenchShort" xml:space="preserve">
+    <value>FR</value>
+  </data>
+  <data name="SegmentThemeDark" xml:space="preserve">
+    <value>Sombre</value>
+  </data>
+  <data name="SegmentThemeLight" xml:space="preserve">
+    <value>Clair</value>
+  </data>
   <data name="SkillsPageSubtitle" xml:space="preserve">
     <value>Groupes de compétences axés sur l’UI desktop, le design system et la livraison WPF.</value>
   </data>
@@ -820,6 +889,12 @@
   <data name="SkillsSectionWpfTitle" xml:space="preserve">
     <value>WPF et MVVM</value>
   </data>
+  <data name="StartupFailureText" xml:space="preserve">
+    <value>Le contenu n’a pas pu être chargé. Fermez puis rouvrez l’application.</value>
+  </data>
+  <data name="StartupLoadingText" xml:space="preserve">
+    <value>Chargement…</value>
+  </data>
   <data name="SummaryExperienceLine" xml:space="preserve">
     <value>Développement logiciel professionnel depuis 2018; interfaces WPF chez Creaform depuis 2020.</value>
   </data>
@@ -850,11 +925,29 @@
   <data name="TabVisualCraftTitle" xml:space="preserve">
     <value>Savoir-faire visuel</value>
   </data>
+  <data name="TimelineAutomationName" xml:space="preserve">
+    <value>Chronologie du parcours</value>
+  </data>
+  <data name="TimelineBarLabelSeparator" xml:space="preserve">
+    <value> · </value>
+  </data>
   <data name="TimelineControlInteractionsHelpText" xml:space="preserve">
-    <value>Cliquez sur la timeline, utilisez la molette pour zoomer, glissez pour déplacer avec inertie, cliquez sur une barre ou n'importe où sur la timeline pour sélectionner une date.</value>
+    <value>Cliquez sur la timeline, utilisez la molette pour zoomer, glissez pour déplacer avec inertie, cliquez sur une barre ou n’importe où sur la timeline pour sélectionner une date. Au clavier, utilisez les flèches, Début et Fin, les touches plus et moins pour zoomer, 0 pour tout afficher et Entrée pour ouvrir la carte du rôle sélectionné.</value>
+  </data>
+  <data name="TimelineHintText" xml:space="preserve">
+    <value>Glissez pour parcourir · Molette ou +/− pour zoomer · Flèches pour naviguer</value>
   </data>
   <data name="TimelineLabelTodayMarker" xml:space="preserve">
     <value>Aujourd'hui</value>
+  </data>
+  <data name="TimelineShowAllButtonText" xml:space="preserve">
+    <value>Tout afficher</value>
+  </data>
+  <data name="TimelineZoomInButtonAutomationName" xml:space="preserve">
+    <value>Zoom avant</value>
+  </data>
+  <data name="TimelineZoomOutButtonAutomationName" xml:space="preserve">
+    <value>Zoom arrière</value>
   </data>
   <data name="ValueFullRemoteOnly" xml:space="preserve">
     <value>100% à distance</value>

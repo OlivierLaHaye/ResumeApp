@@ -14,7 +14,6 @@ using System.Resources;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace ResumeApp.ViewModels.Pages
@@ -51,6 +50,7 @@ namespace ResumeApp.ViewModels.Pages
 		private bool mHasInitializedImages;
 		private bool mHasQueuedImageInitialization;
 		private bool mIsInitializingImages;
+		private GalleryImageLoadState mImagesLoadState = GalleryImageLoadState.Loading;
 
 		public string TitleText => mResourcesService[ field ];
 
@@ -88,6 +88,14 @@ namespace ResumeApp.ViewModels.Pages
 				return mImages;
 			}
 		}
+
+		public string ImagesStatusText => GalleryImageLoadCoordinator.ResolveStatusText( mResourcesService, mImagesLoadState );
+
+		public bool IsImagesLoading
+		{
+			get;
+			private set => SetProperty( ref field, value );
+		} = true;
 
 		public bool IsProjectLinkButtonVisible => !string.IsNullOrWhiteSpace( mProjectLinkUriText );
 
@@ -127,43 +135,6 @@ namespace ResumeApp.ViewModels.Pages
 			RefreshFromResources();
 
 			mResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
-		}
-
-		[ExcludeFromCodeCoverage( Justification = "Async image loading pipeline using ImageSource and Task.Delay for incremental UI updates." )]
-		private static async Task ReplaceObservableImagesIncrementallyAsync( ICollection<ImageSource>? pTarget, List<ImageSource?> pImages, int pBatchSize )
-		{
-			if ( pTarget == null )
-			{
-				return;
-			}
-
-			pTarget.Clear();
-
-			if ( pImages is not { Count: > 0 } )
-			{
-				return;
-			}
-
-			int lBatchSize = pBatchSize <= 0 ? 4 : pBatchSize;
-
-			for ( int lStartIndex = 0; lStartIndex < pImages.Count; lStartIndex += lBatchSize )
-			{
-				int lEndIndexExclusive = Math.Min( lStartIndex + lBatchSize, pImages.Count );
-
-				for ( int lCurrentIndex = lStartIndex; lCurrentIndex < lEndIndexExclusive; lCurrentIndex++ )
-				{
-					ImageSource? lImage = pImages[ lCurrentIndex ];
-
-					if ( lImage == null )
-					{
-						continue;
-					}
-
-					pTarget.Add( lImage );
-				}
-
-				await Task.Delay( 1 );
-			}
 		}
 
 		internal static string ExtractValueAfterFirstColon( string pText )
@@ -371,7 +342,7 @@ namespace ResumeApp.ViewModels.Pages
 			return lValue.StartsWith( "pack://", StringComparison.OrdinalIgnoreCase ) ? lValue : BuildPackUriText( lValue );
 		}
 
-		[ExcludeFromCodeCoverage( Justification = "Creates BitmapImage from pack:// URIs requiring WPF resource loading." )]
+		[ExcludeFromCodeCoverage( Justification = "Creates preview images from pack:// URIs requiring WPF resource loading." )]
 		private static ImageSource? TryCreateImageSource( string? pPackOrRelativePath )
 		{
 			string lValue = ( pPackOrRelativePath ?? string.Empty ).Trim();
@@ -390,28 +361,12 @@ namespace ResumeApp.ViewModels.Pages
 
 			string lUriText = BuildImageUriText( lValue );
 
-			if ( string.IsNullOrWhiteSpace( lUriText ) )
+			if ( string.IsNullOrWhiteSpace( lUriText ) || !Uri.TryCreate( lUriText, UriKind.Absolute, out Uri? lUri ) )
 			{
 				return null;
 			}
 
-			try
-			{
-				var lBitmapImage = new BitmapImage();
-				lBitmapImage.BeginInit();
-				lBitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-				lBitmapImage.UriSource = new Uri( lUriText, UriKind.RelativeOrAbsolute );
-				lBitmapImage.EndInit();
-				lBitmapImage.Freeze();
-
-				return lBitmapImage;
-			}
-			catch ( Exception )
-			{
-				// ignored
-			}
-
-			return null;
+			return ImageDecodeService.TryCreatePreviewImage( lUri );
 		}
 
 		internal static bool IsKnownImageExtension( string? pPath )
@@ -450,40 +405,40 @@ namespace ResumeApp.ViewModels.Pages
 			return lLooksLikeAPath ? lProjectImagesBaseName.Replace( "\\", "/" ).TrimStart( '/' ) : $"Resources/Projects/{lProjectImagesBaseName}/{lProjectImagesBaseName}";
 		}
 
-		[ExcludeFromCodeCoverage( Justification = "Delegates to TryCreateImageSource which creates BitmapImage from pack:// URIs." )]
-		private static ImageSource?[] BuildImageSourcesFromBasePathOrDescriptor( string? pImagesDescriptorOrBasePath )
+		[ExcludeFromCodeCoverage( Justification = "Delegates to TryCreateImageSource which creates preview images from pack:// URIs." )]
+		private static IEnumerable<ImageSource?> EnumerateImageSourcesFromBasePathOrDescriptor( string? pImagesDescriptorOrBasePath )
 		{
 			string lValueText = ( pImagesDescriptorOrBasePath ?? string.Empty ).Trim();
 
 			if ( string.IsNullOrWhiteSpace( lValueText ) )
 			{
-				return [];
+				yield break;
 			}
 
-			bool lHasExplicitList = lValueText.Contains( ";" );
-
-			if ( lHasExplicitList )
+			if ( lValueText.Contains( ';' ) )
 			{
-				return SplitSemicolonSeparatedItems( lValueText )
-					.Select( TryCreateImageSource )
-					.Where( pImageSource => pImageSource != null )
-					.ToArray();
+				foreach ( string lItem in SplitSemicolonSeparatedItems( lValueText ) )
+				{
+					yield return TryCreateImageSource( lItem );
+				}
+
+				yield break;
 			}
 
-			bool lIsSingleImagePath = IsKnownImageExtension( lValueText );
-
-			if ( !lIsSingleImagePath )
+			if ( IsKnownImageExtension( lValueText ) )
 			{
-				return EnumerateIndexedImagesFromBasePath( lValueText ).ToArray();
+				yield return TryCreateImageSource( lValueText );
+				yield break;
 			}
 
-			ImageSource? lSingleImage = TryCreateImageSource( lValueText );
-
-			return lSingleImage == null ? [] : [ lSingleImage ];
+			foreach ( ImageSource? lImageSource in EnumerateIndexedImagesFromBasePath( lValueText ) )
+			{
+				yield return lImageSource;
+			}
 		}
 
-		[ExcludeFromCodeCoverage( Justification = "Delegates to TryCreateImageSource which creates BitmapImage from pack:// URIs." )]
-		private static IEnumerable<ImageSource> EnumerateIndexedImagesFromBasePath( string? pImagesBasePath )
+		[ExcludeFromCodeCoverage( Justification = "Delegates to TryCreateImageSource which creates preview images from pack:// URIs." )]
+		private static IEnumerable<ImageSource?> EnumerateIndexedImagesFromBasePath( string? pImagesBasePath )
 		{
 			string lBasePath = ( pImagesBasePath ?? string.Empty ).Trim();
 
@@ -494,12 +449,13 @@ namespace ResumeApp.ViewModels.Pages
 
 			string lIndexSeparator = lBasePath.EndsWith( '_' ) ? string.Empty : "_";
 			string lIndexedPrefix = lBasePath + lIndexSeparator;
+			bool lIsResourceIndexAvailable = GetAvailableResourceRelativePathsOrNull() != null;
 
 			for ( int lImageIndex = 1; lImageIndex <= MaximumIndexedImageProbeCount; lImageIndex++ )
 			{
-				ImageSource? lImageSource = TryCreateFirstExistingIndexedImage( lIndexedPrefix, lImageIndex );
+				ImageSource? lImageSource = TryCreateFirstExistingIndexedImage( lIndexedPrefix, lImageIndex, out bool lHadCandidate );
 
-				if ( lImageSource == null )
+				if ( lImageSource == null && ( !lHadCandidate || !lIsResourceIndexAvailable ) )
 				{
 					yield break;
 				}
@@ -508,12 +464,38 @@ namespace ResumeApp.ViewModels.Pages
 			}
 		}
 
-		[ExcludeFromCodeCoverage( Justification = "Delegates to TryCreateImageSource which creates BitmapImage from pack:// URIs." )]
-		private static ImageSource? TryCreateFirstExistingIndexedImage( string? pIndexedPrefix, int pImageIndex )
+		[ExcludeFromCodeCoverage( Justification = "Delegates to TryCreateImageSource which creates preview images from pack:// URIs." )]
+		private static ImageSource? TryCreateFirstExistingIndexedImage( string? pIndexedPrefix, int pImageIndex, out bool pHadCandidate )
 		{
+			pHadCandidate = false;
+
 			string lIndexedPrefix = ( pIndexedPrefix ?? string.Empty ).Trim();
 
-			return string.IsNullOrWhiteSpace( lIndexedPrefix ) ? null : sSupportedImageExtensions.Select( pExtension => $"{lIndexedPrefix}{pImageIndex}.{pExtension}" ).Select( pCandidateRelativePath => TryCreateImageSource( pCandidateRelativePath ) ).FirstOrDefault( pImageSource => pImageSource != null );
+			if ( string.IsNullOrWhiteSpace( lIndexedPrefix ) )
+			{
+				return null;
+			}
+
+			foreach ( string lExtension in sSupportedImageExtensions )
+			{
+				string lCandidateRelativePath = $"{lIndexedPrefix}{pImageIndex}.{lExtension}";
+
+				if ( !HasResourceRelativePath( lCandidateRelativePath ) )
+				{
+					continue;
+				}
+
+				pHadCandidate = true;
+
+				ImageSource? lImageSource = TryCreateImageSource( lCandidateRelativePath );
+
+				if ( lImageSource != null )
+				{
+					return lImageSource;
+				}
+			}
+
+			return null;
 		}
 
 		internal void QueueImagesPreload()
@@ -541,8 +523,13 @@ namespace ResumeApp.ViewModels.Pages
 			lDispatcher.BeginInvoke( new Action( InitializeImagesAsync ), pPriority );
 		}
 
-		[ExcludeFromCodeCoverage( Justification = "Async void image loading pipeline using Task.Run, BitmapImage, and Dispatcher integration." )]
+		[ExcludeFromCodeCoverage( Justification = "Async void entry point bridging the Dispatcher to the WIC image loading pipeline." )]
 		private async void InitializeImagesAsync()
+		{
+			await LoadImagesAsync( () => EnumerateImageSourcesFromBasePathOrDescriptor( BuildProjectImagesBasePath( mProjectImagesBaseName ) ) );
+		}
+
+		internal async Task LoadImagesAsync( Func<IEnumerable<ImageSource?>> pSequenceFactory )
 		{
 			if ( mHasInitializedImages || mIsInitializingImages )
 			{
@@ -553,32 +540,33 @@ namespace ResumeApp.ViewModels.Pages
 
 			try
 			{
-				List<ImageSource?>? lImages = null;
-
-				try
-				{
-					lImages = await Task.Run( () =>
-					{
-						string lImagesBasePath = BuildProjectImagesBasePath( mProjectImagesBaseName );
-
-						return BuildImageSourcesFromBasePathOrDescriptor( lImagesBasePath )
-							.Where( pImageSource => pImageSource != null )
-							.ToList();
-					} );
-				}
-				catch ( Exception )
-				{
-					// ignored
-				}
-
-				await ReplaceObservableImagesIncrementallyAsync( mImages, lImages ?? [], pBatchSize: 4 );
+				GalleryImageLoadResult lResult = await GalleryImageLoadCoordinator.LoadAsync( pSequenceFactory, PublishImage );
 
 				mHasInitializedImages = true;
+				IsImagesLoading = false;
+				SetImagesLoadState( lResult.State );
 			}
 			finally
 			{
 				mIsInitializingImages = false;
 			}
+		}
+
+		private void PublishImage( ImageSource pImage )
+		{
+			mImages.Add( pImage );
+			SetImagesLoadState( GalleryImageLoadState.HasImages );
+		}
+
+		private void SetImagesLoadState( GalleryImageLoadState pState )
+		{
+			if ( mImagesLoadState == pState )
+			{
+				return;
+			}
+
+			mImagesLoadState = pState;
+			RaisePropertyChanged( nameof( ImagesStatusText ) );
 		}
 
 		[ExcludeFromCodeCoverage( Justification = "Calls Process.Start with UseShellExecute requiring a running desktop shell." )]
@@ -621,12 +609,13 @@ namespace ResumeApp.ViewModels.Pages
 		{
 			string lPropertyName = pArgs?.PropertyName ?? string.Empty;
 
-			if ( !string.Equals( lPropertyName, "Item[]", StringComparison.Ordinal ) )
+			if ( !string.Equals( lPropertyName, ResourcesService.IndexerPropertyName, StringComparison.Ordinal ) )
 			{
 				return;
 			}
 
 			RefreshFromResources();
+			RaisePropertyChanged( nameof( ImagesStatusText ) );
 		}
 	}
 }

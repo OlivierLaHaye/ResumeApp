@@ -8,10 +8,15 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shell;
+using ResumeApp.Services;
+using ResumeApp.ViewModels.Pages;
 
 namespace ResumeApp.Windows
 {
+	internal readonly record struct FullResolutionDecodePlan( int[] IndexesToCancel, int[] IndexesToStart );
+
 	[ExcludeFromCodeCoverage( Justification = "Window code-behind with P/Invoke, HwndSource hooks, and window chrome management that requires a running Windows desktop and HWND handle." )]
 	public partial class ProjectImageViewerWindow
 	{
@@ -50,10 +55,14 @@ namespace ResumeApp.Windows
 			public readonly int bottom;
 		}
 
+		private const int NeighbourDecodeDelayMilliseconds = 150;
 		private const double TitleBarHeight = 48.0;
-		private const double NormalCornerRadius = 80.0;
+		private const double FrameThickness = 1.0;
+		private const double NormalFrameCornerRadius = 40.0;
+		private const double NormalChromeCornerRadius = 80.0;
 		private const double InitialNormalSizeRatio = 0.95;
-		private const double MinimumWindowWidth = 1400.0;
+		private const double MinimumWindowWidth = 960.0;
+		private const double MinimumWindowHeight = 640.0;
 
 		private const int WmGetMinMaxInfo = 0x0024;
 		private const int MonitorDefaultToNearest = 2;
@@ -63,18 +72,29 @@ namespace ResumeApp.Windows
 				nameof( Images ),
 				typeof( ObservableCollection<ImageSource> ),
 				typeof( ProjectImageViewerWindow ),
-				new PropertyMetadata( null ) );
+				new PropertyMetadata( null, OnImagesChanged ) );
 
 		public static readonly DependencyProperty sSelectedIndexProperty =
 			DependencyProperty.Register(
 				nameof( SelectedIndex ),
 				typeof( int ),
 				typeof( ProjectImageViewerWindow ),
-				new FrameworkPropertyMetadata( -1, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault ) );
+				new FrameworkPropertyMetadata( -1, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSelectedIndexChanged ) );
 
-		private WindowChrome? mWindowChrome;
+		public static readonly DependencyProperty sResourcesServiceProperty =
+			DependencyProperty.Register(
+				nameof( ResourcesService ),
+				typeof( ResourcesService ),
+				typeof( ProjectImageViewerWindow ),
+				new PropertyMetadata( null ) );
+
+		private readonly Dictionary<int, ImageSource> mFullResolutionImagesByIndex = [];
+		private readonly Dictionary<int, CancellationTokenSource> mPendingDecodesByIndex = [];
+
 		private HwndSource? mHwndSource;
+		private WindowChrome? mWindowChrome;
 		private bool mHasAppliedInitialNormalBounds;
+		private bool mIsClosed;
 
 		public ObservableCollection<ImageSource> Images
 		{
@@ -99,6 +119,12 @@ namespace ResumeApp.Windows
 			set => SetValue( sSelectedIndexProperty, value );
 		}
 
+		public ResourcesService? ResourcesService
+		{
+			get => GetValue( sResourcesServiceProperty ) as ResourcesService;
+			set => SetValue( sResourcesServiceProperty, value );
+		}
+
 		public ProjectImageViewerWindow()
 		{
 			InitializeComponent();
@@ -106,11 +132,85 @@ namespace ResumeApp.Windows
 			WindowStartupLocation = WindowStartupLocation.Manual;
 
 			MinWidth = MinimumWindowWidth;
+			MinHeight = MinimumWindowHeight;
+
+			mFullscreenProjectImageCarouselControl.DisplayImageProvider = GetFullResolutionImage;
 
 			StateChanged += OnWindowStateChanged;
 			Closed += OnWindowClosed;
 			Loaded += OnProjectImageViewerWindowLoaded;
 		}
+
+		internal static int ComputeMinTrackSizePixels( int pSystemMinPixels, int pRequestedMinPixels, int pWorkAreaPixels )
+		{
+			int lMinPixels = Math.Max( pSystemMinPixels, pRequestedMinPixels );
+
+			return pWorkAreaPixels > 0
+				? Math.Min( lMinPixels, pWorkAreaPixels )
+				: lMinPixels;
+		}
+
+		internal static double ComputeInitialSizeDip( double pWorkAreaDip, double pRatio, double pMinimumDip )
+		{
+			double lTargetDip = Math.Max( Math.Floor( pWorkAreaDip * pRatio ), pMinimumDip );
+
+			return Math.Min( lTargetDip, pWorkAreaDip );
+		}
+
+		internal static int WrapIndex( int pIndex, int pCount ) => ( ( pIndex % pCount ) + pCount ) % pCount;
+
+		internal static int[] GetFullResolutionWindowIndexes( int pCurrentIndex, int pCount )
+		{
+			if ( pCount <= 0 || pCurrentIndex < 0 || pCurrentIndex >= pCount )
+			{
+				return [];
+			}
+
+			var lIndexes = new List<int>( 3 ) { pCurrentIndex };
+
+			foreach ( int lOffset in new[] { 1, -1 } )
+			{
+				int lIndex = WrapIndex( pCurrentIndex + lOffset, pCount );
+				if ( !lIndexes.Contains( lIndex ) )
+				{
+					lIndexes.Add( lIndex );
+				}
+			}
+
+			return [.. lIndexes];
+		}
+
+		internal static FullResolutionDecodePlan PlanFullResolutionDecodes( IReadOnlyCollection<int> pWantedIndexes, IEnumerable<int> pLoadedIndexes, IEnumerable<int> pPendingIndexes )
+		{
+			int[] lLoadedIndexes = [.. pLoadedIndexes];
+			int[] lPendingIndexes = [.. pPendingIndexes];
+
+			return new FullResolutionDecodePlan(
+				[.. lPendingIndexes.Where( pIndex => !pWantedIndexes.Contains( pIndex ) )],
+				[.. pWantedIndexes.Where( pIndex => !lLoadedIndexes.Contains( pIndex ) && !lPendingIndexes.Contains( pIndex ) )] );
+		}
+
+		internal static TimeSpan GetFullResolutionDecodeDelay( int pIndex, int pCurrentIndex ) =>
+			pIndex == pCurrentIndex ? TimeSpan.Zero : TimeSpan.FromMilliseconds( NeighbourDecodeDelayMilliseconds );
+
+		private static void OnImagesChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
+		{
+			if ( pDependencyObject is ProjectImageViewerWindow lWindow )
+			{
+				lWindow.ResetFullResolutionState();
+			}
+		}
+
+		private static void OnSelectedIndexChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
+		{
+			if ( pDependencyObject is ProjectImageViewerWindow lWindow )
+			{
+				lWindow.QueueFullResolutionDecode();
+			}
+		}
+
+		private static bool CanDecodeOffUiThread( ImageSource? pImageSource ) =>
+			pImageSource is not Freezable lFreezable || lFreezable.IsFrozen;
 
 		private static Matrix GetTransformFromDeviceOrIdentity( IntPtr pWindowHandle )
 		{
@@ -172,9 +272,10 @@ namespace ResumeApp.Windows
 			return true;
 		}
 
-		private static bool TryGetMonitorWorkAreaWidthPixels( IntPtr pHwnd, out int pWorkAreaWidthPixels )
+		private static bool TryGetMonitorWorkAreaSizePixels( IntPtr pHwnd, out int pWorkAreaWidthPixels, out int pWorkAreaHeightPixels )
 		{
 			pWorkAreaWidthPixels = 0;
+			pWorkAreaHeightPixels = 0;
 
 			IntPtr lMonitorHandle = MonitorFromWindow( pHwnd, MonitorDefaultToNearest );
 			if ( lMonitorHandle == IntPtr.Zero )
@@ -194,7 +295,8 @@ namespace ResumeApp.Windows
 			}
 
 			pWorkAreaWidthPixels = Math.Max( 0, lMonitorInfo.rcWork.right - lMonitorInfo.rcWork.left );
-			return pWorkAreaWidthPixels > 0;
+			pWorkAreaHeightPixels = Math.Max( 0, lMonitorInfo.rcWork.bottom - lMonitorInfo.rcWork.top );
+			return pWorkAreaWidthPixels > 0 && pWorkAreaHeightPixels > 0;
 		}
 
 		private static bool TryGetRequestedMinSizeDip( IntPtr pHwnd, out double pMinWidthDip, out double pMinHeightDip )
@@ -283,24 +385,26 @@ namespace ResumeApp.Windows
 			if ( !lHasRequestedMinSize )
 			{
 				lRequestedMinWidthDip = MinimumWindowWidth;
-				lRequestedMinHeightDip = 0.0;
+				lRequestedMinHeightDip = MinimumWindowHeight;
 			}
 
 			lRequestedMinWidthDip = Math.Max( lRequestedMinWidthDip, MinimumWindowWidth );
+			lRequestedMinHeightDip = Math.Max( lRequestedMinHeightDip, MinimumWindowHeight );
 
 			Matrix lTransformToDevice = GetTransformToDeviceOrIdentity( pHwnd );
 
 			int lRequestedMinWidthPixels = ClampToInt32Ceiling( lRequestedMinWidthDip * lTransformToDevice.M11 );
 			int lRequestedMinHeightPixels = ClampToInt32Ceiling( lRequestedMinHeightDip * lTransformToDevice.M22 );
 
-			int lMinTrackWidthPixels = Math.Max( lMinMaxInfo.ptMinTrackSize.x, lRequestedMinWidthPixels );
-			int lMinTrackHeightPixels = Math.Max( lMinMaxInfo.ptMinTrackSize.y, lRequestedMinHeightPixels );
-
-			bool lHasWorkAreaWidthPixels = TryGetMonitorWorkAreaWidthPixels( pHwnd, out int lWorkAreaWidthPixels );
-			if ( lHasWorkAreaWidthPixels && lWorkAreaWidthPixels > 0 )
+			bool lHasWorkAreaSizePixels = TryGetMonitorWorkAreaSizePixels( pHwnd, out int lWorkAreaWidthPixels, out int lWorkAreaHeightPixels );
+			if ( !lHasWorkAreaSizePixels )
 			{
-				lMinTrackWidthPixels = Math.Min( lMinTrackWidthPixels, lWorkAreaWidthPixels );
+				lWorkAreaWidthPixels = 0;
+				lWorkAreaHeightPixels = 0;
 			}
+
+			int lMinTrackWidthPixels = ComputeMinTrackSizePixels( lMinMaxInfo.ptMinTrackSize.x, lRequestedMinWidthPixels, lWorkAreaWidthPixels );
+			int lMinTrackHeightPixels = ComputeMinTrackSizePixels( lMinMaxInfo.ptMinTrackSize.y, lRequestedMinHeightPixels, lWorkAreaHeightPixels );
 
 			if ( lMinTrackWidthPixels > 0 )
 			{
@@ -326,6 +430,7 @@ namespace ResumeApp.Windows
 
 		[DllImport( "user32.dll", CharSet = CharSet.Auto )]
 		private static extern bool GetMonitorInfo( IntPtr pMonitorHandle, ref MonitorInfo pMonitorInfo );
+
 
 		private static IntPtr WindowProc( IntPtr pHwnd, int pMessage, IntPtr pWParam, IntPtr pLParam, ref bool pIsHandled )
 		{
@@ -366,7 +471,7 @@ namespace ResumeApp.Windows
 			mWindowChrome = new WindowChrome
 			{
 				CaptionHeight = TitleBarHeight,
-				CornerRadius = new CornerRadius( NormalCornerRadius ),
+				CornerRadius = new CornerRadius( NormalChromeCornerRadius ),
 				GlassFrameThickness = new Thickness( 0 ),
 				ResizeBorderThickness = new Thickness( 6 ),
 				UseAeroCaptionButtons = false
@@ -387,6 +492,202 @@ namespace ResumeApp.Windows
 		private void OnProjectImageViewerWindowLoaded( object pSender, RoutedEventArgs pEventArgs )
 		{
 			ApplyInitialNormalBoundsIfNeeded();
+
+			Activate();
+			mFullscreenProjectImageCarouselControl.Focus();
+
+			QueueFullResolutionDecode();
+		}
+
+		protected override void OnKeyDown( KeyEventArgs pEventArgs )
+		{
+			base.OnKeyDown( pEventArgs );
+
+			if ( pEventArgs.Handled || ( Keyboard.Modifiers & ( ModifierKeys.Control | ModifierKeys.Alt | ModifierKeys.Windows ) ) != ModifierKeys.None )
+			{
+				return;
+			}
+
+			int lImageCount = Images.Count;
+
+			switch ( pEventArgs.Key )
+			{
+				case Key.Escape:
+					{
+						pEventArgs.Handled = true;
+						Close();
+						return;
+					}
+				case Key.Left when lImageCount > 1:
+					{
+						SelectedIndex = WrapIndex( SelectedIndex - 1, lImageCount );
+						pEventArgs.Handled = true;
+						return;
+					}
+				case Key.Right when lImageCount > 1:
+					{
+						SelectedIndex = WrapIndex( SelectedIndex + 1, lImageCount );
+						pEventArgs.Handled = true;
+						return;
+					}
+				case Key.Home when lImageCount > 1:
+					{
+						SelectedIndex = 0;
+						pEventArgs.Handled = true;
+						return;
+					}
+				case Key.End when lImageCount > 1:
+					{
+						SelectedIndex = lImageCount - 1;
+						pEventArgs.Handled = true;
+						return;
+					}
+			}
+		}
+
+		private ImageSource? GetFullResolutionImage( int pIndex ) =>
+			mFullResolutionImagesByIndex.GetValueOrDefault( pIndex );
+
+		private void ResetFullResolutionState()
+		{
+			if ( mIsClosed )
+			{
+				return;
+			}
+
+			CancelAllPendingDecodes();
+
+			mFullResolutionImagesByIndex.Clear();
+
+			QueueFullResolutionDecode();
+		}
+
+		private void QueueFullResolutionDecode()
+		{
+			if ( mIsClosed || !IsLoaded )
+			{
+				return;
+			}
+
+			ObservableCollection<ImageSource> lImages = Images;
+			int lSelectedIndex = SelectedIndex;
+			int[] lWantedIndexes = GetFullResolutionWindowIndexes( lSelectedIndex, lImages.Count );
+
+			ReleaseFullResolutionImagesOutside( lWantedIndexes );
+
+			FullResolutionDecodePlan lPlan = PlanFullResolutionDecodes( lWantedIndexes, mFullResolutionImagesByIndex.Keys, mPendingDecodesByIndex.Keys );
+
+			foreach ( int lIndex in lPlan.IndexesToCancel )
+			{
+				CancelPendingDecode( lIndex );
+			}
+
+			foreach ( int lIndex in lPlan.IndexesToStart )
+			{
+				var lCancellationTokenSource = new CancellationTokenSource();
+				mPendingDecodesByIndex[ lIndex ] = lCancellationTokenSource;
+
+				_ = DecodeFullResolutionAsync( lIndex, lImages[ lIndex ], GetFullResolutionDecodeDelay( lIndex, lSelectedIndex ), lCancellationTokenSource );
+			}
+		}
+
+		private void CancelPendingDecode( int pIndex )
+		{
+			if ( !mPendingDecodesByIndex.Remove( pIndex, out CancellationTokenSource? lCancellationTokenSource ) )
+			{
+				return;
+			}
+
+			lCancellationTokenSource.Cancel();
+			lCancellationTokenSource.Dispose();
+		}
+
+		private void CancelAllPendingDecodes()
+		{
+			foreach ( int lIndex in mPendingDecodesByIndex.Keys.ToList() )
+			{
+				CancelPendingDecode( lIndex );
+			}
+		}
+
+		private void ReleaseFullResolutionImagesOutside( int[] pWantedIndexes )
+		{
+			int lReleasedCount = 0;
+
+			foreach ( int lIndex in mFullResolutionImagesByIndex.Keys.Where( pIndex => !pWantedIndexes.Contains( pIndex ) ).ToList() )
+			{
+				mFullResolutionImagesByIndex.Remove( lIndex );
+				lReleasedCount++;
+			}
+
+			if ( lReleasedCount > 0 )
+			{
+				mFullscreenProjectImageCarouselControl.RefreshDisplayedImages();
+			}
+		}
+
+		private async Task DecodeFullResolutionAsync( int pIndex, ImageSource? pPreview, TimeSpan pDelay, CancellationTokenSource pCancellationTokenSource )
+		{
+			CancellationToken lCancellationToken = pCancellationTokenSource.Token;
+			BitmapSource? lFullResolution;
+
+			try
+			{
+				if ( pDelay > TimeSpan.Zero )
+				{
+					await Task.Delay( pDelay, lCancellationToken );
+				}
+
+				lFullResolution = CanDecodeOffUiThread( pPreview )
+					? await GalleryImageLoadCoordinator.RunLimitedAsync( () => ImageDecodeService.TryCreateFullResolutionImage( pPreview ), lCancellationToken )
+					: ImageDecodeService.TryCreateFullResolutionImage( pPreview );
+			}
+			catch ( Exception )
+			{
+				lFullResolution = null;
+			}
+
+			if ( lCancellationToken.IsCancellationRequested || mIsClosed )
+			{
+				return;
+			}
+
+			if ( mPendingDecodesByIndex.TryGetValue( pIndex, out CancellationTokenSource? lPendingSource ) && ReferenceEquals( lPendingSource, pCancellationTokenSource ) )
+			{
+				mPendingDecodesByIndex.Remove( pIndex );
+				pCancellationTokenSource.Dispose();
+			}
+
+			ApplyFullResolutionImage( pIndex, pPreview, lFullResolution );
+		}
+
+		private void ApplyFullResolutionImage( int pIndex, ImageSource? pPreview, BitmapSource? pFullResolution )
+		{
+			ObservableCollection<ImageSource> lImages = Images;
+
+			if ( pFullResolution is null
+				|| ReferenceEquals( pFullResolution, pPreview )
+				|| pIndex < 0
+				|| pIndex >= lImages.Count
+				|| !ReferenceEquals( lImages[ pIndex ], pPreview )
+				|| !GetFullResolutionWindowIndexes( SelectedIndex, lImages.Count ).Contains( pIndex ) )
+			{
+				return;
+			}
+
+			mFullResolutionImagesByIndex[ pIndex ] = pFullResolution;
+			mFullscreenProjectImageCarouselControl.RefreshDisplayedImages();
+		}
+
+		private void ReleaseFullResolutionResources()
+		{
+			mIsClosed = true;
+
+			CancelAllPendingDecodes();
+
+			mFullResolutionImagesByIndex.Clear();
+
+			mFullscreenProjectImageCarouselControl.DisplayImageProvider = null;
 		}
 
 		private void ApplyInitialNormalBoundsIfNeeded()
@@ -422,13 +723,11 @@ namespace ResumeApp.Windows
 				return;
 			}
 
-			double lTargetWidth = Math.Floor( lWorkAreaRectDip.Width * InitialNormalSizeRatio );
-			double lTargetHeight = Math.Floor( lWorkAreaRectDip.Height * InitialNormalSizeRatio );
+			MinWidth = Math.Min( MinimumWindowWidth, lWorkAreaRectDip.Width );
+			MinHeight = Math.Min( MinimumWindowHeight, lWorkAreaRectDip.Height );
 
-			lTargetWidth = Math.Min( lTargetWidth, lWorkAreaRectDip.Width );
-			lTargetHeight = Math.Min( lTargetHeight, lWorkAreaRectDip.Height );
-
-			lTargetWidth = Math.Max( lTargetWidth, MinWidth );
+			double lTargetWidth = ComputeInitialSizeDip( lWorkAreaRectDip.Width, InitialNormalSizeRatio, MinWidth );
+			double lTargetHeight = ComputeInitialSizeDip( lWorkAreaRectDip.Height, InitialNormalSizeRatio, MinHeight );
 
 			if ( lTargetWidth <= 0.0 || lTargetHeight <= 0.0 )
 			{
@@ -446,6 +745,8 @@ namespace ResumeApp.Windows
 
 		private void OnWindowClosed( object? pSender, EventArgs pEventArgs )
 		{
+			ReleaseFullResolutionResources();
+
 			if ( mHwndSource == null )
 			{
 				return;
@@ -462,9 +763,10 @@ namespace ResumeApp.Windows
 
 		private void UpdateWindowChromeForCurrentState()
 		{
-			mWindowChrome?.CornerRadius = WindowState == WindowState.Maximized
-				? new CornerRadius( 0 )
-				: new CornerRadius( NormalCornerRadius );
+			bool lIsNormal = WindowState != WindowState.Maximized;
+			mWindowChrome?.CornerRadius = new CornerRadius( lIsNormal ? NormalChromeCornerRadius : 0.0 );
+			mWindowFrameBorder.CornerRadius = new CornerRadius( lIsNormal ? NormalFrameCornerRadius : 0.0 );
+			mWindowFrameBorder.BorderThickness = new Thickness( lIsNormal ? FrameThickness : 0.0 );
 		}
 
 		private void OnMinimizeWindowButtonClick( object pSender, RoutedEventArgs pEventArgs )

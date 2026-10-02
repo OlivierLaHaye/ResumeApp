@@ -14,8 +14,7 @@
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
-        <Setter Property="Padding" Value="16,12,16,16" />
-        <Setter Property="Height" Value="220" />
+        <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
         <Setter Property="Focusable" Value="True" />
         <Setter Property="FocusVisualStyle">
             <Setter.Value>
@@ -38,14 +37,223 @@
 
     <Style x:Key="SectionCardBorderStyle" TargetType="{x:Type Border}">
         <Setter Property="Background" Value="{DynamicResource CommonDarkerGrayBrush}" />
-        <Setter Property="CornerRadius" Value="{StaticResource CommonCornerRadius}" />
-        <Setter Property="Margin" Value="{StaticResource CommonTopBottomThickness}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Margin" Value="0,0,0,16" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
 
     <Style x:Key="SubSectionCardBorderStyle" TargetType="{x:Type Border}">
-        <Setter Property="Background" Value="{DynamicResource CommonDarkGrayBrush}" />
-        <Setter Property="CornerRadius" Value="{StaticResource CommonCornerRadius}" />
-        <Setter Property="Margin" Value="{StaticResource CommonTopBottomThickness}" />
+        <Setter Property="Background" Value="{DynamicResource CommonDarkerGrayBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Margin" Value="0,0,0,16" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <Style x:Key="PageScrollViewerStyle" TargetType="{x:Type ScrollViewer}">
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="PanningMode" Value="VerticalOnly" />
+    </Style>
+
+    <Style x:Key="PageContentPanelStyle" TargetType="{x:Type FrameworkElement}">
+        <Setter Property="Margin" Value="32,28,32,40" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                <Setter Property="Margin" Value="20,20,20,32" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Wide">
+                <Setter Property="Margin" Value="40,32,40,48" />
+                <Setter Property="MaxWidth" Value="1320" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ContentGroupBorderStyle" TargetType="{x:Type Border}">
+        <Setter Property="Background" Value="{DynamicResource CommonDarkerGrayBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Padding" Value="24,20" />
+        <Setter Property="Margin" Value="0,0,0,16" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                <Setter Property="Padding" Value="16,14" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="SectionDividerBorderStyle" TargetType="{x:Type Border}">
+        <Setter Property="Height" Value="1" />
+        <Setter Property="Margin" Value="0,16" />
+        <Setter Property="Background" Value="{DynamicResource BorderSubtleBrush}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <Style x:Key="OutsetFocusRingVisualStyle">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border
+                        Margin="-3"
+                        BorderBrush="{DynamicResource FocusRingBrush}"
+                        BorderThickness="2"
+                        CornerRadius="17"
+                        SnapsToDevicePixels="True" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="InsetFocusRingVisualStyle">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border
+                        Margin="2"
+                        BorderBrush="{DynamicResource FocusRingBrush}"
+                        BorderThickness="2"
+                        CornerRadius="8"
+                        SnapsToDevicePixels="True" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SegmentedGroupBorderStyle" TargetType="{x:Type Border}">
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
+        <Setter Property="CornerRadius" Value="17" />
+        <Setter Property="Background" Value="{DynamicResource CommonDarkerGrayBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <Style x:Key="SegmentedToggleButtonStyle" TargetType="{x:Type controls:CommandToggleButton}">
+        <Setter Property="MinWidth" Value="40" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Padding" Value="10,0" />
+        <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource OutsetFocusRingVisualStyle}" />
+        <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:CommandToggleButton}">
+                    <Border
+                        x:Name="mSegmentBorder"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="14"
+                        SnapsToDevicePixels="True">
+                        <TextBlock
+                            x:Name="mSegmentTextBlock"
+                            Margin="0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            FontWeight="{TemplateBinding FontWeight}"
+                            Foreground="{TemplateBinding Foreground}"
+                            Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"
+                            TextWrapping="NoWrap" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+                <Setter Property="Background" Value="{DynamicResource SurfacePillSelectedBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource SurfacePillSelectedBorderBrush}" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style
+        x:Key="MainTabHeaderTextBlockStyle"
+        BasedOn="{StaticResource {x:Type TextBlock}}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="NoWrap" />
+        <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type TabItem}}}" />
+    </Style>
+
+    <Style x:Key="CaptionCapsuleBorderStyle" TargetType="{x:Type Border}">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Padding" Value="4,2,4,4" />
+        <Setter Property="Background" Value="{DynamicResource CommonDarkerGrayBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderStrongBrush}" />
+        <Setter Property="BorderThickness" Value="1,0,1,1" />
+        <Setter Property="CornerRadius" Value="0,0,12,12" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+    </Style>
+
+    <Style x:Key="ChromeCaptionButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource InsetFocusRingVisualStyle}" />
+        <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border
+                        x:Name="LayoutRoot"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="6">
+                        <TextBlock
+                            x:Name="mCaptionGlyphTextBlock"
+                            Margin="0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                            FontSize="10"
+                            Foreground="{TemplateBinding Foreground}"
+                            Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}"
+                            TextOptions.TextFormattingMode="Display"
+                            TextWrapping="NoWrap" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource BorderSubtleBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="{StaticResource CommonDisableOpacity}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style TargetType="{x:Type Hyperlink}">
@@ -336,69 +544,113 @@
     <!--  Shared chip style with subtle hover feedback  -->
     <Style x:Key="ChipBorderStyle" TargetType="{x:Type Border}">
         <Setter Property="Background" Value="{DynamicResource CommonGrayBrush}" />
-        <Setter Property="CornerRadius" Value="{StaticResource ExtraSmallCornerRadius}" />
-        <Setter Property="Margin" Value="{StaticResource ExtraSmallThickness}" />
-        <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
-        <Setter Property="RenderTransform">
-            <Setter.Value>
-                <ScaleTransform ScaleX="1" ScaleY="1" />
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <EventTrigger RoutedEvent="MouseEnter">
-                <BeginStoryboard>
-                    <Storyboard>
-                        <DoubleAnimation
-                            EasingFunction="{StaticResource CubicEaseOut}"
-                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
-                            To="1.04"
-                            Duration="{StaticResource MicroDuration}" />
-                        <DoubleAnimation
-                            EasingFunction="{StaticResource CubicEaseOut}"
-                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                            To="1.04"
-                            Duration="{StaticResource MicroDuration}" />
-                    </Storyboard>
-                </BeginStoryboard>
-            </EventTrigger>
-            <EventTrigger RoutedEvent="MouseLeave">
-                <BeginStoryboard>
-                    <Storyboard>
-                        <DoubleAnimation
-                            EasingFunction="{StaticResource CubicEaseOut}"
-                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
-                            To="1"
-                            Duration="{StaticResource SubtleDuration}" />
-                        <DoubleAnimation
-                            EasingFunction="{StaticResource CubicEaseOut}"
-                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                            To="1"
-                            Duration="{StaticResource SubtleDuration}" />
-                    </Storyboard>
-                </BeginStoryboard>
-            </EventTrigger>
-        </Style.Triggers>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="8,3" />
+        <Setter Property="Margin" Value="0,0,6,6" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
 
     <Style x:Key="{x:Type TextBlock}" TargetType="{x:Type TextBlock}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="Foreground">
-            <Setter.Value>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Color="{DynamicResource CommonWhiteColor}" />
-                    <GradientStop Offset="1" Color="{DynamicResource CommonWhiteColor}" />
-                </LinearGradientBrush>
-            </Setter.Value>
-        </Setter>
-        <Setter Property="Margin" Value="{StaticResource CommonThickness}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="Margin" Value="0" />
         <Setter Property="TextWrapping" Value="Wrap" />
         <Setter Property="FontFamily" Value="{StaticResource CommonFontFamily}" />
-        <Setter Property="FontSize" Value="{StaticResource CommonFontSize}" />
+        <Setter Property="FontSize" Value="15" />
 
         <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
         <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
         <Setter Property="TextOptions.TextHintingMode" Value="Fixed" />
         <Setter Property="UseLayoutRounding" Value="True" />
+    </Style>
+
+    <Style
+        x:Key="ChipTextBlockStyle"
+        BasedOn="{StaticResource {x:Type TextBlock}}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="TextWrapping" Value="NoWrap" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+
+    <Style
+        x:Key="DisplayNameTextBlockStyle"
+        BasedOn="{StaticResource {x:Type TextBlock}}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="FontSize" Value="32" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style
+        x:Key="PageTitleTextBlockStyle"
+        BasedOn="{StaticResource {x:Type TextBlock}}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="FontSize" Value="26" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Margin" Value="0,0,0,4" />
+    </Style>
+
+    <Style
+        x:Key="PageSubtitleTextBlockStyle"
+        BasedOn="{StaticResource {x:Type TextBlock}}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="Margin" Value="0,0,0,24" />
+        <Setter Property="MaxWidth" Value="760" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+
+    <Style
+        x:Key="PageSectionTitleTextBlockStyle"
+        BasedOn="{StaticResource {x:Type TextBlock}}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+    </Style>
+
+    <Style
+        x:Key="PageBodyTextBlockStyle"
+        BasedOn="{StaticResource {x:Type TextBlock}}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="LineHeight" Value="23" />
+        <Setter Property="MaxWidth" Value="760" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+
+    <Style
+        x:Key="PageSecondaryTextBlockStyle"
+        BasedOn="{StaticResource {x:Type TextBlock}}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="LineHeight" Value="19" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+
+    <Style
+        x:Key="PageLabelTextBlockStyle"
+        BasedOn="{StaticResource {x:Type TextBlock}}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="Margin" Value="0,0,0,4" />
+    </Style>
+
+    <Style
+        x:Key="PageMonoTextBlockStyle"
+        BasedOn="{StaticResource {x:Type TextBlock}}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
     </Style>
 
     <Style
@@ -4543,230 +4795,39 @@
 
     <Style
         x:Key="MinimizeButtonStyle"
-        BasedOn="{StaticResource CaptionButtonStyle}"
-        TargetType="Button">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border
-                        x:Name="LayoutRoot"
-                        Width="45"
-                        Margin="0"
-                        Background="{DynamicResource CommonGrayBrush}"
-                        BorderBrush="{DynamicResource CommonLightGrayBrush}"
-                        BorderThickness="2,0,0,2"
-                        CornerRadius="0,0,0,15">
-                        <Grid Height="30">
-                            <Viewbox Margin="14" Stretch="Uniform">
-                                <Grid>
-                                    <Path Data="F1 M 0.000,0.000 L 400.000,0.000 L 400.000,99.414 L 0.000,99.414 L 0.000,0.000 Z" Fill="{DynamicResource CommonWhiteBrush}" />
-                                </Grid>
-                            </Viewbox>
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
-                            <Setter TargetName="LayoutRoot" Property="Background">
-                                <Setter.Value>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                        <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                                        <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                                    </LinearGradientBrush>
-                                </Setter.Value>
-                            </Setter>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="{StaticResource CommonDisableOpacity}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
-                <Setter Property="Background">
-                    <Setter.Value>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                            <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                            <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                        </LinearGradientBrush>
-                    </Setter.Value>
-                </Setter>
-            </Trigger>
-        </Style.Triggers>
+        BasedOn="{StaticResource ChromeCaptionButtonStyle}"
+        TargetType="{x:Type Button}">
+        <Setter Property="Content" Value="&#xE921;" />
     </Style>
 
     <Style
         x:Key="MaximizeButtonStyle"
-        BasedOn="{StaticResource CaptionButtonStyle}"
-        TargetType="Button">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border
-                        x:Name="LayoutRoot"
-                        Width="45"
-                        Margin="0"
-                        Background="{DynamicResource CommonGrayBrush}"
-                        BorderBrush="{DynamicResource CommonLightGrayBrush}"
-                        BorderThickness="0,0,0,2">
-                        <Grid Height="30">
-                            <Viewbox Margin="11" Stretch="Uniform">
-                                <Grid>
-                                    <Path Data="F1 M 100.000,100.000 L 300.586,100.000 L 300.586,300.586 L 100.000,300.586 L 100.000,100.000 Z M 0.000,0.000 L 0.000,400.586 L 400.586,400.586 L 400.586,0.000 L 0.000,0.000 Z" Fill="{DynamicResource CommonWhiteBrush}" />
-                                </Grid>
-                            </Viewbox>
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
-                            <Setter TargetName="LayoutRoot" Property="Background">
-                                <Setter.Value>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                        <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                                        <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                                    </LinearGradientBrush>
-                                </Setter.Value>
-                            </Setter>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="{StaticResource CommonDisableOpacity}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
-                <Setter Property="Background">
-                    <Setter.Value>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                            <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                            <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                        </LinearGradientBrush>
-                    </Setter.Value>
-                </Setter>
-            </Trigger>
-        </Style.Triggers>
+        BasedOn="{StaticResource ChromeCaptionButtonStyle}"
+        TargetType="{x:Type Button}">
+        <Setter Property="Content" Value="&#xE922;" />
     </Style>
 
     <Style
         x:Key="RestoreButtonStyle"
-        BasedOn="{StaticResource CaptionButtonStyle}"
-        TargetType="Button">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border
-                        x:Name="LayoutRoot"
-                        Width="45"
-                        Margin="0"
-                        Background="{DynamicResource CommonGrayBrush}"
-                        BorderBrush="{DynamicResource CommonLightGrayBrush}"
-                        BorderThickness="0,0,0,2">
-                        <Grid Height="30">
-                            <Viewbox Margin="11" Stretch="Uniform">
-                                <Grid>
-                                    <Path Data="F1 M 100.000,100.000 L 200.586,100.000 L 200.586,200.586 L 100.000,200.586 L 100.000,100.000 Z M 0.000,0.000 L 0.000,300.586 L 300.586,300.586 L 300.586,0.000 L 0.000,0.000 Z" Fill="{DynamicResource CommonWhiteBrush}" />
-                                </Grid>
-                            </Viewbox>
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
-                            <Setter TargetName="LayoutRoot" Property="Background">
-                                <Setter.Value>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                        <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                                        <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                                    </LinearGradientBrush>
-                                </Setter.Value>
-                            </Setter>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="{StaticResource CommonDisableOpacity}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
-                <Setter Property="Background">
-                    <Setter.Value>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                            <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                            <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                        </LinearGradientBrush>
-                    </Setter.Value>
-                </Setter>
-            </Trigger>
-        </Style.Triggers>
+        BasedOn="{StaticResource ChromeCaptionButtonStyle}"
+        TargetType="{x:Type Button}">
+        <Setter Property="Content" Value="&#xE923;" />
     </Style>
 
     <Style
         x:Key="CloseButtonStyle"
-        BasedOn="{StaticResource CaptionButtonStyle}"
-        TargetType="Button">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border
-                        x:Name="LayoutRoot"
-                        Width="45"
-                        Margin="0"
-                        Background="{DynamicResource CommonGrayBrush}"
-                        BorderBrush="{DynamicResource CommonLightGrayBrush}"
-                        BorderThickness="0,0,2,2"
-                        CornerRadius="0,0,15,0">
-                        <Grid Height="30">
-                            <Viewbox Margin="11" Stretch="Uniform">
-                                <Grid>
-                                    <Path Data="F1 M 0.176,0.000 L 50.176,0.000 L 51.738,0.000 C 64.434,0.586 77.324,6.445 86.113,15.625 L 200.176,129.688 L 315.801,15.625 C 329.082,4.102 338.066,0.391 350.176,0.000 L 400.176,0.000 L 400.176,50.000 C 400.176,64.258 398.418,77.539 387.676,87.500 L 273.613,201.562 L 386.113,314.062 C 395.488,323.438 400.176,336.719 400.176,350.000 L 400.176,400.000 L 350.176,400.000 C 336.895,400.000 323.613,395.312 314.238,385.938 L 200.176,271.875 L 86.113,385.938 C 76.738,395.312 63.457,400.000 50.176,400.000 L 0.176,400.000 L 0.176,350.000 C 0.176,336.719 4.863,323.438 14.238,314.062 L 128.301,201.562 L 14.238,87.500 C 3.691,77.734 -0.996,64.062 0.176,50.000 L 0.176,0.000 Z" Fill="{DynamicResource CommonWhiteBrush}" />
-                                </Grid>
-                            </Viewbox>
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
-                            <Setter TargetName="LayoutRoot" Property="Background">
-                                <Setter.Value>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                        <GradientStop Offset="0" Color="{DynamicResource CommonRedColor}" />
-                                        <GradientStop Offset="1" Color="{DynamicResource CommonRedColor}" />
-                                    </LinearGradientBrush>
-                                </Setter.Value>
-                            </Setter>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="{StaticResource CommonDisableOpacity}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        BasedOn="{StaticResource ChromeCaptionButtonStyle}"
+        TargetType="{x:Type Button}">
+        <Setter Property="Content" Value="&#xE8BB;" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
-                <Setter Property="Background">
-                    <Setter.Value>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                            <GradientStop Offset="0" Color="{DynamicResource CommonColor}" />
-                            <GradientStop Offset="1" Color="{DynamicResource CommonColor}" />
-                        </LinearGradientBrush>
-                    </Setter.Value>
-                </Setter>
+                <Setter Property="Background" Value="{DynamicResource CaptionCloseHoverBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource CaptionCloseHoverGlyphBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource CaptionCloseHoverBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource CaptionCloseHoverGlyphBrush}" />
+                <Setter Property="Opacity" Value="0.85" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -5334,115 +5395,46 @@
     </Style>
 
     <Style x:Key="MainTabItemStyle" TargetType="{x:Type TabItem}">
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource InsetFocusRingVisualStyle}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="18,12" />
-        <Setter Property="HorizontalAlignment" Value="Stretch" />
-        <Setter Property="VerticalAlignment" Value="Stretch" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource CommonWhiteBrush}" />
-        <Setter Property="TextElement.FontSize" Value="18" />
-        <Setter Property="TextElement.FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="16,0" />
+        <Setter Property="MinHeight" Value="40" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
-                    <Grid x:Name="mTabItemRootGrid">
-                        <Border
-                            x:Name="mTabItemBorder"
-                            Margin="6"
-                            Background="{TemplateBinding Background}"
-                            CornerRadius="18" />
-
-                        <!--  Hover overlay: fades in smoothly on hover  -->
-                        <Border
-                            x:Name="mTabItemHoverOverlay"
-                            Margin="6"
-                            Background="{DynamicResource OnSurfaceDividerOnDarkBrush}"
-                            CornerRadius="18"
-                            Opacity="0" />
-
-                        <!--  Selected overlay: fades in smoothly on selection  -->
-                        <Border
-                            x:Name="mTabItemSelectedOverlay"
-                            Margin="6"
-                            Background="{DynamicResource OnSurfaceCardStrokeOnDarkBrush}"
-                            CornerRadius="18"
-                            Opacity="0" />
-
+                    <Border
+                        x:Name="mTabItemPillBorder"
+                        MinHeight="{TemplateBinding MinHeight}"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="10"
+                        SnapsToDevicePixels="True">
                         <ContentPresenter
                             x:Name="mTabItemContentPresenter"
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
                             ContentSource="Header"
-                            RecognizesAccessKey="True">
-                            <ContentPresenter.Margin>
-                                <Thickness
-                                    Bottom="18"
-                                    Left="24"
-                                    Right="24"
-                                    Top="18" />
-                            </ContentPresenter.Margin>
-                        </ContentPresenter>
-                    </Grid>
+                            RecognizesAccessKey="True" />
+                    </Border>
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Trigger.EnterActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation
-                                            EasingFunction="{StaticResource CubicEaseOut}"
-                                            Storyboard.TargetName="mTabItemHoverOverlay"
-                                            Storyboard.TargetProperty="Opacity"
-                                            To="1"
-                                            Duration="{StaticResource MicroDuration}" />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </Trigger.EnterActions>
-                            <Trigger.ExitActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation
-                                            EasingFunction="{StaticResource CubicEaseOut}"
-                                            Storyboard.TargetName="mTabItemHoverOverlay"
-                                            Storyboard.TargetProperty="Opacity"
-                                            To="0"
-                                            Duration="{StaticResource SubtleDuration}" />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </Trigger.ExitActions>
+                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                            <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
                         </Trigger>
 
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="TextElement.Foreground" Value="{DynamicResource CommonBrush}" />
-                            <Trigger.EnterActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation
-                                            EasingFunction="{StaticResource CubicEaseOut}"
-                                            Storyboard.TargetName="mTabItemSelectedOverlay"
-                                            Storyboard.TargetProperty="Opacity"
-                                            To="1"
-                                            Duration="{StaticResource MicroDuration}" />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </Trigger.EnterActions>
-                            <Trigger.ExitActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation
-                                            EasingFunction="{StaticResource CubicEaseOut}"
-                                            Storyboard.TargetName="mTabItemSelectedOverlay"
-                                            Storyboard.TargetProperty="Opacity"
-                                            To="0"
-                                            Duration="{StaticResource SubtleDuration}" />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </Trigger.ExitActions>
+                            <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+                            <Setter Property="Background" Value="{DynamicResource SurfacePillSelectedBrush}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource SurfacePillSelectedBorderBrush}" />
                         </Trigger>
 
                         <Trigger Property="IsEnabled" Value="False">
@@ -5460,11 +5452,12 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource MainTabItemStyle}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabControl}">
-                    <Grid x:Name="mTabControlLayoutRoot">
+                    <Grid x:Name="mTabControlLayoutRoot" KeyboardNavigation.TabNavigation="Local">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
@@ -5473,38 +5466,30 @@
                         <Border
                             x:Name="mTabStripBorder"
                             Grid.Row="0"
-                            Padding="6"
+                            Margin="20,0,20,8"
+                            Padding="4"
                             Background="{DynamicResource CommonDarkerGrayBrush}"
-                            CornerRadius="22">
+                            BorderBrush="{DynamicResource BorderSubtleBrush}"
+                            BorderThickness="1"
+                            CornerRadius="14"
+                            SnapsToDevicePixels="True">
                             <UniformGrid
                                 x:Name="mTabHeaderUniformGrid"
                                 IsItemsHost="True"
+                                KeyboardNavigation.DirectionalNavigation="Cycle"
+                                KeyboardNavigation.TabIndex="1"
+                                KeyboardNavigation.TabNavigation="Once"
                                 Rows="1" />
                         </Border>
-                        <Border
-                            Grid.Row="1"
-                            Margin="0,16,0,0"
-                            Style="{StaticResource SectionCardBorderStyle}">
-                            <ContentPresenter x:Name="mSelectedContentPresenter" ContentSource="SelectedContent" />
-                        </Border>
-                    </Grid>
 
-                    <!--  Page entrance: fade in content on tab switch  -->
-                    <ControlTemplate.Triggers>
-                        <EventTrigger RoutedEvent="Selector.SelectionChanged">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <DoubleAnimation
-                                        EasingFunction="{StaticResource CubicEaseOut}"
-                                        Storyboard.TargetName="mSelectedContentPresenter"
-                                        Storyboard.TargetProperty="Opacity"
-                                        From="0"
-                                        To="1"
-                                        Duration="{StaticResource SubtleDuration}" />
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                    </ControlTemplate.Triggers>
+                        <ContentPresenter
+                            x:Name="PART_SelectedContentHost"
+                            Grid.Row="1"
+                            Margin="0,0,6,22"
+                            ContentSource="SelectedContent"
+                            KeyboardNavigation.TabIndex="2"
+                            KeyboardNavigation.TabNavigation="Local" />
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -5773,178 +5758,143 @@
     </Style>
 
     <Style x:Key="ContactActionPillButtonStyle" TargetType="{x:Type Button}">
-        <Style.Resources>
-            <SolidColorBrush
-                x:Key="mContactActionNormalBackgroundBrush"
-                Opacity="0.08"
-                Color="{DynamicResource CommonWhiteColor}" />
-            <SolidColorBrush
-                x:Key="mContactActionNormalBorderBrush"
-                Opacity="0.16"
-                Color="{DynamicResource CommonWhiteColor}" />
-
-            <SolidColorBrush
-                x:Key="mContactActionHoverBackgroundBrush"
-                Opacity="0.16"
-                Color="{DynamicResource CommonBlueColor}" />
-            <SolidColorBrush
-                x:Key="mContactActionHoverBorderBrush"
-                Opacity="0.55"
-                Color="{DynamicResource CommonBlueColor}" />
-
-            <SolidColorBrush
-                x:Key="mContactActionPressedBackgroundBrush"
-                Opacity="0.22"
-                Color="{DynamicResource CommonBlueStrongColor}" />
-            <SolidColorBrush
-                x:Key="mContactActionPressedBorderBrush"
-                Opacity="0.75"
-                Color="{DynamicResource CommonBlueStrongColor}" />
-        </Style.Resources>
-
-        <Setter Property="Background" Value="{StaticResource mContactActionNormalBackgroundBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource mContactActionNormalBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource CommonDarkGrayBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="IsTabStop" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource OutsetFocusRingVisualStyle}" />
         <Setter Property="MinWidth" Value="80" />
-        <Setter Property="Height" Value="40" />
+        <Setter Property="Height" Value="36" />
+        <Setter Property="Padding" Value="14,0" />
         <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
-        <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Grid x:Name="mContactActionTemplateRoot" SnapsToDevicePixels="True">
-                        <Border
-                            x:Name="mContactActionBorder"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{StaticResource CommonCornerRadius}"
-                            RenderTransformOrigin="0.5,0.5">
-                            <Border.RenderTransform>
-                                <ScaleTransform x:Name="mContactActionScaleTransform" ScaleX="1" ScaleY="1" />
-                            </Border.RenderTransform>
-
-                            <ContentPresenter
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                RecognizesAccessKey="True" />
-                        </Border>
-
-                        <VisualStateManager.VisualStateGroups>
-                            <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal">
-                                    <Storyboard>
-                                        <DoubleAnimation
-                                            Storyboard.TargetName="mContactActionScaleTransform"
-                                            Storyboard.TargetProperty="ScaleX"
-                                            To="1"
-                                            Duration="0:0:0.10">
-                                            <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation
-                                            Storyboard.TargetName="mContactActionScaleTransform"
-                                            Storyboard.TargetProperty="ScaleY"
-                                            To="1"
-                                            Duration="0:0:0.10">
-                                            <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="mContactActionBorder" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource mContactActionNormalBackgroundBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="mContactActionBorder" Storyboard.TargetProperty="BorderBrush">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource mContactActionNormalBorderBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-
-                                        <DoubleAnimation
-                                            Storyboard.TargetName="mContactActionBorder"
-                                            Storyboard.TargetProperty="Opacity"
-                                            To="1"
-                                            Duration="0:0:0" />
-                                    </Storyboard>
-                                </VisualState>
-
-                                <VisualState x:Name="MouseOver">
-                                    <Storyboard>
-                                        <DoubleAnimation
-                                            Storyboard.TargetName="mContactActionScaleTransform"
-                                            Storyboard.TargetProperty="ScaleX"
-                                            To="1.05"
-                                            Duration="0:0:0.10">
-                                            <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation
-                                            Storyboard.TargetName="mContactActionScaleTransform"
-                                            Storyboard.TargetProperty="ScaleY"
-                                            To="1.05"
-                                            Duration="0:0:0.10">
-                                            <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="mContactActionBorder" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource mContactActionHoverBackgroundBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="mContactActionBorder" Storyboard.TargetProperty="BorderBrush">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource mContactActionHoverBorderBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualState>
-
-                                <VisualState x:Name="Pressed">
-                                    <Storyboard>
-                                        <DoubleAnimation
-                                            Storyboard.TargetName="mContactActionScaleTransform"
-                                            Storyboard.TargetProperty="ScaleX"
-                                            To="0.98"
-                                            Duration="0:0:0.05">
-                                            <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-                                        <DoubleAnimation
-                                            Storyboard.TargetName="mContactActionScaleTransform"
-                                            Storyboard.TargetProperty="ScaleY"
-                                            To="0.98"
-                                            Duration="0:0:0.05">
-                                            <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
-
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="mContactActionBorder" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource mContactActionPressedBackgroundBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="mContactActionBorder" Storyboard.TargetProperty="BorderBrush">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource mContactActionPressedBorderBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
-                                </VisualState>
-
-                                <VisualState x:Name="Disabled">
-                                    <Storyboard>
-                                        <DoubleAnimation
-                                            Storyboard.TargetName="mContactActionBorder"
-                                            Storyboard.TargetProperty="Opacity"
-                                            To="0.45"
-                                            Duration="0:0:0" />
-                                    </Storyboard>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateManager.VisualStateGroups>
-                    </Grid>
+                    <Border
+                        x:Name="mContactActionBorder"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="18"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            RecognizesAccessKey="True" />
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SurfacePillSelectedBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource BorderSubtleBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="{StaticResource CommonDisableOpacity}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="TimelineZoomButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="30" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="IsTabStop" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource InsetFocusRingVisualStyle}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border
+                        x:Name="mTimelineZoomButtonBorder"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(attachedProperties:CornerRadiusAssist.sCornerRadius)}"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SurfacePillSelectedBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="{StaticResource CommonDisableOpacity}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="TimelinePillButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="IsTabStop" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource OutsetFocusRingVisualStyle}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border
+                        x:Name="mTimelinePillBorder"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="13"
+                        SnapsToDevicePixels="True">
+                        <TextBlock
+                            x:Name="mTimelinePillTextBlock"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontFamily="{TemplateBinding FontFamily}"
+                            FontSize="{TemplateBinding FontSize}"
+                            FontWeight="{TemplateBinding FontWeight}"
+                            Foreground="{TemplateBinding Foreground}"
+                            Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SurfacePillSelectedBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                <Setter Property="Opacity" Value="{StaticResource CommonDisableOpacity}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

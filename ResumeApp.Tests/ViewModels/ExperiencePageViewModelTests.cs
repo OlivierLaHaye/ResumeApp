@@ -335,7 +335,8 @@ public sealed class ExperiencePageViewModelTests
 
         lViewModel.SelectedDate = lNewDate;
 
-        Assert.Contains( "SetSelectedDate", lRaisedProperties );
+        Assert.Contains( nameof( ExperiencePageViewModel.SelectedDate ), lRaisedProperties );
+        Assert.DoesNotContain( "SetSelectedDate", lRaisedProperties );
     }
 
     [Fact]
@@ -348,7 +349,10 @@ public sealed class ExperiencePageViewModelTests
 
         lViewModel.SelectedTimeFrame = lViewModel.ExperienceTimeFrames[1];
 
-        Assert.Contains( "SetSelectedTimeFrame", lRaisedProperties );
+        Assert.Contains( nameof( ExperiencePageViewModel.SelectedTimeFrame ), lRaisedProperties );
+        Assert.Contains( nameof( ExperiencePageViewModel.SelectedDate ), lRaisedProperties );
+        Assert.Contains( nameof( ExperiencePageViewModel.SelectedTimelineEntry ), lRaisedProperties );
+        Assert.DoesNotContain( "SetSelectedTimeFrame", lRaisedProperties );
     }
 
     [Fact]
@@ -361,7 +365,49 @@ public sealed class ExperiencePageViewModelTests
 
         lViewModel.SelectedTimelineEntry = lViewModel.TimelineEntries[1];
 
-        Assert.Contains( "SetSelectedTimelineEntry", lRaisedProperties );
+        Assert.Contains( nameof( ExperiencePageViewModel.SelectedTimelineEntry ), lRaisedProperties );
+        Assert.Contains( nameof( ExperiencePageViewModel.SelectedDate ), lRaisedProperties );
+        Assert.DoesNotContain( "SetSelectedTimelineEntry", lRaisedProperties );
+    }
+
+    [Fact]
+    public void SelectedTimelineEntry_ChangesOnlyOneIsSelectedFlag()
+    {
+        var lViewModel = Create();
+        Assert.True( lViewModel.TimelineEntries.Count > 2, "Test requires at least three entries" );
+
+        lViewModel.SelectedTimelineEntry = lViewModel.TimelineEntries[2];
+
+        Assert.Single( lViewModel.TimelineEntries, pEntry => pEntry.IsSelected );
+        Assert.True( lViewModel.TimelineEntries[2].IsSelected );
+    }
+
+    [Fact]
+    public void SelectedDate_MovesIsSelectedFlagToSynchronizedEntry()
+    {
+        var lViewModel = Create();
+        Assert.True( lViewModel.TimelineEntries.Count > 3, "Test requires at least four entries" );
+
+        lViewModel.SelectedDate = lViewModel.TimelineEntries[3].StartDate;
+
+        Assert.Same( lViewModel.TimelineEntries[3], lViewModel.SelectedTimelineEntry );
+        Assert.Single( lViewModel.TimelineEntries, pEntry => pEntry.IsSelected );
+        Assert.True( lViewModel.TimelineEntries[3].IsSelected );
+    }
+
+    [Fact]
+    public void SelectedTimeFrame_SelectsMatchingEntryAndDate()
+    {
+        var lViewModel = Create();
+        Assert.True( lViewModel.ExperienceTimeFrames.Count > 2, "Test requires at least three frames" );
+
+        var lFrame = lViewModel.ExperienceTimeFrames[2];
+        lViewModel.SelectedTimeFrame = lFrame;
+
+        Assert.Same( lFrame, lViewModel.SelectedTimeFrame );
+        Assert.Same( lViewModel.TimelineEntries[2], lViewModel.SelectedTimelineEntry );
+        Assert.Equal( lFrame.StartDate.Date, lViewModel.SelectedDate );
+        Assert.Single( lViewModel.TimelineEntries, pEntry => pEntry.IsSelected );
     }
 
     [Fact]
@@ -369,7 +415,6 @@ public sealed class ExperiencePageViewModelTests
     {
         var lResourcesService = new ResourcesService();
         var lViewModel = new ExperiencePageViewModel( lResourcesService, new ThemeService() );
-        int lInitialCount = lViewModel.TimelineEntries.Count;
         var lRaisedProperties = new List<string?>();
         lViewModel.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
 
@@ -377,5 +422,128 @@ public sealed class ExperiencePageViewModelTests
 
         Assert.Contains( "TimelineControlInteractionsHelpText", lRaisedProperties );
         Assert.True( lViewModel.TimelineEntries.Count > 0 );
+    }
+
+    [Fact]
+    public void CultureChange_RebuildsCollectionsOnlyOncePerSwitch()
+    {
+        var lResourcesService = new ResourcesService();
+        var lViewModel = new ExperiencePageViewModel( lResourcesService, new ThemeService() );
+        int lResetCount = 0;
+        lViewModel.TimelineEntries.CollectionChanged += ( _, pArgs ) =>
+        {
+            if ( pArgs.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset )
+            {
+                lResetCount++;
+            }
+        };
+
+        lResourcesService.SetLanguage( AppLanguage.FrenchCanada );
+
+        Assert.Equal( 1, lResetCount );
+    }
+
+    [Theory]
+    [InlineData( 0 )]
+    [InlineData( 2 )]
+    [InlineData( 4 )]
+    public void CultureRoundTrip_PreservesLogicalSelectionAndMembership( int pSelectedIndex )
+    {
+        var lResourcesService = new ResourcesService();
+        var lViewModel = new ExperiencePageViewModel( lResourcesService, new ThemeService() );
+        Assert.True( lViewModel.TimelineEntries.Count > pSelectedIndex, "Test requires enough entries" );
+
+        lViewModel.SelectedTimelineEntry = lViewModel.TimelineEntries[ pSelectedIndex ];
+        DateTime lSelectedDate = lViewModel.SelectedDate;
+        DateTime lSelectedStartDate = lViewModel.TimelineEntries[ pSelectedIndex ].StartDate;
+
+        lResourcesService.SetLanguage( AppLanguage.FrenchCanada );
+        AssertSelectionIsCoherent( lViewModel, pSelectedIndex, lSelectedDate, lSelectedStartDate );
+
+        lResourcesService.SetLanguage( AppLanguage.EnglishCanada );
+        AssertSelectionIsCoherent( lViewModel, pSelectedIndex, lSelectedDate, lSelectedStartDate );
+    }
+
+    [Fact]
+    public void CultureChange_RaisesSelectionNotificationsForRebuiltInstances()
+    {
+        var lResourcesService = new ResourcesService();
+        var lViewModel = new ExperiencePageViewModel( lResourcesService, new ThemeService() );
+        var lRaisedProperties = new List<string?>();
+        lViewModel.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
+
+        lResourcesService.SetLanguage( AppLanguage.FrenchCanada );
+
+        Assert.Contains( nameof( ExperiencePageViewModel.SelectedTimelineEntry ), lRaisedProperties );
+        Assert.Contains( nameof( ExperiencePageViewModel.SelectedTimeFrame ), lRaisedProperties );
+    }
+
+    [Fact]
+    public void ExperienceTimeFrames_DescriptionIsDateRangeThenSeparatorThenDuration()
+    {
+        var lViewModel = Create();
+
+        for ( int lIndex = 0; lIndex < lViewModel.ExperienceTimeFrames.Count; lIndex++ )
+        {
+            var lFrame = lViewModel.ExperienceTimeFrames[ lIndex ];
+            var lEntry = lViewModel.TimelineEntries[ lIndex ];
+
+            Assert.NotEmpty( lEntry.DurationText );
+            Assert.Equal( $"{lEntry.DateRangeText} · {lEntry.DurationText}", lFrame.DescriptionText );
+        }
+    }
+
+    [Fact]
+    public void ExperienceTimeFrames_OpenEndedFrameDescribesPresentInEnglish()
+    {
+        var lViewModel = Create();
+
+        var lOpenEndedEntry = lViewModel.TimelineEntries.First( pEntry => pEntry.EndDate == null );
+        var lFrame = lViewModel.ExperienceTimeFrames[ lViewModel.TimelineEntries.IndexOf( lOpenEndedEntry ) ];
+
+        Assert.StartsWith( $"{lOpenEndedEntry.StartDate:yyyy-MM} – Present · ", lFrame.DescriptionText );
+    }
+
+    [Fact]
+    public void ExperienceTimeFrames_DescriptionIsRefreshedOnLanguageChange()
+    {
+        var lResourcesService = new ResourcesService();
+        var lViewModel = new ExperiencePageViewModel( lResourcesService, new ThemeService() );
+        string[] lEnglishDescriptions = lViewModel.ExperienceTimeFrames.Select( pFrame => pFrame.DescriptionText ).ToArray();
+
+        lResourcesService.SetLanguage( AppLanguage.FrenchCanada );
+
+        Assert.Equal( lEnglishDescriptions.Length, lViewModel.ExperienceTimeFrames.Count );
+
+        for ( int lIndex = 0; lIndex < lViewModel.ExperienceTimeFrames.Count; lIndex++ )
+        {
+            var lFrame = lViewModel.ExperienceTimeFrames[ lIndex ];
+            var lEntry = lViewModel.TimelineEntries[ lIndex ];
+
+            Assert.Equal( $"{lEntry.DateRangeText} · {lEntry.DurationText}", lFrame.DescriptionText );
+            Assert.NotEqual( lEnglishDescriptions[ lIndex ], lFrame.DescriptionText );
+        }
+
+        var lOpenEndedFrame = lViewModel.ExperienceTimeFrames[ lViewModel.TimelineEntries.ToList().FindIndex( pEntry => pEntry.EndDate == null ) ];
+        Assert.Contains( "– aujourd'hui · ", lOpenEndedFrame.DescriptionText );
+        Assert.DoesNotContain( "Present", lOpenEndedFrame.DescriptionText );
+    }
+
+    private static void AssertSelectionIsCoherent(
+        ExperiencePageViewModel pViewModel,
+        int pExpectedIndex,
+        DateTime pExpectedDate,
+        DateTime pExpectedStartDate )
+    {
+        Assert.NotNull( pViewModel.SelectedTimelineEntry );
+        Assert.NotNull( pViewModel.SelectedTimeFrame );
+        Assert.Contains( pViewModel.SelectedTimelineEntry, pViewModel.TimelineEntries );
+        Assert.Contains( pViewModel.SelectedTimeFrame, pViewModel.ExperienceTimeFrames );
+        Assert.Same( pViewModel.TimelineEntries[ pExpectedIndex ], pViewModel.SelectedTimelineEntry );
+        Assert.Equal( pExpectedStartDate, pViewModel.SelectedTimelineEntry!.StartDate );
+        Assert.Equal( pExpectedStartDate.Date, pViewModel.SelectedTimeFrame!.StartDate.Date );
+        Assert.Equal( pExpectedDate, pViewModel.SelectedDate );
+        Assert.Single( pViewModel.TimelineEntries, pEntry => pEntry.IsSelected );
+        Assert.True( pViewModel.SelectedTimelineEntry.IsSelected );
     }
 }
