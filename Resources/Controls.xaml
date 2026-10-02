@@ -143,6 +143,8 @@
         <Setter Property="Padding" Value="10,0" />
         <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource OutsetFocusRingVisualStyle}" />
@@ -154,6 +156,8 @@
                         x:Name="mSegmentBorder"
                         Padding="{TemplateBinding Padding}"
                         Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="14"
                         SnapsToDevicePixels="True">
                         <TextBlock
@@ -178,6 +182,7 @@
             <Trigger Property="IsChecked" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
                 <Setter Property="Background" Value="{DynamicResource SurfacePillSelectedBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource SurfacePillSelectedBorderBrush}" />
                 <Setter Property="FontWeight" Value="SemiBold" />
             </Trigger>
         </Style.Triggers>
@@ -5397,7 +5402,8 @@
         <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
-        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="16,0" />
         <Setter Property="MinHeight" Value="40" />
         <Setter Property="Template">
@@ -5408,6 +5414,8 @@
                         MinHeight="{TemplateBinding MinHeight}"
                         Padding="{TemplateBinding Padding}"
                         Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="10"
                         SnapsToDevicePixels="True">
                         <ContentPresenter
@@ -5427,6 +5435,7 @@
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
                             <Setter Property="Background" Value="{DynamicResource SurfacePillSelectedBrush}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource SurfacePillSelectedBorderBrush}" />
                         </Trigger>
 
                         <Trigger Property="IsEnabled" Value="False">

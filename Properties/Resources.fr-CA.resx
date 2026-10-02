@@ -88,9 +88,6 @@
   <data name="AutomationCarouselNext" xml:space="preserve">
     <value>Image suivante</value>
   </data>
-  <data name="AutomationCarouselOpen" xml:space="preserve">
-    <value>Agrandir l’image</value>
-  </data>
   <data name="AutomationCarouselPrevious" xml:space="preserve">
     <value>Image précédente</value>
   </data>

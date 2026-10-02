@@ -3,6 +3,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Win32;
+using ResumeApp.Helpers;
 using ResumeApp.Infrastructure;
 using System.Runtime.Versioning;
 using System.ComponentModel;
@@ -38,7 +39,8 @@ namespace ResumeApp.Services
 			"CommonDarkerGrayColor",
 			"CommonDarkGrayColor",
 			"CommonGrayColor",
-			"SurfaceHoverColor"
+			"SurfaceHoverColor",
+			"SurfacePillSelectedColor"
 		];
 
 		internal static IReadOnlyList<string> HighContrastTextColorKeys { get; } =
@@ -48,6 +50,7 @@ namespace ResumeApp.Services
 			"TextPrimaryColor",
 			"TextSecondaryColor",
 			"BorderSubtleColor",
+			"BorderStrongColor",
 			"CaptionCloseHoverGlyphColor"
 		];
 
@@ -58,7 +61,9 @@ namespace ResumeApp.Services
 			"AccentColor",
 			"FocusRingColor",
 			"SurfaceSelectedColor",
-			"CaptionCloseHoverColor"
+			"CaptionCloseHoverColor",
+			"SurfacePillSelectedBorderColor",
+			.. ColorHelper.sAccentColorKeys
 		];
 
 		internal static IReadOnlyList<string> HighContrastHighlightTextColorKeys { get; } =

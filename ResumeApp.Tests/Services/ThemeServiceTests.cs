@@ -1,4 +1,5 @@
 using System.Windows.Media;
+using ResumeApp.Helpers;
 using ResumeApp.Services;
 using Xunit;
 
@@ -124,6 +125,43 @@ public sealed class ThemeServiceTests
 
         Assert.All( lSemanticKeys, pKey => Assert.Contains( pKey, lAllKeys ) );
         Assert.Equal( lAllKeys.Length, lAllKeys.Distinct( StringComparer.Ordinal ).Count() );
+    }
+
+    [Fact]
+    public void HighContrastKeys_MapShellPillTokensToReadableRoles()
+    {
+        Assert.Contains( "SurfacePillSelectedColor", ThemeService.HighContrastSurfaceColorKeys );
+        Assert.Contains( "SurfacePillSelectedBorderColor", ThemeService.HighContrastHighlightColorKeys );
+        Assert.Contains( "BorderStrongColor", ThemeService.HighContrastTextColorKeys );
+    }
+
+    [Fact]
+    public void HighContrastHighlightKeys_IncludeEveryTimelineLaneColor()
+    {
+        Assert.Equal( ColorHelper.sAccentBrushKeys.Length, ColorHelper.sAccentColorKeys.Length );
+
+        for ( int lIndex = 0; lIndex < ColorHelper.sAccentBrushKeys.Length; lIndex++ )
+        {
+            string lColorKey = ColorHelper.sAccentColorKeys[ lIndex ];
+
+            Assert.EndsWith( "Color", lColorKey );
+            Assert.Equal( ColorHelper.sAccentBrushKeys[ lIndex ], ThemeService.GetBrushKeyForColorKey( lColorKey ) );
+            Assert.Contains( lColorKey, ThemeService.HighContrastHighlightColorKeys );
+        }
+    }
+
+    [StaFact]
+    public void CreateHighContrastDictionary_OverridesEveryTimelineLaneBrushWithHighlight()
+    {
+        Color lHighlight = Colors.Cyan;
+
+        var lDictionary = ThemeService.CreateHighContrastDictionary( Colors.Black, Colors.White, lHighlight, Colors.Navy, Colors.Yellow );
+
+        Assert.All( ColorHelper.sAccentBrushKeys, pBrushKey =>
+        {
+            var lBrush = Assert.IsType<SolidColorBrush>( lDictionary[ pBrushKey ] );
+            Assert.Equal( lHighlight, lBrush.Color );
+        } );
     }
 
     private static void AssertRole( System.Windows.ResourceDictionary pDictionary, IEnumerable<string> pColorKeys, Color pExpected )
