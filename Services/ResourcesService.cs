@@ -10,6 +10,8 @@ namespace ResumeApp.Services
 {
 	public sealed class ResourcesService : PropertyChangedNotifier
 	{
+		public const string IndexerPropertyName = "Item[]";
+
 		private static readonly ResourceManager sResourceManager = CreateResourceManager();
 
 		public CultureInfo ActiveCulture
@@ -168,7 +170,7 @@ namespace ResumeApp.Services
 			RegistrySettingsService.SaveLanguage( pLanguage );
 
 			RaisePropertyChanged( nameof( ActiveLanguageDisplayName ) );
-			RaisePropertyChanged( "Item[]" );
+			RaisePropertyChanged( IndexerPropertyName );
 		}
 	}
 }
