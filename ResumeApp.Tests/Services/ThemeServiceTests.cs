@@ -109,22 +109,42 @@ public sealed class ThemeServiceTests
         AssertRole( lDictionary, ThemeService.HighContrastHotTrackColorKeys, lHotTrack );
     }
 
+    private static string[] GetAllHighContrastColorKeys() =>
+    [
+        .. ThemeService.HighContrastSurfaceColorKeys,
+        .. ThemeService.HighContrastTextColorKeys,
+        .. ThemeService.HighContrastHighlightColorKeys,
+        .. ThemeService.HighContrastHighlightTextColorKeys,
+        .. ThemeService.HighContrastHotTrackColorKeys
+    ];
+
     [Fact]
     public void HighContrastKeys_CoverSemanticTokens()
     {
-        string[] lAllKeys =
-        [
-            .. ThemeService.HighContrastSurfaceColorKeys,
-            .. ThemeService.HighContrastTextColorKeys,
-            .. ThemeService.HighContrastHighlightColorKeys,
-            .. ThemeService.HighContrastHighlightTextColorKeys,
-            .. ThemeService.HighContrastHotTrackColorKeys
-        ];
+        string[] lAllKeys = GetAllHighContrastColorKeys();
 
         string[] lSemanticKeys = [ "TextPrimaryColor", "TextSecondaryColor", "AccentColor", "AccentTextColor", "FocusRingColor", "BorderSubtleColor", "SurfaceHoverColor", "SurfaceSelectedColor", "TextOnSelectedColor" ];
 
         Assert.All( lSemanticKeys, pKey => Assert.Contains( pKey, lAllKeys ) );
         Assert.Equal( lAllKeys.Length, lAllKeys.Distinct( StringComparer.Ordinal ).Count() );
+    }
+
+    [StaFact]
+    public void HighContrastKeys_ExistAsColorAndBrushInBothThemeDictionaries()
+    {
+        string[] lThemeFileNames = [ "Theme.Dark.xaml", "Theme.Light.xaml" ];
+
+        foreach ( string lThemeFileName in lThemeFileNames )
+        {
+            var lDictionary = Assert.IsType<System.Windows.ResourceDictionary>(
+                System.Windows.Application.LoadComponent( new Uri( $"/ResumeApp;component/Resources/{lThemeFileName}", UriKind.Relative ) ) );
+
+            Assert.All( GetAllHighContrastColorKeys(), pColorKey =>
+            {
+                Assert.IsType<Color>( lDictionary[ pColorKey ] );
+                Assert.IsType<SolidColorBrush>( lDictionary[ ThemeService.GetBrushKeyForColorKey( pColorKey ) ] );
+            } );
+        }
     }
 
     [Fact]

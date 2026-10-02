@@ -55,11 +55,12 @@ Essential text no longer uses opacity. Nominal solid-surface contrast (computed,
 |---|---|---|
 | TextSecondary on raised surface | `#A6A6A6` on `#1C1C1C` ≈ 7.0:1 | `#4D4D4D` on `#E6E6E6` ≈ 6.8:1 |
 | AccentText on page surface | `#4DA3FF` on `#141414` ≈ 7.0:1 | `#0057D6` on `#F2F2F2` ≈ 5.6:1 |
+| AccentText on selected tab / segment pill | `#4DA3FF` on `#333333` ≈ 4.8:1 | `#0057D6` on `#DCDCDC` ≈ 4.6:1 |
 | Accent graphics (focus ring, selected role border) | `#047AF7` on `#141414` ≈ 4.5:1 | `#047AF7` on `#F2F2F2` ≈ 3.7:1 |
 
 Targets: ≥ 4.5:1 for normal text, ≥ 3:1 for meaningful control and focus graphics. This is a readability target, not a WCAG certification.
 
-High contrast: when Windows high contrast is on, the theme service applies a dictionary built from `SystemColors` (window, window text, highlight, highlight text, hot-track) instead of the app palette and re-applies it when the setting changes. Selected pills use the window surface with a highlight outline and hot-track text; the frame border uses window text; timeline lanes use highlight and are drawn opaque.
+High contrast: when Windows high contrast is on, the theme service applies a dictionary built from `SystemColors` (window, window text, highlight, highlight text, hot-track) instead of the app palette and re-applies it when the setting changes. Selected pills use the window surface with a highlight outline and hot-track text (the `SurfacePillSelectedBorder` token matches the pill fill in the normal themes, so the outline only appears in high contrast); the frame border uses window text; timeline lanes use highlight and are drawn opaque.
 
 ## 5. Motion
 
@@ -109,7 +110,7 @@ No ambient loops, autoplay, cursor followers, parallax or glow.
 
 Validation recorded on 2026-10-02. Final release-build evidence is kept with the hand-off report, not in this note.
 
-- Tests: the xUnit suite grew from 576 (baseline `8c07625`) to 701 passing tests (Debug, `dotnet test`, 0 failed). New coverage includes the command toggle, motion policy, high-contrast role mapping, adaptive size classes, window bounds clamping, carousel/viewer keyboard handling, preview-size decoding, the shared decode limiter, timeline label collision and culture formatting.
+- Tests: the xUnit suite grew from 576 (baseline `8c07625`) to 702 passing tests (Debug, `dotnet test`, 0 failed). New coverage includes the command toggle, motion policy, high-contrast role mapping, adaptive size classes, window bounds clamping, carousel/viewer keyboard handling, preview-size decoding, the shared decode limiter, timeline label collision and culture formatting.
 - UI Automation (real app, commit `601a607`): segmented toggles expose the Toggle pattern with localized names; re-selecting the active language keeps it on; tabs and carousel controls have localized names ("Image 1 of 10" / "Image 1 sur 6").
 - Performance: Release builds of `8c07625` (baseline) and `601a607` (changed) were measured interleaved, three runs each, on the same machine. Before the hybrid shell commits.
 
