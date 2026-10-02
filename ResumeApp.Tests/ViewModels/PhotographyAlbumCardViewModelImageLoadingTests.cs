@@ -5,6 +5,7 @@ using Xunit;
 
 namespace ResumeApp.Tests.ViewModels;
 
+[Collection( GalleryImageLoadCollection.Name )]
 public sealed class PhotographyAlbumCardViewModelImageLoadingTests
 {
     private static PhotographyAlbumCardViewModel Create( ResourcesService pResourcesService ) =>

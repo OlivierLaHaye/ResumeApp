@@ -11,9 +11,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shell;
 using ResumeApp.Services;
+using ResumeApp.ViewModels.Pages;
 
 namespace ResumeApp.Windows
 {
+	internal readonly record struct FullResolutionDecodePlan( int[] IndexesToCancel, int[] IndexesToStart );
+
 	[ExcludeFromCodeCoverage( Justification = "Window code-behind with P/Invoke, HwndSource hooks, and window chrome management that requires a running Windows desktop and HWND handle." )]
 	public partial class ProjectImageViewerWindow
 	{
@@ -52,6 +55,7 @@ namespace ResumeApp.Windows
 			public readonly int bottom;
 		}
 
+		private const int NeighbourDecodeDelayMilliseconds = 150;
 		private const double TitleBarHeight = 48.0;
 		private const double FallbackFrameThickness = 1.0;
 		private const double InitialNormalSizeRatio = 0.95;
@@ -85,10 +89,9 @@ namespace ResumeApp.Windows
 				new PropertyMetadata( null ) );
 
 		private readonly Dictionary<int, ImageSource> mFullResolutionImagesByIndex = [];
-		private readonly HashSet<int> mPendingDecodeIndexes = [];
+		private readonly Dictionary<int, CancellationTokenSource> mPendingDecodesByIndex = [];
 
 		private HwndSource? mHwndSource;
-		private CancellationTokenSource? mDecodeCancellationTokenSource = new();
 		private bool mHasAppliedInitialNormalBounds;
 		private bool mHasSystemRoundedCorners;
 		private bool mIsClosed;
@@ -176,6 +179,19 @@ namespace ResumeApp.Windows
 
 			return [.. lIndexes];
 		}
+
+		internal static FullResolutionDecodePlan PlanFullResolutionDecodes( IReadOnlyCollection<int> pWantedIndexes, IEnumerable<int> pLoadedIndexes, IEnumerable<int> pPendingIndexes )
+		{
+			int[] lLoadedIndexes = [.. pLoadedIndexes];
+			int[] lPendingIndexes = [.. pPendingIndexes];
+
+			return new FullResolutionDecodePlan(
+				[.. lPendingIndexes.Where( pIndex => !pWantedIndexes.Contains( pIndex ) )],
+				[.. pWantedIndexes.Where( pIndex => !lLoadedIndexes.Contains( pIndex ) && !lPendingIndexes.Contains( pIndex ) )] );
+		}
+
+		internal static TimeSpan GetFullResolutionDecodeDelay( int pIndex, int pCurrentIndex ) =>
+			pIndex == pCurrentIndex ? TimeSpan.Zero : TimeSpan.FromMilliseconds( NeighbourDecodeDelayMilliseconds );
 
 		private static void OnImagesChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
@@ -560,36 +576,58 @@ namespace ResumeApp.Windows
 				return;
 			}
 
-			mDecodeCancellationTokenSource?.Cancel();
-			mDecodeCancellationTokenSource?.Dispose();
-			mDecodeCancellationTokenSource = new CancellationTokenSource();
+			CancelAllPendingDecodes();
 
 			mFullResolutionImagesByIndex.Clear();
-			mPendingDecodeIndexes.Clear();
 
 			QueueFullResolutionDecode();
 		}
 
 		private void QueueFullResolutionDecode()
 		{
-			if ( mIsClosed || !IsLoaded || mDecodeCancellationTokenSource is null )
+			if ( mIsClosed || !IsLoaded )
 			{
 				return;
 			}
 
 			ObservableCollection<ImageSource> lImages = Images;
-			int[] lWantedIndexes = GetFullResolutionWindowIndexes( SelectedIndex, lImages.Count );
+			int lSelectedIndex = SelectedIndex;
+			int[] lWantedIndexes = GetFullResolutionWindowIndexes( lSelectedIndex, lImages.Count );
 
 			ReleaseFullResolutionImagesOutside( lWantedIndexes );
 
-			foreach ( int lIndex in lWantedIndexes )
-			{
-				if ( mFullResolutionImagesByIndex.ContainsKey( lIndex ) || !mPendingDecodeIndexes.Add( lIndex ) )
-				{
-					continue;
-				}
+			FullResolutionDecodePlan lPlan = PlanFullResolutionDecodes( lWantedIndexes, mFullResolutionImagesByIndex.Keys, mPendingDecodesByIndex.Keys );
 
-				_ = DecodeFullResolutionAsync( lIndex, lImages[ lIndex ], mDecodeCancellationTokenSource.Token );
+			foreach ( int lIndex in lPlan.IndexesToCancel )
+			{
+				CancelPendingDecode( lIndex );
+			}
+
+			foreach ( int lIndex in lPlan.IndexesToStart )
+			{
+				var lCancellationTokenSource = new CancellationTokenSource();
+				mPendingDecodesByIndex[ lIndex ] = lCancellationTokenSource;
+
+				_ = DecodeFullResolutionAsync( lIndex, lImages[ lIndex ], GetFullResolutionDecodeDelay( lIndex, lSelectedIndex ), lCancellationTokenSource );
+			}
+		}
+
+		private void CancelPendingDecode( int pIndex )
+		{
+			if ( !mPendingDecodesByIndex.Remove( pIndex, out CancellationTokenSource? lCancellationTokenSource ) )
+			{
+				return;
+			}
+
+			lCancellationTokenSource.Cancel();
+			lCancellationTokenSource.Dispose();
+		}
+
+		private void CancelAllPendingDecodes()
+		{
+			foreach ( int lIndex in mPendingDecodesByIndex.Keys.ToList() )
+			{
+				CancelPendingDecode( lIndex );
 			}
 		}
 
@@ -609,14 +647,20 @@ namespace ResumeApp.Windows
 			}
 		}
 
-		private async Task DecodeFullResolutionAsync( int pIndex, ImageSource? pPreview, CancellationToken pCancellationToken )
+		private async Task DecodeFullResolutionAsync( int pIndex, ImageSource? pPreview, TimeSpan pDelay, CancellationTokenSource pCancellationTokenSource )
 		{
+			CancellationToken lCancellationToken = pCancellationTokenSource.Token;
 			BitmapSource? lFullResolution;
 
 			try
 			{
+				if ( pDelay > TimeSpan.Zero )
+				{
+					await Task.Delay( pDelay, lCancellationToken );
+				}
+
 				lFullResolution = CanDecodeOffUiThread( pPreview )
-					? await Task.Run( () => ImageDecodeService.TryCreateFullResolutionImage( pPreview ), pCancellationToken )
+					? await GalleryImageLoadCoordinator.RunLimitedAsync( () => ImageDecodeService.TryCreateFullResolutionImage( pPreview ), lCancellationToken )
 					: ImageDecodeService.TryCreateFullResolutionImage( pPreview );
 			}
 			catch ( Exception )
@@ -624,12 +668,17 @@ namespace ResumeApp.Windows
 				lFullResolution = null;
 			}
 
-			if ( pCancellationToken.IsCancellationRequested || mIsClosed )
+			if ( lCancellationToken.IsCancellationRequested || mIsClosed )
 			{
 				return;
 			}
 
-			mPendingDecodeIndexes.Remove( pIndex );
+			if ( mPendingDecodesByIndex.TryGetValue( pIndex, out CancellationTokenSource? lPendingSource ) && ReferenceEquals( lPendingSource, pCancellationTokenSource ) )
+			{
+				mPendingDecodesByIndex.Remove( pIndex );
+				pCancellationTokenSource.Dispose();
+			}
+
 			ApplyFullResolutionImage( pIndex, pPreview, lFullResolution );
 		}
 
@@ -655,12 +704,9 @@ namespace ResumeApp.Windows
 		{
 			mIsClosed = true;
 
-			mDecodeCancellationTokenSource?.Cancel();
-			mDecodeCancellationTokenSource?.Dispose();
-			mDecodeCancellationTokenSource = null;
+			CancelAllPendingDecodes();
 
 			mFullResolutionImagesByIndex.Clear();
-			mPendingDecodeIndexes.Clear();
 
 			mFullscreenProjectImageCarouselControl.DisplayImageProvider = null;
 		}

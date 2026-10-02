@@ -53,13 +53,15 @@ namespace ResumeApp.ViewModels.Pages
 			};
 		}
 
-		internal static async Task<T> RunLimitedAsync<T>( Func<T> pWork )
+		internal static Task<T> RunLimitedAsync<T>( Func<T> pWork ) => RunLimitedAsync( pWork, CancellationToken.None );
+
+		internal static async Task<T> RunLimitedAsync<T>( Func<T> pWork, CancellationToken pCancellationToken )
 		{
-			await sDecodeSemaphore.WaitAsync();
+			await sDecodeSemaphore.WaitAsync( pCancellationToken );
 
 			try
 			{
-				return await Task.Run( pWork );
+				return await Task.Run( pWork, pCancellationToken );
 			}
 			finally
 			{

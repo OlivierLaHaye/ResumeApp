@@ -5,6 +5,7 @@ using Xunit;
 
 namespace ResumeApp.Tests.ViewModels;
 
+[Collection( GalleryImageLoadCollection.Name )]
 public sealed class GalleryImageLoadCoordinatorTests
 {
     [Fact]
@@ -165,6 +166,43 @@ public sealed class GalleryImageLoadCoordinatorTests
         await Task.WhenAll( lTasks );
 
         Assert.Equal( GalleryImageLoadCoordinator.MaximumConcurrentDecodes, Volatile.Read( ref lMaximum ) );
+    }
+
+    [Fact]
+    public async Task RunLimitedAsync_CancelledWhileWaitingForSlot_SkipsWorkAndKeepsSlotsIntact()
+    {
+        using var lRelease = new ManualResetEventSlim( false );
+        using var lCancellationTokenSource = new CancellationTokenSource();
+        int lStarted = 0;
+        int lCancelledWorkRan = 0;
+
+        int BlockingWork()
+        {
+            Interlocked.Increment( ref lStarted );
+            lRelease.Wait( TimeSpan.FromSeconds( 10 ) );
+
+            return 1;
+        }
+
+        Task[] lBlockingTasks = Enumerable.Range( 0, GalleryImageLoadCoordinator.MaximumConcurrentDecodes )
+            .Select( _ => GalleryImageLoadCoordinator.RunLimitedAsync( BlockingWork ) )
+            .ToArray();
+
+        await GalleryImageTestHelper.WaitUntilAsync( () => Volatile.Read( ref lStarted ) == GalleryImageLoadCoordinator.MaximumConcurrentDecodes );
+
+        Task<int> lCancelledTask = GalleryImageLoadCoordinator.RunLimitedAsync(
+            () => Interlocked.Increment( ref lCancelledWorkRan ),
+            lCancellationTokenSource.Token );
+
+        lCancellationTokenSource.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>( () => lCancelledTask );
+
+        lRelease.Set();
+        await Task.WhenAll( lBlockingTasks );
+
+        Assert.Equal( 0, Volatile.Read( ref lCancelledWorkRan ) );
+        Assert.Equal( GalleryImageLoadCoordinator.MaximumConcurrentDecodes, GalleryImageLoadCoordinator.AvailableDecodeSlots );
     }
 
     [Fact]

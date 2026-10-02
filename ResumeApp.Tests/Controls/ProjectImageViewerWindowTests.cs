@@ -57,6 +57,69 @@ public sealed class ProjectImageViewerWindowTests
         Assert.Empty( ProjectImageViewerWindow.GetFullResolutionWindowIndexes( pCurrentIndex, pCount ) );
     }
 
+    [Fact]
+    public void PlanFullResolutionDecodes_NothingLoaded_StartsAllWantedCurrentFirst()
+    {
+        FullResolutionDecodePlan lPlan = ProjectImageViewerWindow.PlanFullResolutionDecodes( [ 2, 3, 1 ], [], [] );
+
+        Assert.Equal( [ 2, 3, 1 ], lPlan.IndexesToStart );
+        Assert.Empty( lPlan.IndexesToCancel );
+    }
+
+    [Fact]
+    public void PlanFullResolutionDecodes_SkipsLoadedAndPendingIndexes()
+    {
+        FullResolutionDecodePlan lPlan = ProjectImageViewerWindow.PlanFullResolutionDecodes( [ 2, 3, 1 ], [ 2 ], [ 3 ] );
+
+        Assert.Equal( [ 1 ], lPlan.IndexesToStart );
+        Assert.Empty( lPlan.IndexesToCancel );
+    }
+
+    [Fact]
+    public void PlanFullResolutionDecodes_CancelsPendingIndexesLeavingTheWindow()
+    {
+        FullResolutionDecodePlan lPlan = ProjectImageViewerWindow.PlanFullResolutionDecodes( [ 5, 6, 4 ], [ 2 ], [ 1, 2, 3, 4 ] );
+
+        Assert.Equal( [ 1, 2, 3 ], lPlan.IndexesToCancel );
+        Assert.Equal( [ 5, 6 ], lPlan.IndexesToStart );
+    }
+
+    [Fact]
+    public void PlanFullResolutionDecodes_HoldingArrowKey_NeverKeepsMoreThanWindowPending()
+    {
+        var lPending = new HashSet<int>();
+        var lLoaded = new HashSet<int>();
+
+        for ( int lCurrent = 0; lCurrent < 40; lCurrent++ )
+        {
+            int[] lWanted = ProjectImageViewerWindow.GetFullResolutionWindowIndexes( lCurrent, 100 );
+            FullResolutionDecodePlan lPlan = ProjectImageViewerWindow.PlanFullResolutionDecodes( lWanted, lLoaded, lPending );
+
+            lPending.ExceptWith( lPlan.IndexesToCancel );
+            lPending.UnionWith( lPlan.IndexesToStart );
+
+            Assert.True( lPending.Count <= lWanted.Length );
+            Assert.All( lPending, pIndex => Assert.Contains( pIndex, lWanted ) );
+        }
+    }
+
+    [Fact]
+    public void PlanFullResolutionDecodes_InvalidWindow_CancelsEverythingPending()
+    {
+        FullResolutionDecodePlan lPlan = ProjectImageViewerWindow.PlanFullResolutionDecodes( [], [], [ 0, 1 ] );
+
+        Assert.Equal( [ 0, 1 ], lPlan.IndexesToCancel );
+        Assert.Empty( lPlan.IndexesToStart );
+    }
+
+    [Fact]
+    public void GetFullResolutionDecodeDelay_CurrentImageIsImmediateAndNeighboursAreDebounced()
+    {
+        Assert.Equal( TimeSpan.Zero, ProjectImageViewerWindow.GetFullResolutionDecodeDelay( 2, 2 ) );
+        Assert.True( ProjectImageViewerWindow.GetFullResolutionDecodeDelay( 3, 2 ) > TimeSpan.Zero );
+        Assert.True( ProjectImageViewerWindow.GetFullResolutionDecodeDelay( 1, 2 ) <= TimeSpan.FromMilliseconds( 250 ) );
+    }
+
     [Theory]
     [InlineData( -1, 4, 3 )]
     [InlineData( 4, 4, 0 )]
