@@ -30,9 +30,9 @@ These are window-only captures from the real app, with rounded corners preserved
 
 #### Experience timeline
 
-![Experience timeline view in English light mode, captured from the real app window on a vertical 4K display](docs/readme-assets/screenshots/experience-en-light-vertical.png)
+![Experience page in English light mode: the whole-career timeline with two lanes, zoom controls and the selected role card, captured from the real app window](docs/readme-assets/screenshots/experience-en-light-horizontal.png)
 
-English · Light mode · Vertical 4K capture
+English · Light mode · 1400 × 900 window at 150 % scaling
 
 #### Project case studies
 

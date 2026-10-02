@@ -124,7 +124,38 @@ Validation recorded on 2026-10-02. Final release-build evidence is kept with the
 The memory drop comes from preview-size decoding. Start-up time to named tabs did not change measurably.
 
 Known remaining items:
-- Some French résumé strings still contain English text (for example "Lead UI/UX…", "(Hybrid)", "Tech"). They need an author-written translation and were not machine translated.
+- Some French résumé strings still contain English text (for example the job titles and "Tech"). They need an author-written translation and were not machine translated. The UI/UX role scope and "(Hybride)" location now use the author's own French from the legacy `Experience1Scope` and `Experience1LocationDates` values (section 11).
 - The minimum window size is clamped to the work area at start-up but is not re-evaluated when the window moves to another monitor.
 - Caption button automation names are empty for a moment during start-up, before resources load.
 - Implicit template storyboards in `Controls.xaml` are not gated by `MotionPolicy` (see section 5).
+
+## 11. Experience page and timeline (2026-10-02)
+
+An audit of the Experience page (ui-ux-research-strategist, ui-ux-pro-max and Hallmark) found an unlabelled grey band, bars that changed lanes while panning, two identical "FARO CREAFORM" bars, washed-out light-theme bars (about 1.2:1), a fixed 220 DIP chart with empty space, no screen-reader support and a left-stuck wide layout. The owner approved an interactive mockup before implementation.
+
+Timeline (`Controls/TimelineControl.cs`, pure logic in `Controls/TimelineLayoutHelper.cs`):
+- Opens on the whole career: `[earliest start − 12 DIP, today + 20 DIP]`. The old fit was undone by `CoerceValue` calls that reset the zoom to its 2 px/day default; the fit is now applied once width and data are known and re-applied while "show all" is active. `EnsureDateVisible` only pans.
+- Stable lanes computed once from all roles (first fit, touching roles share a lane, newest lane first): the employment track and OLH PHOTOGRAPHIE in parallel.
+- Bars: role fill (`Common<Hue>StrongBrush`, `TimelineInactiveBarOpacity` 0.72 dark / 1.0 light) with a 1 DIP `Common<Hue>EdgeBrush` outline, 2 DIP seams between touching roles, square cuts at the plot edges, selected ring in `FocusRingBrush`. No gloss, glow or dot.
+- Labels "Company · Role" (company SemiBold); a role that follows the same company shows the role only; fallback to company only, then ellipsis when at least 56 DIP is free.
+- Year gridlines replace the alternate-year bands. Axis shows years at full range and months when zoomed, with the year in SemiBold at each January; nothing is drawn after today.
+- Month-precision date pill (`SurfacePillSelectedBrush` / `AccentTextBrush`), solid Today marker, 3 DIP accent span under the selected role.
+- Height follows the size class and lane count: 106 / 136 / 148 DIP for two lanes (Compact / Regular / Wide).
+- Input: existing drag, inertia, wheel and arrow keys, plus + / − (×1.25 around the selected date, 180-day floor), 0 (show all) and Enter (`SelectionActivated`, focuses the role card). Public API used by the page: `ZoomIn()`, `ZoomOut()`, `ShowAll()`, read-only `IsShowingAll`.
+- `TimelineControlAutomationPeer`: name `TimelineAutomationName`, help text `TimelineControlInteractionsHelpText`, read-only value "Company · Role, range · duration".
+- High contrast: the eight Edge colours map to window text; bars stay on highlight and are drawn opaque.
+
+Page (`Pages/ExperiencePage.xaml`):
+- Column margins 20 / 32 / 40 DIP; Wide is capped at 1320 DIP and centred like Overview and Projects.
+- Foot row under the chart: −, + and "Show all" (disabled while showing all) and a one-line hint; Compact hides the hint and the page subtitle.
+- Role cards: title 18 SemiBold, employer 14 SemiBold secondary; Regular and Wide use two columns (scope and bullets up to 720 DIP, a 280 DIP meta column with date range, duration, location and technology chips); Compact stays single-column. The selected outline is an overlay, so nothing shifts; the focus ring matches the card corners; the rail dot uses the role colour and outline.
+- Date range "2024-03 – aujourd'hui" / "2024-03 – Present" (`ExperienceDateRangeSeparator` value is now " – ", new `ExperienceDateRangeOpenEnd`), duration in whole months (`ExperienceDuration{Year,Month}{One,Many}`), chips split only on ", ".
+
+New resource keys (EN and FR-CA): `TimelineAutomationName`, `TimelineBarLabelSeparator`, `TimelineShowAllButtonText`, `TimelineZoomInButtonAutomationName`, `TimelineZoomOutButtonAutomationName`, `TimelineHintText`, `ExperienceDateRangeOpenEnd`, `ExperienceDurationYearOne`, `ExperienceDurationYearMany`, `ExperienceDurationMonthOne`, `ExperienceDurationMonthMany` (300 keys in each file). The new French strings were written for this change and are flagged for the author's review.
+
+Validation:
+- Debug and Release builds: 0 warnings, 0 errors. Tests: 853 passing (701 before), including lanes, label fallback, axis and pill formatting in fr-CA and en-CA, fit and zoom limits, `IsShowingAll`, the automation peer, durations, chips, resource parity and page layout at 960 × 640, 1400 × 900 and 2560 × 1300 without horizontal overflow.
+- Real Release app captured through UI Automation and `PrintWindow` at 1400 × 900, 960 × 640 and 1920 × 1080 DIP (150 % scaling), dark and light, French and English, scrolled and zoomed. The app's saved theme and language were restored to their starting values.
+- Not checked: high-contrast rendering on screen, an on-screen keyboard pass and a screen-reader session.
+
+Known limits: the duration of an open-ended role is computed when the cards are built, so it updates on the next language switch or restart; switching language rebuilds the roles and returns the timeline to the whole-career view.
