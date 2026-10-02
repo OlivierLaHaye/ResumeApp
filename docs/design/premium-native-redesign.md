@@ -110,7 +110,7 @@ No ambient loops, autoplay, cursor followers, parallax or glow.
 
 Validation recorded on 2026-10-02. Final release-build evidence is kept with the hand-off report, not in this note.
 
-- Tests: the xUnit suite grew from 576 (baseline `8c07625`) to 702 passing tests (Debug, `dotnet test`, 0 failed). New coverage includes the command toggle, motion policy, high-contrast role mapping, adaptive size classes, window bounds clamping, carousel/viewer keyboard handling, preview-size decoding, the shared decode limiter, timeline label collision and culture formatting.
+- Tests: the xUnit suite grew from 576 (baseline `8c07625`) to 701 passing tests (Debug, `dotnet test`, 0 failed). New coverage includes the command toggle, motion policy, high-contrast role mapping, adaptive size classes, window bounds clamping, carousel/viewer keyboard handling, preview-size decoding, the shared decode limiter, timeline label collision and culture formatting.
 - UI Automation (real app, commit `601a607`): segmented toggles expose the Toggle pattern with localized names; re-selecting the active language keeps it on; tabs and carousel controls have localized names ("Image 1 of 10" / "Image 1 sur 6").
 - Performance: Release builds of `8c07625` (baseline) and `601a607` (changed) were measured interleaved, three runs each, on the same machine. Before the hybrid shell commits.
 
