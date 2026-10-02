@@ -93,4 +93,21 @@ namespace ResumeApp.Converters
 			return Binding.DoNothing;
 		}
 	}
+
+	public sealed class PaletteIndexToBrushMultiConverter : IMultiValueConverter
+	{
+		private readonly PaletteIndexToBrushConverter mBrushConverter = new();
+
+		public object Convert( object[] pValues, Type pTargetType, object pParameter, CultureInfo pCulture )
+		{
+			object? lPaletteIndex = pValues is { Length: > 0 } ? pValues[ 0 ] : null;
+
+			return mBrushConverter.Convert( lPaletteIndex!, pTargetType, pParameter, pCulture );
+		}
+
+		public object[] ConvertBack( object pValue, Type[] pTargetTypes, object pParameter, CultureInfo pCulture )
+		{
+			throw new NotSupportedException();
+		}
+	}
 }

@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 using ResumeApp.Converters;
+using ResumeApp.Services;
 using Xunit;
 
 namespace ResumeApp.Tests.Converters;
@@ -147,5 +148,59 @@ public sealed class PaletteIndexToBrushConverterTests
         var lResult = lConverter.Convert( true, typeof( Brush ), null!, CultureInfo.InvariantCulture );
 
         Assert.NotNull( lResult );
+    }
+}
+
+public sealed class PaletteIndexToBrushMultiConverterTests
+{
+    [StaFact]
+    public void Convert_IndexAndThemeInputs_ReturnsBrush()
+    {
+        var lConverter = new PaletteIndexToBrushMultiConverter();
+
+        var lResult = lConverter.Convert( [ 2, AppTheme.Dark, false ], typeof( Brush ), null!, CultureInfo.InvariantCulture );
+
+        Assert.IsAssignableFrom<Brush>( lResult );
+    }
+
+    [StaFact]
+    public void Convert_MatchesSingleValueConverterForSameIndex()
+    {
+        var lMultiConverter = new PaletteIndexToBrushMultiConverter();
+        var lSingleConverter = new PaletteIndexToBrushConverter();
+
+        var lMultiResult = lMultiConverter.Convert( [ 3, AppTheme.Light, true ], typeof( Brush ), null!, CultureInfo.InvariantCulture );
+        var lSingleResult = lSingleConverter.Convert( 3, typeof( Brush ), null!, CultureInfo.InvariantCulture );
+
+        Assert.Equal( lSingleResult, lMultiResult );
+    }
+
+    [StaFact]
+    public void Convert_EmptyValues_DefaultsToFirstPaletteBrush()
+    {
+        var lConverter = new PaletteIndexToBrushMultiConverter();
+
+        var lResult = lConverter.Convert( [ ], typeof( Brush ), null!, CultureInfo.InvariantCulture );
+
+        Assert.IsAssignableFrom<Brush>( lResult );
+    }
+
+    [StaFact]
+    public void Convert_UnsetIndex_DefaultsToFirstPaletteBrush()
+    {
+        var lConverter = new PaletteIndexToBrushMultiConverter();
+
+        var lResult = lConverter.Convert( [ DependencyProperty.UnsetValue ], typeof( Brush ), null!, CultureInfo.InvariantCulture );
+
+        Assert.IsAssignableFrom<Brush>( lResult );
+    }
+
+    [StaFact]
+    public void ConvertBack_ThrowsNotSupported()
+    {
+        var lConverter = new PaletteIndexToBrushMultiConverter();
+
+        Assert.Throws<NotSupportedException>( () =>
+            lConverter.ConvertBack( Brushes.Red, [ typeof( int ) ], null!, CultureInfo.InvariantCulture ) );
     }
 }

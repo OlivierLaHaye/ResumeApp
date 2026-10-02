@@ -26,6 +26,13 @@ namespace ResumeApp.Controls
 			public Rect HitRect { get; } = pHitRect;
 		}
 
+		private sealed class SelectedLabelLayout( FormattedText pText, Rect pPillRect )
+		{
+			public FormattedText Text { get; } = pText;
+
+			public Rect PillRect { get; } = pPillRect;
+		}
+
 		private sealed class VisibleTimeFrame(
 			TimelineTimeFrameItem pItem,
 			DateTime pStartDate,
@@ -168,6 +175,10 @@ namespace ResumeApp.Controls
 		private const double TimeFrameLabelFontSize = 12.0;
 
 		private const double MajorTickLabelGapPixels = 20.0;
+		private const double SelectedLabelCollisionGapPixels = 6.0;
+		private const double SelectedDateLabelFontSize = 12.0;
+		private const double SelectedPillPaddingX = 8.0;
+		private const double SelectedPillPaddingY = 4.0;
 
 		private const double DragActivationThresholdPixels = 3.0;
 
@@ -442,6 +453,58 @@ namespace ResumeApp.Controls
 				TickGranularity.Months => pDate.ToString( "MMM yyyy", CultureInfo.CurrentCulture ),
 				_ => pDate.ToString( "MMM d", CultureInfo.CurrentCulture )
 			};
+		}
+
+		internal static string FormatSelectedDateLabel( DateTime pDate, CultureInfo pCulture )
+		{
+			var lPattern = string.Equals( pCulture.TwoLetterISOLanguageName, "en", StringComparison.OrdinalIgnoreCase )
+				? "MMM d, yyyy"
+				: "d MMM yyyy";
+
+			return pDate.ToString( lPattern, pCulture );
+		}
+
+		internal static double ClampTickLabelLeft( double pLeft, double pWidth, double pMinX, double pMaxX )
+		{
+			var lMaxLeft = pMaxX - pWidth;
+			return lMaxLeft <= pMinX ? pMinX : Math.Max( pMinX, Math.Min( pLeft, lMaxLeft ) );
+		}
+
+		internal static bool TryGetTickLabelRect(
+			double pTickX,
+			double pLabelWidth,
+			double pLabelY,
+			double pLabelHeight,
+			Rect pContentRect,
+			out Rect pLabelRect )
+		{
+			if ( pTickX < 0.0 || pTickX > pContentRect.Width )
+			{
+				pLabelRect = Rect.Empty;
+				return false;
+			}
+
+			var lLeft = ClampTickLabelLeft(
+				pContentRect.Left + pTickX - ( pLabelWidth * 0.5 ),
+				pLabelWidth,
+				pContentRect.Left,
+				pContentRect.Right );
+
+			pLabelRect = new Rect( lLeft, pLabelY, pLabelWidth, pLabelHeight );
+			return true;
+		}
+
+		internal static bool ShouldSkipTickLabel( Rect pLabelRect, Rect? pSelectedLabelRect, double pGapPixels )
+		{
+			if ( !pSelectedLabelRect.HasValue || pSelectedLabelRect.Value.IsEmpty )
+			{
+				return false;
+			}
+
+			var lGuardRect = pSelectedLabelRect.Value;
+			lGuardRect.Inflate( pGapPixels, 0.0 );
+
+			return lGuardRect.IntersectsWith( pLabelRect );
 		}
 
 		private static KeyboardStep GetKeyboardStep( double pZoomLevel, bool pIsControlDown )
@@ -1638,7 +1701,9 @@ namespace ResumeApp.Controls
 
 		private void OnThemeServicePropertyChanged( object? pSender, PropertyChangedEventArgs pEventArgs )
 		{
-			if ( !string.IsNullOrEmpty( pEventArgs.PropertyName ) && pEventArgs.PropertyName != nameof( ThemeService.ActiveTheme ) )
+			if ( !string.IsNullOrEmpty( pEventArgs.PropertyName )
+				 && pEventArgs.PropertyName != nameof( ThemeService.ActiveTheme )
+				 && pEventArgs.PropertyName != nameof( ThemeService.IsHighContrastActive ) )
 			{
 				return;
 			}
@@ -1815,6 +1880,10 @@ namespace ResumeApp.Controls
 			var lHairlineBrush = TryFindResource( "HairlineTwoToneBrush" ) as Brush;
 			var lAccentBrush = TryFindResource( "CommonBrush" ) as Brush;
 			var lEraBandBrush = CreateOpacityBrush( lForegroundBrush, 0.03 );
+			var lIsHighContrast = ThemeService.Instance?.IsHighContrastActive == true;
+			var lTitleBrush = lIsHighContrast
+				? ( TryFindResource( "TextOnSelectedBrush" ) as Brush ) ?? lForegroundBrush
+				: lForegroundBrush;
 
 			var lEffectiveMinDate = EffectiveMinDate;
 			var lEffectiveMaxDate = DateTime.Today;
@@ -1871,11 +1940,11 @@ namespace ResumeApp.Controls
 				var lIsHovered = mHoveredTimeFrameItem != null && ReferenceEquals( mHoveredTimeFrameItem, lFrame.Item );
 
 				var lEffectiveBarBrush = lFrameBrush;
-				if ( lIsHovered && !lIsSelected )
+				if ( !lIsHighContrast && lIsHovered && !lIsSelected )
 				{
 					lEffectiveBarBrush = CreateOpacityBrush( lFrameBrush, 0.85 ) ?? lFrameBrush;
 				}
-				else if ( !lIsSelected )
+				else if ( !lIsHighContrast && !lIsSelected )
 				{
 					lEffectiveBarBrush = CreateOpacityBrush( lFrameBrush, 0.65 ) ?? lFrameBrush;
 				}
@@ -1928,7 +1997,7 @@ namespace ResumeApp.Controls
 			}
 
 			var lTypeface = new Typeface( FontFamily, FontStyle, FontWeight, FontStretch );
-			var lTitleDrawInfos = LayoutTimeFrameTitles( lVisibleTimeFrames, pContentRect, lBarRectsByItem, lTypeface, lForegroundBrush, lPixelsPerDip );
+			var lTitleDrawInfos = LayoutTimeFrameTitles( lVisibleTimeFrames, pContentRect, lBarRectsByItem, lTypeface, lTitleBrush, lPixelsPerDip );
 
 			foreach ( var lTitleInfo in lTitleDrawInfos )
 			{
@@ -1959,7 +2028,7 @@ namespace ResumeApp.Controls
 				pDrawingContext.PushClip( new RectangleGeometry( lClipRect, lBarCornerRadius, lBarCornerRadius ) );
 				try
 				{
-					pDrawingContext.DrawEllipse( lForegroundBrush, null, new Point( lDotCenterX, lDotCenterY ), lDotRadius, lDotRadius );
+					pDrawingContext.DrawEllipse( lTitleBrush, null, new Point( lDotCenterX, lDotCenterY ), lDotRadius, lDotRadius );
 					pDrawingContext.DrawText( lTitleInfo.Text, new Point( lTextLeft, lTextTop ) );
 				}
 				finally
@@ -1977,6 +2046,13 @@ namespace ResumeApp.Controls
 				pDrawingContext.DrawLine( lPen, new Point( pContentRect.Left, lBaselineY ), new Point( pContentRect.Right, lBaselineY ) );
 			}
 
+			var lSelectedLabelLayout = CreateSelectedLabelLayout(
+				pContentRect,
+				lViewportStart,
+				lBaselineY,
+				lForegroundBrush,
+				lPixelsPerDip );
+
 			DrawTicksAndLabels(
 				pDrawingContext,
 				pContentRect,
@@ -1986,6 +2062,7 @@ namespace ResumeApp.Controls
 				lTickLabelY,
 				lDividerBrush,
 				lForegroundBrush,
+				lSelectedLabelLayout?.PillRect,
 				lPixelsPerDip );
 
 			DrawTodayMarker(
@@ -2005,8 +2082,7 @@ namespace ResumeApp.Controls
 				lViewportStart,
 				lBaselineY,
 				lAccentBrush,
-				lForegroundBrush,
-				lPixelsPerDip );
+				lSelectedLabelLayout );
 		}
 
 		private void DrawYearEraBands(
@@ -2168,10 +2244,8 @@ namespace ResumeApp.Controls
 
 					var lWidth = lText?.WidthIncludingTrailingWhitespace ?? 0.0;
 					var lX = DateToPixel( lTickDate, pViewportStart, pContentRect );
-					var lLeft = pContentRect.Left + lX - ( lWidth * 0.5 );
-					var lRect = new Rect( lLeft, 0.0, lWidth, 1.0 );
 
-					if ( lRect.Right < pContentRect.Left || lRect.Left > pContentRect.Right )
+					if ( !TryGetTickLabelRect( lX, lWidth, 0.0, 1.0, pContentRect, out var lRect ) )
 					{
 						continue;
 					}
@@ -2203,6 +2277,7 @@ namespace ResumeApp.Controls
 			double pLabelY,
 			Brush pTickBrush,
 			Brush pLabelBrush,
+			Rect? pSelectedLabelRect,
 			double pPixelsPerDip )
 		{
 			var lTypeface = new Typeface( FontFamily, FontStyle, FontWeight, FontStretch );
@@ -2227,10 +2302,8 @@ namespace ResumeApp.Controls
 					continue;
 				}
 
-				var lTextX = pContentRect.Left + lX - ( lText.WidthIncludingTrailingWhitespace * 0.5 );
-				var lTextRect = new Rect( lTextX, pLabelY, lText.WidthIncludingTrailingWhitespace, lText.Height );
-
-				if ( lTextRect.Right < pContentRect.Left || lTextRect.Left > pContentRect.Right )
+				if ( !TryGetTickLabelRect( lX, lText.WidthIncludingTrailingWhitespace, pLabelY, lText.Height, pContentRect, out var lTextRect )
+					 || ShouldSkipTickLabel( lTextRect, pSelectedLabelRect, SelectedLabelCollisionGapPixels ) )
 				{
 					continue;
 				}
@@ -2249,14 +2322,43 @@ namespace ResumeApp.Controls
 			}
 		}
 
+		private SelectedLabelLayout? CreateSelectedLabelLayout(
+			Rect pContentRect,
+			DateTime pViewportStart,
+			double pBaselineY,
+			Brush pTextBrush,
+			double pPixelsPerDip )
+		{
+			var lSelected = ClampDateToRange( SelectedDate );
+
+			var lLineX = pContentRect.Left + DateToPixel( lSelected, pViewportStart, pContentRect );
+
+			var lTypeface = new Typeface( FontFamily, FontStyle, FontWeight, FontStretch );
+
+			var lLabel = FormatSelectedDateLabel( lSelected, CultureInfo.CurrentCulture );
+			var lText = CreateFormattedTextCached( lLabel, lTypeface, SelectedDateLabelFontSize, pTextBrush, pPixelsPerDip );
+
+			if ( lText == null )
+			{
+				return null;
+			}
+
+			var lPillWidth = lText.WidthIncludingTrailingWhitespace + ( SelectedPillPaddingX * 2.0 );
+			var lPillHeight = lText.Height + ( SelectedPillPaddingY * 2.0 );
+
+			var lPillX = Math.Max( pContentRect.Left, Math.Min( pContentRect.Right - lPillWidth, lLineX - ( lPillWidth * 0.5 ) ) );
+			var lPillY = pBaselineY + 2.0;
+
+			return new SelectedLabelLayout( lText, new Rect( lPillX, lPillY, lPillWidth, lPillHeight ) );
+		}
+
 		private void DrawSelectedIndicator(
 			DrawingContext pDrawingContext,
 			Rect pContentRect,
 			DateTime pViewportStart,
 			double pBaselineY,
 			Brush? pAccentBrush,
-			Brush pTextBrush,
-			double pPixelsPerDip )
+			SelectedLabelLayout? pLabelLayout )
 		{
 			var lSelected = ClampDateToRange( SelectedDate );
 
@@ -2269,32 +2371,18 @@ namespace ResumeApp.Controls
 				if ( lLineBrush != null )
 				{
 					var lPen = new Pen( lLineBrush, 1.5 );
-					pDrawingContext.DrawLine( lPen, new Point( lLineX, pContentRect.Top + 6.0 ), new Point( lLineX, pContentRect.Bottom - 10.0 ) );
+					pDrawingContext.DrawLine( lPen, new Point( lLineX, pContentRect.Top + 6.0 ), new Point( lLineX, pBaselineY ) );
 				}
 
 				pDrawingContext.DrawEllipse( pAccentBrush, null, new Point( lLineX, pBaselineY ), 3.5, 3.5 );
 			}
 
-			var lTypeface = new Typeface( FontFamily, FontStyle, FontWeight, FontStretch );
-
-			var lLabel = lSelected.ToString( "MMM d, yyyy", CultureInfo.CurrentCulture );
-			var lText = CreateFormattedTextCached( lLabel, lTypeface, 11.0, pTextBrush, pPixelsPerDip );
-
-			if ( lText == null )
+			if ( pLabelLayout == null )
 			{
 				return;
 			}
 
-			const double lPillPaddingX = 8.0;
-			const double lPillPaddingY = 4.0;
-
-			var lPillWidth = lText.WidthIncludingTrailingWhitespace + ( lPillPaddingX * 2.0 );
-			var lPillHeight = lText.Height + ( lPillPaddingY * 2.0 );
-
-			var lPillX = Math.Max( pContentRect.Left, Math.Min( pContentRect.Right - lPillWidth, lLineX - ( lPillWidth * 0.5 ) ) );
-			var lPillY = pBaselineY + 2.0;
-
-			var lPillRect = new Rect( lPillX, lPillY, lPillWidth, lPillHeight );
+			var lPillRect = pLabelLayout.PillRect;
 
 			var lPillBackground = CreateOpacityBrush( pAccentBrush, 0.18 ) ?? ( TryFindResource( "OnSurfaceCardStrokeOnDarkBrush" ) as Brush );
 			DrawRoundedRect( pDrawingContext, lPillRect, lPillBackground, new RadiusXy( 8.0, 8.0 ) );
@@ -2306,7 +2394,7 @@ namespace ResumeApp.Controls
 				pDrawingContext.DrawRoundedRectangle( null, lPillPen, lPillRect, 8.0, 8.0 );
 			}
 
-			pDrawingContext.DrawText( lText, new Point( lPillRect.Left + lPillPaddingX, lPillRect.Top + lPillPaddingY ) );
+			pDrawingContext.DrawText( pLabelLayout.Text, new Point( lPillRect.Left + SelectedPillPaddingX, lPillRect.Top + SelectedPillPaddingY ) );
 		}
 
 		private Rect GetContentRect()

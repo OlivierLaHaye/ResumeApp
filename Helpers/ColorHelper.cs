@@ -21,6 +21,11 @@ namespace ResumeApp.Helpers
 			"CommonPinkStrongBrush"
 		];
 
+		public static readonly string[] sAccentColorKeys =
+		[
+			.. sAccentBrushKeys.Select( pBrushKey => string.Concat( pBrushKey.AsSpan( 0, pBrushKey.Length - "Brush".Length ), "Color" ) )
+		];
+
 		public static Color CalculateAverageColor( List<Color> pColors )
 		{
 			return Color.FromArgb(

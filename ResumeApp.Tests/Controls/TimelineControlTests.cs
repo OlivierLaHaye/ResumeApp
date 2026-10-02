@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Input;
 using ResumeApp.Controls;
 using ResumeApp.Models;
@@ -239,6 +241,95 @@ public sealed class TimelineControlTests
         {
             MotionPolicy.SetAnimationEnabledOverride( null );
         }
+    }
+
+    [Theory]
+    [InlineData( "en-CA", "Mar 1, 2024" )]
+    [InlineData( "en-US", "Mar 1, 2024" )]
+    [InlineData( "fr-CA", "1 mars 2024" )]
+    public void FormatSelectedDateLabel_FollowsCultureConventions( string pCultureName, string pExpected )
+    {
+        var lCulture = CultureInfo.GetCultureInfo( pCultureName );
+
+        var lLabel = TimelineControl.FormatSelectedDateLabel( new DateTime( 2024, 3, 1 ), lCulture );
+
+        Assert.Equal( pExpected, lLabel );
+    }
+
+    [Theory]
+    [InlineData( -26.0, 52.0, 16.0, 400.0, 16.0 )]
+    [InlineData( 100.0, 52.0, 16.0, 400.0, 100.0 )]
+    [InlineData( 390.0, 52.0, 16.0, 400.0, 348.0 )]
+    [InlineData( 0.0, 500.0, 16.0, 400.0, 16.0 )]
+    public void ClampTickLabelLeft_KeepsLabelInsidePlotBounds( double pLeft, double pWidth, double pMinX, double pMaxX, double pExpected )
+    {
+        Assert.Equal( pExpected, TimelineControl.ClampTickLabelLeft( pLeft, pWidth, pMinX, pMaxX ) );
+    }
+
+    [Fact]
+    public void TryGetTickLabelRect_TickAtLeftEdge_ClampsLabelInsideContentRect()
+    {
+        var lContentRect = new Rect( 16.0, 12.0, 400.0, 100.0 );
+
+        var lResult = TimelineControl.TryGetTickLabelRect( 0.0, 60.0, 80.0, 16.0, lContentRect, out var lLabelRect );
+
+        Assert.True( lResult );
+        Assert.Equal( lContentRect.Left, lLabelRect.Left );
+        Assert.Equal( 60.0, lLabelRect.Width );
+    }
+
+    [Fact]
+    public void TryGetTickLabelRect_TickAtRightEdge_ClampsLabelInsideContentRect()
+    {
+        var lContentRect = new Rect( 16.0, 12.0, 400.0, 100.0 );
+
+        var lResult = TimelineControl.TryGetTickLabelRect( 400.0, 60.0, 80.0, 16.0, lContentRect, out var lLabelRect );
+
+        Assert.True( lResult );
+        Assert.Equal( lContentRect.Right, lLabelRect.Right );
+    }
+
+    [Theory]
+    [InlineData( -1.0 )]
+    [InlineData( 400.5 )]
+    public void TryGetTickLabelRect_TickOutsideContent_ReturnsFalse( double pTickX )
+    {
+        var lContentRect = new Rect( 16.0, 12.0, 400.0, 100.0 );
+
+        Assert.False( TimelineControl.TryGetTickLabelRect( pTickX, 60.0, 80.0, 16.0, lContentRect, out _ ) );
+    }
+
+    [Fact]
+    public void ShouldSkipTickLabel_OverlappingSelectedLabel_ReturnsTrue()
+    {
+        var lSelectedRect = new Rect( 100.0, 74.0, 90.0, 24.0 );
+        var lTickRect = new Rect( 120.0, 80.0, 60.0, 16.0 );
+
+        Assert.True( TimelineControl.ShouldSkipTickLabel( lTickRect, lSelectedRect, 6.0 ) );
+    }
+
+    [Fact]
+    public void ShouldSkipTickLabel_WithinGuardGap_ReturnsTrue()
+    {
+        var lSelectedRect = new Rect( 100.0, 74.0, 90.0, 24.0 );
+        var lTickRect = new Rect( 193.0, 80.0, 60.0, 16.0 );
+
+        Assert.True( TimelineControl.ShouldSkipTickLabel( lTickRect, lSelectedRect, 6.0 ) );
+    }
+
+    [Fact]
+    public void ShouldSkipTickLabel_FarFromSelectedLabel_ReturnsFalse()
+    {
+        var lSelectedRect = new Rect( 100.0, 74.0, 90.0, 24.0 );
+        var lTickRect = new Rect( 260.0, 80.0, 60.0, 16.0 );
+
+        Assert.False( TimelineControl.ShouldSkipTickLabel( lTickRect, lSelectedRect, 6.0 ) );
+    }
+
+    [Fact]
+    public void ShouldSkipTickLabel_NoSelectedLabel_ReturnsFalse()
+    {
+        Assert.False( TimelineControl.ShouldSkipTickLabel( new Rect( 0.0, 0.0, 60.0, 16.0 ), null, 6.0 ) );
     }
 
     [StaFact]

@@ -8,19 +8,59 @@
     xmlns:attachedProperties="clr-namespace:ResumeApp.AttachedProperties"
     xmlns:behaviors="clr-namespace:ResumeApp.Behaviors"
     xmlns:controls="clr-namespace:ResumeApp.Controls"
+    xmlns:converters="clr-namespace:ResumeApp.Converters"
     x:Name="mExperiencePageRoot"
     SnapsToDevicePixels="True"
     UseLayoutRounding="True">
 
     <UserControl.Resources>
+        <converters:PaletteIndexToBrushMultiConverter x:Key="PaletteIndexToBrushMultiConverter" />
+
         <Style x:Key="ExperienceHeaderBandStyle" TargetType="{x:Type FrameworkElement}">
             <Setter Property="Margin" Value="32,28,32,16" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
-                    <Setter Property="Margin" Value="20,20,20,12" />
+                    <Setter Property="Margin" Value="20,12,20,8" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Wide">
                     <Setter Property="Margin" Value="40,32,40,16" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="ExperienceSubtitleTextBlockStyle"
+            BasedOn="{StaticResource PageSubtitleTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="Margin" Value="0,0,0,16" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Margin" Value="0,0,0,8" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="ExperienceTimelineBorderStyle"
+            BasedOn="{StaticResource ContentGroupBorderStyle}"
+            TargetType="{x:Type Border}">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Padding" Value="16,12" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Padding" Value="12,8" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="ExperienceTimelineControlStyle"
+            BasedOn="{StaticResource {x:Type controls:TimelineControl}}"
+            TargetType="{x:Type controls:TimelineControl}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Height" Value="140" />
+                    <Setter Property="Padding" Value="12,6,12,6" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -88,13 +128,13 @@
             x:Key="ExperienceCardBorderStyle"
             BasedOn="{StaticResource ContentGroupBorderStyle}"
             TargetType="{x:Type Border}">
+            <Setter Property="BorderThickness" Value="2" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" Value="True">
                     <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                    <Setter Property="BorderBrush" Value="{Binding PaletteIndex, Converter={StaticResource PaletteIndexToBrushConverter}}" />
-                    <Setter Property="BorderThickness" Value="2" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource FocusRingBrush}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -121,20 +161,16 @@
                     Text="{Binding ResourcesService[SectionHeaderExperience]}" />
                 <TextBlock
                     x:Name="mSectionSubtitleTextBlock"
-                    Margin="0,0,0,16"
-                    Style="{StaticResource PageSubtitleTextBlockStyle}"
+                    Style="{StaticResource ExperienceSubtitleTextBlockStyle}"
                     Text="{Binding ResourcesService[ExperiencePageSubtitle]}" />
 
-                <Border
-                    x:Name="mTimelineBorder"
-                    Margin="0"
-                    Padding="16,12"
-                    Style="{StaticResource ContentGroupBorderStyle}">
+                <Border x:Name="mTimelineBorder" Style="{StaticResource ExperienceTimelineBorderStyle}">
                     <Grid x:Name="mTimelineLayoutGrid">
                         <controls:TimelineControl
                             x:Name="mExperienceTimelineControl"
                             Focusable="True"
                             MinDate="{Binding TimelineMinDate}"
+                            Style="{StaticResource ExperienceTimelineControlStyle}"
                             SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             SelectedTimeFrame="{Binding SelectedTimeFrame, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             TimeFrames="{Binding ExperienceTimeFrames}"
@@ -172,6 +208,7 @@
                         <DataTemplate>
                             <Button
                                 x:Name="mExperienceCardButton"
+                                AutomationProperties.Name="{Binding RoleText}"
                                 Command="{Binding DataContext.SelectExperienceCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                                 CommandParameter="{Binding}"
                                 Style="{StaticResource ExperienceCardButtonStyle}">
@@ -195,8 +232,14 @@
                                             Margin="0,24,0,0"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Top"
-                                            Background="{Binding PaletteIndex, Converter={StaticResource PaletteIndexToBrushConverter}}"
                                             CornerRadius="6">
+                                            <Border.Background>
+                                                <MultiBinding Converter="{StaticResource PaletteIndexToBrushMultiConverter}">
+                                                    <Binding Path="PaletteIndex" />
+                                                    <Binding Path="DataContext.ThemeService.ActiveTheme" RelativeSource="{RelativeSource AncestorType={x:Type UserControl}}" />
+                                                    <Binding Path="DataContext.ThemeService.IsHighContrastActive" RelativeSource="{RelativeSource AncestorType={x:Type UserControl}}" />
+                                                </MultiBinding>
+                                            </Border.Background>
                                             <Border.Style>
                                                 <Style TargetType="{x:Type Border}">
                                                     <Style.Triggers>
@@ -211,10 +254,7 @@
                                         </Border>
                                     </Grid>
 
-                                    <Grid
-                                        x:Name="mContentGrid"
-                                        Grid.Column="1"
-                                        Margin="{Binding LaneLeftMargin}">
+                                    <Grid x:Name="mContentGrid" Grid.Column="1">
                                         <Border x:Name="mCardBorder" Style="{StaticResource ExperienceCardBorderStyle}">
                                             <StackPanel x:Name="mCardContentStackPanel" Orientation="Vertical">
                                                 <TextBlock
