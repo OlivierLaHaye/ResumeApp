@@ -5,6 +5,7 @@
     x:Class="ResumeApp.Pages.ExperiencePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:attachedProperties="clr-namespace:ResumeApp.AttachedProperties"
     xmlns:behaviors="clr-namespace:ResumeApp.Behaviors"
     xmlns:controls="clr-namespace:ResumeApp.Controls"
     x:Name="mExperiencePageRoot"
@@ -12,31 +13,49 @@
     UseLayoutRounding="True">
 
     <UserControl.Resources>
-        <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
-            <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
-            <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
-            <Setter Property="TextWrapping" Value="Wrap" />
+        <Style x:Key="ExperienceHeaderBandStyle" TargetType="{x:Type FrameworkElement}">
+            <Setter Property="Margin" Value="32,28,32,16" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Margin" Value="20,20,20,12" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Wide">
+                    <Setter Property="Margin" Value="40,32,40,16" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ExperienceListBandStyle" TargetType="{x:Type FrameworkElement}">
+            <Setter Property="Margin" Value="32,0,32,40" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Margin" Value="20,0,20,32" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Wide">
+                    <Setter Property="Margin" Value="40,0,40,48" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
 
         <Style
-            x:Key="MonoBodyTextBlockStyle"
-            BasedOn="{StaticResource {x:Type TextBlock}}"
+            x:Key="BulletGlyphTextBlockStyle"
+            BasedOn="{StaticResource PageBodyTextBlockStyle}"
             TargetType="{x:Type TextBlock}">
-            <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}" />
-            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
-            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="VerticalAlignment" Value="Top" />
         </Style>
 
-        <Style x:Key="ExperienceCardFocusVisualStyle" TargetType="{x:Type Control}">
-            <Setter Property="Template">
+        <Style x:Key="ExperienceCardFocusVisualStyle">
+            <Setter Property="Control.Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Control}">
+                    <ControlTemplate>
                         <Border
-                            x:Name="mFocusBorder"
-                            BorderBrush="{DynamicResource CommonBrush}"
-                            BorderThickness="{StaticResource ExtraSmallBorderThickness}"
-                            CornerRadius="{StaticResource CommonCornerRadius}"
-                            Opacity="{StaticResource CommonOpacity}" />
+                            Margin="-3,-3,-3,13"
+                            BorderBrush="{DynamicResource FocusRingBrush}"
+                            BorderThickness="2"
+                            CornerRadius="10"
+                            SnapsToDevicePixels="True" />
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -48,6 +67,8 @@
             <Setter Property="Padding" Value="0" />
             <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
             <Setter Property="Focusable" Value="True" />
+            <Setter Property="IsTabStop" Value="True" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="FocusVisualStyle" Value="{StaticResource ExperienceCardFocusVisualStyle}" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -55,297 +76,198 @@
                         <Border
                             x:Name="mButtonRootBorder"
                             Background="{TemplateBinding Background}"
-                            CornerRadius="{StaticResource CommonCornerRadius}"
-                            RenderTransformOrigin="0.5,0.5">
-                            <Border.RenderTransform>
-                                <ScaleTransform ScaleX="1" ScaleY="1" />
-                            </Border.RenderTransform>
+                            CornerRadius="8">
                             <ContentPresenter />
                         </Border>
-
-                        <ControlTemplate.Triggers>
-                            <!--  Subtle scale on hover  -->
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation
-                                                EasingFunction="{StaticResource CubicEaseOut}"
-                                                Storyboard.TargetName="mButtonRootBorder"
-                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
-                                                To="{StaticResource UniformScaleSubtleHover}"
-                                                Duration="{StaticResource MicroDuration}" />
-                                            <DoubleAnimation
-                                                EasingFunction="{StaticResource CubicEaseOut}"
-                                                Storyboard.TargetName="mButtonRootBorder"
-                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                                                To="{StaticResource UniformScaleSubtleHover}"
-                                                Duration="{StaticResource MicroDuration}" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
-                                <Trigger.ExitActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation
-                                                EasingFunction="{StaticResource CubicEaseOut}"
-                                                Storyboard.TargetName="mButtonRootBorder"
-                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
-                                                To="1"
-                                                Duration="{StaticResource SubtleDuration}" />
-                                            <DoubleAnimation
-                                                EasingFunction="{StaticResource CubicEaseOut}"
-                                                Storyboard.TargetName="mButtonRootBorder"
-                                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                                                To="1"
-                                                Duration="{StaticResource SubtleDuration}" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.ExitActions>
-                            </Trigger>
-
-                            <!--  Subtle press feedback  -->
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="mButtonRootBorder" Property="Opacity" Value="0.85" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style
+            x:Key="ExperienceCardBorderStyle"
+            BasedOn="{StaticResource ContentGroupBorderStyle}"
+            TargetType="{x:Type Border}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter Property="BorderBrush" Value="{Binding PaletteIndex, Converter={StaticResource PaletteIndexToBrushConverter}}" />
+                    <Setter Property="BorderThickness" Value="2" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
-    <Grid x:Name="mExperiencePageLayoutRoot" Margin="{StaticResource LargeThickness}">
+    <Grid x:Name="mExperiencePageLayoutRoot">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <StackPanel
-            x:Name="mHeaderStackPanel"
-            Grid.Row="0"
-            Orientation="Vertical">
-            <TextBlock
-                x:Name="mSectionTitleTextBlock"
-                FontSize="{StaticResource LargeFontSize}"
-                Text="{Binding ResourcesService[SectionHeaderExperience]}" />
-            <TextBlock
-                x:Name="mSectionSubtitleTextBlock"
-                Margin="{StaticResource SmallThickness}"
-                FontSize="{StaticResource SmallFontSize}"
-                Opacity="{StaticResource LowOpacity}"
-                Text="{Binding ResourcesService[ExperiencePageSubtitle]}" />
-        </StackPanel>
+        <Grid x:Name="mExperienceHeaderHostGrid" Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MaxWidth="1400" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel
+                x:Name="mHeaderStackPanel"
+                Orientation="Vertical"
+                Style="{StaticResource ExperienceHeaderBandStyle}">
+                <TextBlock
+                    x:Name="mSectionTitleTextBlock"
+                    Style="{StaticResource PageTitleTextBlockStyle}"
+                    Text="{Binding ResourcesService[SectionHeaderExperience]}" />
+                <TextBlock
+                    x:Name="mSectionSubtitleTextBlock"
+                    Margin="0,0,0,16"
+                    Style="{StaticResource PageSubtitleTextBlockStyle}"
+                    Text="{Binding ResourcesService[ExperiencePageSubtitle]}" />
 
-        <Border
-            x:Name="mTimelineBorder"
-            Grid.Row="1"
-            Style="{StaticResource SubSectionCardBorderStyle}">
-            <Grid x:Name="mTimelineLayoutGrid" Margin="{StaticResource CommonThickness}">
-                <controls:TimelineControl
-                    x:Name="mExperienceTimelineControl"
-                    Focusable="True"
-                    MinDate="{Binding TimelineMinDate}"
-                    SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedTimeFrame="{Binding SelectedTimeFrame, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TimeFrames="{Binding ExperienceTimeFrames}"
-                    TodayMarkerText="{Binding ResourcesService[TimelineLabelTodayMarker]}" />
-            </Grid>
-        </Border>
+                <Border
+                    x:Name="mTimelineBorder"
+                    Margin="0"
+                    Padding="16,12"
+                    Style="{StaticResource ContentGroupBorderStyle}">
+                    <Grid x:Name="mTimelineLayoutGrid">
+                        <controls:TimelineControl
+                            x:Name="mExperienceTimelineControl"
+                            Focusable="True"
+                            MinDate="{Binding TimelineMinDate}"
+                            SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            SelectedTimeFrame="{Binding SelectedTimeFrame, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            TimeFrames="{Binding ExperienceTimeFrames}"
+                            TodayMarkerText="{Binding ResourcesService[TimelineLabelTodayMarker]}" />
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </Grid>
 
         <ScrollViewer
             x:Name="mExperienceScrollViewer"
-            Grid.Row="2"
+            Grid.Row="1"
             behaviors:ExperienceTimelineScrollSyncBehavior.IsEnabled="True"
             behaviors:ExperienceTimelineScrollSyncBehavior.ItemsControl="{Binding ElementName=mExperienceItemsControl}"
             behaviors:ExperienceTimelineScrollSyncBehavior.SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             behaviors:ExperienceTimelineScrollSyncBehavior.SelectedItem="{Binding SelectedTimelineEntry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             CanContentScroll="False"
-            HorizontalScrollBarVisibility="Disabled"
-            VerticalScrollBarVisibility="Auto">
-            <ScrollViewer.OpacityMask>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Offset="0" Color="Transparent" />
-                    <GradientStop Color="Black">
-                        <GradientStop.Offset>
-                            <MultiBinding Converter="{StaticResource GradientOffsetTopConverter}" ConverterParameter="{StaticResource PageGradientOffsetPixels}">
-                                <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                                <Binding Path="VerticalOffset" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                            </MultiBinding>
-                        </GradientStop.Offset>
-                    </GradientStop>
-                    <GradientStop Color="Black">
-                        <GradientStop.Offset>
-                            <MultiBinding Converter="{StaticResource GradientOffsetBottomConverter}" ConverterParameter="{StaticResource PageGradientOffsetPixels}">
-                                <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                                <Binding Path="VerticalOffset" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                                <Binding Path="ScrollableHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                            </MultiBinding>
-                        </GradientStop.Offset>
-                    </GradientStop>
-                    <GradientStop Offset="1" Color="Transparent" />
-                </LinearGradientBrush>
-            </ScrollViewer.OpacityMask>
-            <ItemsControl x:Name="mExperienceItemsControl" ItemsSource="{Binding TimelineEntries}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel x:Name="mExperienceItemsStackPanel" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+            Style="{StaticResource PageScrollViewerStyle}">
+            <Grid x:Name="mExperienceListHostGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MaxWidth="1400" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ItemsControl
+                    x:Name="mExperienceItemsControl"
+                    ItemsSource="{Binding TimelineEntries}"
+                    Style="{StaticResource ExperienceListBandStyle}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel x:Name="mExperienceItemsStackPanel" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Button
-                            x:Name="mExperienceCardButton"
-                            Margin="{StaticResource SmallTopBottomThickness}"
-                            Command="{Binding DataContext.SelectExperienceCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
-                            CommandParameter="{Binding}"
-                            Style="{StaticResource ExperienceCardButtonStyle}">
-                            <Grid x:Name="mTimelineItemGrid">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button
+                                x:Name="mExperienceCardButton"
+                                Command="{Binding DataContext.SelectExperienceCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                CommandParameter="{Binding}"
+                                Style="{StaticResource ExperienceCardButtonStyle}">
+                                <Grid x:Name="mTimelineItemGrid">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
 
-                                <Grid x:Name="mRailGrid" Grid.Column="0" Width="32">
-                                    <Border
-                                        x:Name="mRailLineBorder"
-                                        Width="{StaticResource ExtraExtraSmallThicknessValue}"
-                                        HorizontalAlignment="Center"
-                                        Background="{DynamicResource OnSurfaceDividerOnDarkBrush}" />
+                                    <Grid x:Name="mRailGrid" Grid.Column="0" Width="32">
+                                        <Border
+                                            x:Name="mRailLineBorder"
+                                            Width="{StaticResource ExtraExtraSmallThicknessValue}"
+                                            HorizontalAlignment="Center"
+                                            Background="{DynamicResource OnSurfaceDividerOnDarkBrush}" />
 
-                                    <Border
-                                        x:Name="mMarkerBorder"
-                                        Width="12"
-                                        Height="12"
-                                        Margin="0,16,0,0"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Top"
-                                        Background="{Binding PaletteIndex, Converter={StaticResource PaletteIndexToBrushConverter}}"
-                                        CornerRadius="6">
-                                        <Border.Style>
-                                            <Style TargetType="{x:Type Border}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                        <Setter Property="Width" Value="14" />
-                                                        <Setter Property="Height" Value="14" />
-                                                        <Setter Property="CornerRadius" Value="7" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                    </Border>
-                                </Grid>
+                                        <Border
+                                            x:Name="mMarkerBorder"
+                                            Width="12"
+                                            Height="12"
+                                            Margin="0,24,0,0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Background="{Binding PaletteIndex, Converter={StaticResource PaletteIndexToBrushConverter}}"
+                                            CornerRadius="6">
+                                            <Border.Style>
+                                                <Style TargetType="{x:Type Border}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                            <Setter Property="Width" Value="14" />
+                                                            <Setter Property="Height" Value="14" />
+                                                            <Setter Property="CornerRadius" Value="7" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                        </Border>
+                                    </Grid>
 
-                                <Grid
-                                    x:Name="mContentGrid"
-                                    Grid.Column="1"
-                                    Margin="{Binding LaneLeftMargin}">
-                                    <Border x:Name="mCardBorder">
-                                        <Border.Style>
-                                            <Style BasedOn="{StaticResource SubSectionCardBorderStyle}" TargetType="{x:Type Border}">
-                                                <Setter Property="BorderThickness" Value="0" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                        <Setter Property="BorderBrush" Value="{Binding PaletteIndex, Converter={StaticResource PaletteIndexToBrushConverter}}" />
-                                                        <Setter Property="BorderThickness" Value="1.5" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <Grid x:Name="mCardLayoutGrid" Margin="{StaticResource CommonThickness}">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="3" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
+                                    <Grid
+                                        x:Name="mContentGrid"
+                                        Grid.Column="1"
+                                        Margin="{Binding LaneLeftMargin}">
+                                        <Border x:Name="mCardBorder" Style="{StaticResource ExperienceCardBorderStyle}">
+                                            <StackPanel x:Name="mCardContentStackPanel" Orientation="Vertical">
+                                                <TextBlock
+                                                    x:Name="mRoleTextBlock"
+                                                    Margin="0"
+                                                    Style="{StaticResource PageSectionTitleTextBlockStyle}"
+                                                    Text="{Binding RoleText}" />
+                                                <TextBlock
+                                                    x:Name="mCompanyTextBlock"
+                                                    Margin="0,2,0,0"
+                                                    Style="{StaticResource PageBodyTextBlockStyle}"
+                                                    Text="{Binding CompanyText}" />
 
-                                            <Border
-                                                x:Name="mAccentBarBorder"
-                                                Grid.Column="0"
-                                                Margin="0,2,8,2"
-                                                Background="{Binding PaletteIndex, Converter={StaticResource PaletteIndexToBrushConverter}}"
-                                                CornerRadius="1.5"
-                                                Opacity="0.6" />
-
-                                            <Grid x:Name="mCardContentGrid" Grid.Column="1">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                </Grid.RowDefinitions>
-
-                                                <StackPanel x:Name="mHeaderRowStackPanel" Orientation="Vertical">
+                                                <WrapPanel
+                                                    x:Name="mMetaWrapPanel"
+                                                    Margin="0,8,0,0"
+                                                    Orientation="Horizontal">
                                                     <TextBlock
-                                                        x:Name="mRoleTextBlock"
-                                                        FontSize="{StaticResource CommonFontSize}"
-                                                        FontWeight="SemiBold"
-                                                        Text="{Binding RoleText}" />
-                                                    <TextBlock
-                                                        x:Name="mCompanyTextBlock"
-                                                        FontSize="{StaticResource SmallFontSize}"
-                                                        Opacity="0.65"
-                                                        Text="{Binding CompanyText}" />
-                                                </StackPanel>
-
-                                                <Grid
-                                                    x:Name="mMetaGrid"
-                                                    Grid.Row="1"
-                                                    Margin="{StaticResource SmallThickness}">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="*" />
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <Border
-                                                        x:Name="mDatesPillBorder"
-                                                        Background="{DynamicResource CommonGrayBrush}"
-                                                        CornerRadius="{StaticResource ExtraSmallCornerRadius}">
-                                                        <TextBlock
-                                                            x:Name="mDatesTextBlock"
-                                                            Margin="{StaticResource SmallThickness}"
-                                                            FontFamily="{StaticResource MonoFontFamily}"
-                                                            FontSize="{StaticResource SmallFontSize}"
-                                                            Text="{Binding DateRangeText}" />
-                                                    </Border>
-
+                                                        x:Name="mDatesTextBlock"
+                                                        Margin="0,0,16,0"
+                                                        Style="{StaticResource PageMonoTextBlockStyle}"
+                                                        Text="{Binding DateRangeText}" />
                                                     <TextBlock
                                                         x:Name="mLocationTextBlock"
-                                                        Grid.Column="1"
-                                                        Margin="{StaticResource SmallLeftRightThickness}"
-                                                        VerticalAlignment="Center"
-                                                        FontSize="{StaticResource SmallFontSize}"
-                                                        Opacity="{StaticResource LowOpacity}"
+                                                        Style="{StaticResource PageSecondaryTextBlockStyle}"
                                                         Text="{Binding LocationText}" />
-                                                </Grid>
+                                                </WrapPanel>
 
                                                 <TextBlock
                                                     x:Name="mScopeTextBlock"
-                                                    Grid.Row="2"
-                                                    Margin="{StaticResource SmallThickness}"
-                                                    FontSize="{StaticResource SmallFontSize}"
-                                                    Opacity="0.65"
+                                                    Margin="0,12,0,0"
+                                                    Style="{StaticResource PageBodyTextBlockStyle}"
                                                     Text="{Binding ScopeText}" />
 
                                                 <ItemsControl
                                                     x:Name="mAccomplishmentsItemsControl"
-                                                    Grid.Row="3"
-                                                    Margin="{StaticResource SmallThickness}"
+                                                    Margin="0,12,0,0"
+                                                    Focusable="False"
                                                     ItemsSource="{Binding Accomplishments}">
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
-                                                            <DockPanel x:Name="mBulletDockPanel" LastChildFill="True">
+                                                            <DockPanel
+                                                                x:Name="mBulletDockPanel"
+                                                                Margin="0,0,0,6"
+                                                                LastChildFill="True">
                                                                 <TextBlock
                                                                     x:Name="mBulletGlyphTextBlock"
-                                                                    Margin="{StaticResource SmallLeftRightThickness}"
                                                                     DockPanel.Dock="Left"
-                                                                    Opacity="{StaticResource CommonOpacity}"
+                                                                    Style="{StaticResource BulletGlyphTextBlockStyle}"
                                                                     Text="{Binding DataContext.ResourcesService[GlyphBullet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                                                                 <TextBlock
                                                                     x:Name="mBulletTextBlock"
-                                                                    FontSize="{StaticResource SmallFontSize}"
+                                                                    Style="{StaticResource PageBodyTextBlockStyle}"
                                                                     Text="{Binding}" />
                                                             </DockPanel>
                                                         </DataTemplate>
@@ -354,19 +276,16 @@
 
                                                 <StackPanel
                                                     x:Name="mTechStackPanel"
-                                                    Grid.Row="4"
-                                                    Margin="{StaticResource SmallThickness}"
+                                                    Margin="0,8,0,0"
                                                     Orientation="Vertical">
                                                     <TextBlock
                                                         x:Name="mTechLabelTextBlock"
-                                                        FontFamily="{StaticResource MonoFontFamily}"
-                                                        FontSize="{StaticResource SmallFontSize}"
-                                                        Opacity="{StaticResource LowOpacity}"
+                                                        Style="{StaticResource PageLabelTextBlockStyle}"
                                                         Text="{Binding DataContext.ResourcesService[LabelTech], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
 
                                                     <ItemsControl
                                                         x:Name="mTechChipsItemsControl"
-                                                        Margin="{StaticResource ExtraSmallThickness}"
+                                                        Focusable="False"
                                                         ItemsSource="{Binding TechItems}">
                                                         <ItemsControl.ItemsPanel>
                                                             <ItemsPanelTemplate>
@@ -378,23 +297,22 @@
                                                                 <Border x:Name="mTechChipBorder" Style="{StaticResource ChipBorderStyle}">
                                                                     <TextBlock
                                                                         x:Name="mTechChipTextBlock"
-                                                                        Margin="{StaticResource SmallThickness}"
-                                                                        Style="{StaticResource MonoBodyTextBlockStyle}"
+                                                                        Style="{StaticResource ChipTextBlockStyle}"
                                                                         Text="{Binding}" />
                                                                 </Border>
                                                             </DataTemplate>
                                                         </ItemsControl.ItemTemplate>
                                                     </ItemsControl>
                                                 </StackPanel>
-                                            </Grid>
-                                        </Grid>
-                                    </Border>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
         </ScrollViewer>
     </Grid>
 </UserControl>

@@ -5,189 +5,168 @@
     x:Class="ResumeApp.Pages.OverviewPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:attachedProperties="clr-namespace:ResumeApp.AttachedProperties"
     x:Name="mOverviewPageRoot"
     SnapsToDevicePixels="True"
     UseLayoutRounding="True">
 
     <UserControl.Resources>
-        <Style
-            x:Key="BaseTextBlockStyle"
-            BasedOn="{StaticResource {x:Type TextBlock}}"
-            TargetType="{x:Type TextBlock}">
-            <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
+        <Style x:Key="IdentitySecondaryColumnStyle" TargetType="{x:Type StackPanel}">
+            <Setter Property="Grid.Row" Value="0" />
+            <Setter Property="Grid.Column" Value="2" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Grid.Row" Value="1" />
+                    <Setter Property="Grid.Column" Value="0" />
+                    <Setter Property="Grid.ColumnSpan" Value="3" />
+                    <Setter Property="Margin" Value="0,24,0,0" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
 
-        <Style BasedOn="{StaticResource BaseTextBlockStyle}" TargetType="{x:Type TextBlock}" />
+        <Style x:Key="SummarySecondaryColumnStyle" TargetType="{x:Type StackPanel}">
+            <Setter Property="Grid.Row" Value="0" />
+            <Setter Property="Grid.Column" Value="2" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Grid.Row" Value="1" />
+                    <Setter Property="Grid.Column" Value="0" />
+                    <Setter Property="Grid.ColumnSpan" Value="3" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
 
-        <Style
-            x:Key="SectionTitleTextBlockStyle"
-            BasedOn="{StaticResource BaseTextBlockStyle}"
-            TargetType="{x:Type TextBlock}" />
-
-        <Style
-            x:Key="SectionBodyTextBlockStyle"
-            BasedOn="{StaticResource BaseTextBlockStyle}"
-            TargetType="{x:Type TextBlock}">
-            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
-            <Setter Property="Opacity" Value="{StaticResource CommonOpacity}" />
+        <Style x:Key="PrimaryColumnStyle" TargetType="{x:Type StackPanel}">
+            <Setter Property="Grid.Row" Value="0" />
+            <Setter Property="Grid.Column" Value="0" />
+            <Setter Property="Grid.ColumnSpan" Value="1" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Grid.ColumnSpan" Value="3" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
 
         <Style
-            x:Key="LabelTextBlockStyle"
-            BasedOn="{StaticResource BaseTextBlockStyle}"
+            x:Key="BulletGlyphTextBlockStyle"
+            BasedOn="{StaticResource PageBodyTextBlockStyle}"
             TargetType="{x:Type TextBlock}">
-            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
-            <Setter Property="Opacity" Value="{StaticResource LowOpacity}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="VerticalAlignment" Value="Top" />
         </Style>
 
         <Style
-            x:Key="ValueTextBlockStyle"
-            BasedOn="{StaticResource BaseTextBlockStyle}"
+            x:Key="ContactValueTextBlockStyle"
+            BasedOn="{StaticResource PageBodyTextBlockStyle}"
             TargetType="{x:Type TextBlock}">
-            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+            <Setter Property="Margin" Value="0,0,12,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            <Setter Property="TextWrapping" Value="NoWrap" />
         </Style>
-
     </UserControl.Resources>
 
-    <ScrollViewer
-        x:Name="mOverviewScrollViewer"
-        HorizontalScrollBarVisibility="Disabled"
-        VerticalScrollBarVisibility="Auto">
-        <ScrollViewer.OpacityMask>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Offset="0" Color="Transparent" />
-                <GradientStop Color="Black">
-                    <GradientStop.Offset>
-                        <MultiBinding Converter="{StaticResource GradientOffsetTopConverter}" ConverterParameter="{StaticResource PageGradientOffsetPixels}">
-                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                            <Binding Path="VerticalOffset" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                        </MultiBinding>
-                    </GradientStop.Offset>
-                </GradientStop>
-                <GradientStop Color="Black">
-                    <GradientStop.Offset>
-                        <MultiBinding Converter="{StaticResource GradientOffsetBottomConverter}" ConverterParameter="{StaticResource PageGradientOffsetPixels}">
-                            <Binding Path="ActualHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                            <Binding Path="VerticalOffset" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                            <Binding Path="ScrollableHeight" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ScrollViewer}" />
-                        </MultiBinding>
-                    </GradientStop.Offset>
-                </GradientStop>
-                <GradientStop Offset="1" Color="Transparent" />
-            </LinearGradientBrush>
-        </ScrollViewer.OpacityMask>
-        <Grid x:Name="mOverviewLayoutRoot" Margin="{StaticResource LargeThickness}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+    <ScrollViewer x:Name="mOverviewScrollViewer" Style="{StaticResource PageScrollViewerStyle}">
+        <Grid x:Name="mOverviewContentHostGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MaxWidth="1400" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel x:Name="mOverviewLayoutRoot" HorizontalAlignment="Stretch" Style="{StaticResource PageContentPanelStyle}">
 
-            <Border
-                x:Name="mHeaderSectionBorder"
-                Grid.Row="0"
-                Style="{StaticResource SubSectionCardBorderStyle}">
-                <Grid x:Name="mHeaderSectionGrid" Margin="{StaticResource CommonThickness}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <StackPanel x:Name="mHeaderTitleStackPanel" Orientation="Vertical">
-                        <TextBlock
-                            x:Name="mFullNameTextBlock"
-                            FontSize="{StaticResource ExtraLargeFontSize}"
-                            Text="{Binding FullNameText}" />
-                        <TextBlock
-                            x:Name="mTargetTitlesTextBlock"
-                            Margin="{StaticResource SmallThickness}"
-                            FontFamily="{StaticResource MonoFontFamily}"
-                            FontSize="{StaticResource SmallFontSize}"
-                            Opacity="{StaticResource CommonOpacity}"
-                            Text="{Binding TargetTitlesText}" />
-                    </StackPanel>
-
-                    <Grid
-                        x:Name="mHeaderMetaGrid"
-                        Grid.Row="1"
-                        Margin="{StaticResource CommonTopBottomThickness}">
+                <Border
+                    x:Name="mHeaderSectionBorder"
+                    Margin="0,0,0,32"
+                    Style="{StaticResource ContentGroupBorderStyle}">
+                    <Grid x:Name="mHeaderSectionGrid">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="32" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
                         <StackPanel
-                            x:Name="mHeaderLeftMetaStackPanel"
-                            Grid.Column="0"
-                            Orientation="Vertical">
-                            <TextBlock
-                                x:Name="mLocationLabelTextBlock"
-                                Margin="{StaticResource SmallThickness}"
-                                Style="{StaticResource LabelTextBlockStyle}"
-                                Text="{Binding ResourcesService[LabelLocation]}" />
-                            <TextBlock
-                                x:Name="mLocationValueTextBlock"
-                                Margin="{StaticResource ExtraSmallThickness}"
-                                Style="{StaticResource ValueTextBlockStyle}"
-                                Text="{Binding LocationText}" />
-
-                            <TextBlock
-                                x:Name="mWorkPreferenceLabelTextBlock"
-                                Margin="{StaticResource SmallThickness}"
-                                Style="{StaticResource LabelTextBlockStyle}"
-                                Text="{Binding ResourcesService[LabelWorkPreference]}" />
-                            <TextBlock
-                                    x:Name="mWorkPreferenceValueTextBlock"
-                                Margin="{StaticResource ExtraSmallThickness}"
-                                Style="{StaticResource ValueTextBlockStyle}"
-                                Text="{Binding WorkPreferenceText}" />
-                            <Button
-                                x:Name="mPrintableResumeButtonControl"
-                                Margin="{StaticResource SmallThickness}"
-                                HorizontalAlignment="Left"
-                                Focusable="True"
-                                Height="Auto"
-                                MinHeight="44"
-                                AutomationProperties.Name="{Binding PrintableResumeButtonText}"
-                                Command="{Binding OpenUrlCommand}"
-                                CommandParameter="{Binding PrintableResumeUrl}"
-                                Style="{StaticResource ContactActionPillButtonStyle}">
-                                <Button.FocusVisualStyle>
-                                    <Style>
-                                        <Setter Property="Control.Template">
-                                            <Setter.Value>
-                                                <ControlTemplate>
-                                                    <Border
-                                                        Margin="-3"
-                                                        BorderBrush="{DynamicResource CommonBrush}"
-                                                        BorderThickness="2"
-                                                        CornerRadius="{StaticResource CommonCornerRadius}" />
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </Button.FocusVisualStyle>
+                            x:Name="mHeaderLeftColumnStackPanel"
+                            Orientation="Vertical"
+                            Style="{StaticResource PrimaryColumnStyle}">
+                            <StackPanel
+                                x:Name="mHeaderTitleStackPanel"
+                                Margin="0,0,0,24"
+                                Orientation="Vertical">
                                 <TextBlock
-                                    x:Name="mPrintableResumeButtonTextControl"
-                                    Margin="{StaticResource SmallThickness}"
-                                    FontSize="{StaticResource SmallFontSize}"
-                                    Text="{Binding PrintableResumeButtonText}"
-                                    TextWrapping="Wrap" />
-                            </Button>
+                                    x:Name="mFullNameTextBlock"
+                                    Style="{StaticResource DisplayNameTextBlockStyle}"
+                                    Text="{Binding FullNameText}" />
+                                <TextBlock
+                                    x:Name="mTargetTitlesTextBlock"
+                                    Margin="0,4,0,0"
+                                    FontSize="15"
+                                    Style="{StaticResource PageMonoTextBlockStyle}"
+                                    Text="{Binding TargetTitlesText}" />
+                            </StackPanel>
+
+                            <StackPanel x:Name="mHeaderLeftMetaStackPanel" Orientation="Vertical">
+                                <StackPanel
+                                    x:Name="mLocationStackPanel"
+                                    Margin="0,0,0,16"
+                                    Orientation="Vertical">
+                                    <TextBlock
+                                        x:Name="mLocationLabelTextBlock"
+                                        Style="{StaticResource PageLabelTextBlockStyle}"
+                                        Text="{Binding ResourcesService[LabelLocation]}" />
+                                    <TextBlock
+                                        x:Name="mLocationValueTextBlock"
+                                        Style="{StaticResource PageBodyTextBlockStyle}"
+                                        Text="{Binding LocationText}" />
+                                </StackPanel>
+
+                                <StackPanel
+                                    x:Name="mWorkPreferenceStackPanel"
+                                    Margin="0,0,0,16"
+                                    Orientation="Vertical">
+                                    <TextBlock
+                                        x:Name="mWorkPreferenceLabelTextBlock"
+                                        Style="{StaticResource PageLabelTextBlockStyle}"
+                                        Text="{Binding ResourcesService[LabelWorkPreference]}" />
+                                    <TextBlock
+                                        x:Name="mWorkPreferenceValueTextBlock"
+                                        Style="{StaticResource PageBodyTextBlockStyle}"
+                                        Text="{Binding WorkPreferenceText}" />
+                                </StackPanel>
+
+                                <Button
+                                    x:Name="mPrintableResumeButtonControl"
+                                    Height="Auto"
+                                    MinHeight="36"
+                                    Padding="14,8"
+                                    HorizontalAlignment="Left"
+                                    AutomationProperties.Name="{Binding PrintableResumeButtonText}"
+                                    Command="{Binding OpenUrlCommand}"
+                                    CommandParameter="{Binding PrintableResumeUrl}"
+                                    Style="{StaticResource ContactActionPillButtonStyle}">
+                                    <TextBlock
+                                        x:Name="mPrintableResumeButtonTextControl"
+                                        FontSize="13"
+                                        Text="{Binding PrintableResumeButtonText}"
+                                        TextWrapping="Wrap" />
+                                </Button>
+                            </StackPanel>
                         </StackPanel>
 
                         <StackPanel
                             x:Name="mHeaderRightMetaStackPanel"
-                            Grid.Column="1"
-                            Orientation="Vertical">
+                            Orientation="Vertical"
+                            Style="{StaticResource IdentitySecondaryColumnStyle}">
                             <TextBlock
                                 x:Name="mEmailLabelTextBlock"
-                                Margin="{StaticResource SmallThickness}"
-                                Style="{StaticResource LabelTextBlockStyle}"
+                                Style="{StaticResource PageLabelTextBlockStyle}"
                                 Text="{Binding ResourcesService[LabelEmail]}" />
-                            <Grid x:Name="mEmailValueWithActionGrid" Margin="{StaticResource ExtraSmallThickness}">
+                            <Grid x:Name="mEmailValueWithActionGrid" Margin="0,0,0,16">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
@@ -196,31 +175,28 @@
                                 <TextBlock
                                     x:Name="mEmailValueTextBlock"
                                     Grid.Column="0"
-                                    Margin="0,0,10,0"
-                                    VerticalAlignment="Center"
-                                    Style="{StaticResource ValueTextBlockStyle}"
+                                    Style="{StaticResource ContactValueTextBlockStyle}"
                                     Text="{Binding EmailText}"
-                                    TextTrimming="CharacterEllipsis"
-                                    TextWrapping="NoWrap" />
+                                    ToolTip="{Binding EmailText}" />
                                 <Button
                                     x:Name="mEmailActionButton"
                                     Grid.Column="1"
+                                    AutomationProperties.LabeledBy="{Binding ElementName=mEmailLabelTextBlock}"
                                     Command="{Binding ComposeEmailCommand}"
                                     CommandParameter="{Binding EmailText}"
                                     Style="{StaticResource ContactActionPillButtonStyle}">
                                     <TextBlock
                                         x:Name="mEmailActionButtonTextBlock"
-                                        FontSize="{StaticResource SmallFontSize}"
+                                        FontSize="13"
                                         Text="{Binding ComposeEmailButtonText}" />
                                 </Button>
                             </Grid>
 
                             <TextBlock
                                 x:Name="mLinkedInLabelTextBlock"
-                                Margin="{StaticResource SmallThickness}"
-                                Style="{StaticResource LabelTextBlockStyle}"
+                                Style="{StaticResource PageLabelTextBlockStyle}"
                                 Text="{Binding ResourcesService[LabelLinkedIn]}" />
-                            <Grid x:Name="mLinkedInValueWithActionGrid" Margin="{StaticResource ExtraSmallThickness}">
+                            <Grid x:Name="mLinkedInValueWithActionGrid" Margin="0,0,0,16">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
@@ -229,31 +205,28 @@
                                 <TextBlock
                                     x:Name="mLinkedInValueTextBlock"
                                     Grid.Column="0"
-                                    Margin="0,0,10,0"
-                                    VerticalAlignment="Center"
-                                    Style="{StaticResource ValueTextBlockStyle}"
+                                    Style="{StaticResource ContactValueTextBlockStyle}"
                                     Text="{Binding LinkedInText}"
-                                    TextTrimming="CharacterEllipsis"
-                                    TextWrapping="NoWrap" />
+                                    ToolTip="{Binding LinkedInText}" />
                                 <Button
                                     x:Name="mLinkedInActionButton"
                                     Grid.Column="1"
+                                    AutomationProperties.LabeledBy="{Binding ElementName=mLinkedInLabelTextBlock}"
                                     Command="{Binding OpenUrlCommand}"
                                     CommandParameter="{Binding LinkedInText}"
                                     Style="{StaticResource ContactActionPillButtonStyle}">
                                     <TextBlock
                                         x:Name="mLinkedInActionButtonTextBlock"
-                                        FontSize="{StaticResource SmallFontSize}"
+                                        FontSize="13"
                                         Text="{Binding OpenUrlButtonText}" />
                                 </Button>
                             </Grid>
 
                             <TextBlock
                                 x:Name="mGitHubLabelTextBlock"
-                                Margin="{StaticResource SmallThickness}"
-                                Style="{StaticResource LabelTextBlockStyle}"
+                                Style="{StaticResource PageLabelTextBlockStyle}"
                                 Text="{Binding ResourcesService[LabelGitHub]}" />
-                            <Grid x:Name="mGitHubValueWithActionGrid" Margin="{StaticResource ExtraSmallThickness}">
+                            <Grid x:Name="mGitHubValueWithActionGrid" Margin="0,0,0,16">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
@@ -262,31 +235,28 @@
                                 <TextBlock
                                     x:Name="mGitHubValueTextBlock"
                                     Grid.Column="0"
-                                    Margin="0,0,10,0"
-                                    VerticalAlignment="Center"
-                                    Style="{StaticResource ValueTextBlockStyle}"
+                                    Style="{StaticResource ContactValueTextBlockStyle}"
                                     Text="{Binding GitHubText}"
-                                    TextTrimming="CharacterEllipsis"
-                                    TextWrapping="NoWrap" />
+                                    ToolTip="{Binding GitHubText}" />
                                 <Button
                                     x:Name="mGitHubActionButton"
                                     Grid.Column="1"
+                                    AutomationProperties.LabeledBy="{Binding ElementName=mGitHubLabelTextBlock}"
                                     Command="{Binding OpenUrlCommand}"
                                     CommandParameter="{Binding GitHubText}"
                                     Style="{StaticResource ContactActionPillButtonStyle}">
                                     <TextBlock
                                         x:Name="mGitHubActionButtonTextBlock"
-                                        FontSize="{StaticResource SmallFontSize}"
+                                        FontSize="13"
                                         Text="{Binding OpenUrlButtonText}" />
                                 </Button>
                             </Grid>
 
                             <TextBlock
                                 x:Name="mPortfolioLabelTextBlock"
-                                Margin="{StaticResource SmallThickness}"
-                                Style="{StaticResource LabelTextBlockStyle}"
+                                Style="{StaticResource PageLabelTextBlockStyle}"
                                 Text="{Binding ResourcesService[LabelPortfolio]}" />
-                            <Grid x:Name="mPortfolioValueWithActionGrid" Margin="{StaticResource ExtraSmallThickness}">
+                            <Grid x:Name="mPortfolioValueWithActionGrid">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
@@ -295,160 +265,164 @@
                                 <TextBlock
                                     x:Name="mPortfolioValueTextBlock"
                                     Grid.Column="0"
-                                    Margin="0,0,10,0"
-                                    VerticalAlignment="Center"
-                                    Style="{StaticResource ValueTextBlockStyle}"
+                                    Style="{StaticResource ContactValueTextBlockStyle}"
                                     Text="{Binding PortfolioText}"
-                                    TextTrimming="CharacterEllipsis"
-                                    TextWrapping="NoWrap" />
+                                    ToolTip="{Binding PortfolioText}" />
                                 <Button
                                     x:Name="mPortfolioActionButton"
                                     Grid.Column="1"
+                                    AutomationProperties.LabeledBy="{Binding ElementName=mPortfolioLabelTextBlock}"
                                     Command="{Binding OpenUrlCommand}"
                                     CommandParameter="{Binding PortfolioText}"
                                     Style="{StaticResource ContactActionPillButtonStyle}">
                                     <TextBlock
                                         x:Name="mPortfolioActionButtonTextBlock"
-                                        FontSize="{StaticResource SmallFontSize}"
+                                        FontSize="13"
                                         Text="{Binding OpenUrlButtonText}" />
                                 </Button>
                             </Grid>
                         </StackPanel>
-
                     </Grid>
+                </Border>
+
+                <Grid x:Name="mOverviewSectionsGrid">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="32" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel
+                        x:Name="mOverviewPrimaryColumnStackPanel"
+                        Orientation="Vertical"
+                        Style="{StaticResource PrimaryColumnStyle}">
+                        <StackPanel
+                            x:Name="mSummaryStackPanel"
+                            Margin="0,0,0,32"
+                            Orientation="Vertical">
+                            <TextBlock
+                                x:Name="mSummaryTitleTextBlock"
+                                Style="{StaticResource PageSectionTitleTextBlockStyle}"
+                                Text="{Binding ResourcesService[SectionHeaderSummary]}" />
+                            <TextBlock
+                                x:Name="mSummaryBodyTextBlock"
+                                Style="{StaticResource PageBodyTextBlockStyle}"
+                                Text="{Binding SummaryText}" />
+                        </StackPanel>
+
+                        <StackPanel
+                            x:Name="mCoreSkillsStackPanel"
+                            Margin="0,0,0,32"
+                            Orientation="Vertical">
+                            <TextBlock
+                                x:Name="mCoreSkillsTitleTextBlock"
+                                Style="{StaticResource PageSectionTitleTextBlockStyle}"
+                                Text="{Binding ResourcesService[SectionHeaderCoreSkills]}" />
+
+                            <ItemsControl
+                                x:Name="mCoreSkillsItemsControl"
+                                Focusable="False"
+                                ItemsSource="{Binding CoreSkillsLines}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel
+                                            x:Name="mCoreSkillsDockPanel"
+                                            Margin="0,0,0,6"
+                                            LastChildFill="True">
+                                            <TextBlock
+                                                x:Name="mCoreSkillsBulletTextBlock"
+                                                DockPanel.Dock="Left"
+                                                Style="{StaticResource BulletGlyphTextBlockStyle}"
+                                                Text="{Binding DataContext.ResourcesService[GlyphBullet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                            <TextBlock
+                                                x:Name="mCoreSkillsTextBlock"
+                                                Style="{StaticResource PageBodyTextBlockStyle}"
+                                                Text="{Binding DisplayText}" />
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel
+                        x:Name="mOverviewSecondaryColumnStackPanel"
+                        Orientation="Vertical"
+                        Style="{StaticResource SummarySecondaryColumnStyle}">
+                        <StackPanel
+                            x:Name="mHighlightsStackPanel"
+                            Margin="0,0,0,32"
+                            Orientation="Vertical">
+                            <TextBlock
+                                x:Name="mHighlightsTitleTextBlock"
+                                Style="{StaticResource PageSectionTitleTextBlockStyle}"
+                                Text="{Binding ResourcesService[SectionHeaderHighlights]}" />
+
+                            <ItemsControl
+                                x:Name="mHighlightsItemsControl"
+                                Focusable="False"
+                                ItemsSource="{Binding Highlights}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel
+                                            x:Name="mHighlightDockPanel"
+                                            Margin="0,0,0,6"
+                                            LastChildFill="True">
+                                            <TextBlock
+                                                x:Name="mHighlightBulletTextBlock"
+                                                DockPanel.Dock="Left"
+                                                Style="{StaticResource BulletGlyphTextBlockStyle}"
+                                                Text="{Binding DataContext.ResourcesService[GlyphBullet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                            <TextBlock
+                                                x:Name="mHighlightTextBlock"
+                                                Style="{StaticResource PageBodyTextBlockStyle}"
+                                                Text="{Binding DisplayText}" />
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+
+                        <StackPanel
+                            x:Name="mDesignSystemStackPanel"
+                            Margin="0,0,0,32"
+                            Orientation="Vertical">
+                            <TextBlock
+                                x:Name="mDesignSystemTitleTextBlock"
+                                Style="{StaticResource PageSectionTitleTextBlockStyle}"
+                                Text="{Binding ResourcesService[SectionHeaderDesignSystem]}" />
+
+                            <ItemsControl
+                                x:Name="mDesignSystemItemsControl"
+                                Focusable="False"
+                                ItemsSource="{Binding DesignSystemPoints}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel
+                                            x:Name="mDesignSystemDockPanel"
+                                            Margin="0,0,0,6"
+                                            LastChildFill="True">
+                                            <TextBlock
+                                                x:Name="mDesignSystemBulletTextBlock"
+                                                DockPanel.Dock="Left"
+                                                Style="{StaticResource BulletGlyphTextBlockStyle}"
+                                                Text="{Binding DataContext.ResourcesService[GlyphBullet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                            <TextBlock
+                                                x:Name="mDesignSystemTextBlock"
+                                                Style="{StaticResource PageBodyTextBlockStyle}"
+                                                Text="{Binding DisplayText}" />
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </StackPanel>
                 </Grid>
-            </Border>
-
-            <Border
-                x:Name="mSummarySectionBorder"
-                Grid.Row="1"
-                Style="{StaticResource SubSectionCardBorderStyle}">
-                <StackPanel
-                    x:Name="mSummaryStackPanel"
-                    Margin="{StaticResource CommonThickness}"
-                    Orientation="Vertical">
-                    <TextBlock
-                        x:Name="mSummaryTitleTextBlock"
-                        Style="{StaticResource SectionTitleTextBlockStyle}"
-                        Text="{Binding ResourcesService[SectionHeaderSummary]}" />
-                    <TextBlock
-                        x:Name="mSummaryBodyTextBlock"
-                        Margin="{StaticResource SmallThickness}"
-                        Style="{StaticResource SectionBodyTextBlockStyle}"
-                        Text="{Binding SummaryText}" />
-                </StackPanel>
-            </Border>
-
-            <Border
-                x:Name="mHighlightsSectionBorder"
-                Grid.Row="3"
-                Style="{StaticResource SubSectionCardBorderStyle}">
-                <StackPanel
-                    x:Name="mHighlightsStackPanel"
-                    Margin="{StaticResource CommonThickness}"
-                    Orientation="Vertical">
-                    <TextBlock
-                        x:Name="mHighlightsTitleTextBlock"
-                        Style="{StaticResource SectionTitleTextBlockStyle}"
-                        Text="{Binding ResourcesService[SectionHeaderHighlights]}" />
-
-                    <ItemsControl
-                        x:Name="mHighlightsItemsControl"
-                        Margin="{StaticResource SmallThickness}"
-                        ItemsSource="{Binding Highlights}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <DockPanel x:Name="mHighlightDockPanel" LastChildFill="True">
-                                    <TextBlock
-                                        x:Name="mHighlightBulletTextBlock"
-                                        Margin="{StaticResource SmallLeftRightThickness}"
-                                        DockPanel.Dock="Left"
-                                        Opacity="{StaticResource CommonOpacity}"
-                                        Text="{Binding DataContext.ResourcesService[GlyphBullet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
-                                    <TextBlock
-                                        x:Name="mHighlightTextBlock"
-                                        Style="{StaticResource SectionBodyTextBlockStyle}"
-                                        Text="{Binding DisplayText}" />
-                                </DockPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-            </Border>
-
-            <Border
-                x:Name="mDesignSystemSectionBorder"
-                Grid.Row="4"
-                Style="{StaticResource SubSectionCardBorderStyle}">
-                <StackPanel
-                    x:Name="mDesignSystemStackPanel"
-                    Margin="{StaticResource CommonThickness}"
-                    Orientation="Vertical">
-                    <TextBlock
-                        x:Name="mDesignSystemTitleTextBlock"
-                        Style="{StaticResource SectionTitleTextBlockStyle}"
-                        Text="{Binding ResourcesService[SectionHeaderDesignSystem]}" />
-
-                    <ItemsControl
-                        x:Name="mDesignSystemItemsControl"
-                        Margin="{StaticResource SmallThickness}"
-                        ItemsSource="{Binding DesignSystemPoints}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <DockPanel x:Name="mDesignSystemDockPanel" LastChildFill="True">
-                                    <TextBlock
-                                        x:Name="mDesignSystemBulletTextBlock"
-                                        Margin="{StaticResource SmallLeftRightThickness}"
-                                        DockPanel.Dock="Left"
-                                        Opacity="{StaticResource CommonOpacity}"
-                                        Text="{Binding DataContext.ResourcesService[GlyphBullet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
-                                    <TextBlock
-                                        x:Name="mDesignSystemTextBlock"
-                                        Style="{StaticResource SectionBodyTextBlockStyle}"
-                                        Text="{Binding DisplayText}" />
-                                </DockPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-            </Border>
-
-            <Border
-                x:Name="mCoreSkillsSectionBorder"
-                Grid.Row="2"
-                Style="{StaticResource SubSectionCardBorderStyle}">
-                <StackPanel
-                    x:Name="mCoreSkillsStackPanel"
-                    Margin="{StaticResource CommonThickness}"
-                    Orientation="Vertical">
-                    <TextBlock
-                        x:Name="mCoreSkillsTitleTextBlock"
-                        Style="{StaticResource SectionTitleTextBlockStyle}"
-                        Text="{Binding ResourcesService[SectionHeaderCoreSkills]}" />
-
-                    <ItemsControl
-                        x:Name="mCoreSkillsItemsControl"
-                        Margin="{StaticResource SmallThickness}"
-                        ItemsSource="{Binding CoreSkillsLines}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <DockPanel x:Name="mCoreSkillsDockPanel" LastChildFill="True">
-                                    <TextBlock
-                                        x:Name="mCoreSkillsBulletTextBlock"
-                                        Margin="{StaticResource SmallLeftRightThickness}"
-                                        DockPanel.Dock="Left"
-                                        Opacity="{StaticResource CommonOpacity}"
-                                        Text="{Binding DataContext.ResourcesService[GlyphBullet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
-                                    <TextBlock
-                                        x:Name="mCoreSkillsTextBlock"
-                                        Style="{StaticResource SectionBodyTextBlockStyle}"
-                                        Text="{Binding DisplayText}" />
-                                </DockPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-            </Border>
+            </StackPanel>
         </Grid>
     </ScrollViewer>
 </UserControl>
