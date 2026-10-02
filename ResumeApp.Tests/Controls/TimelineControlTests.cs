@@ -1,12 +1,26 @@
 using System.Collections.ObjectModel;
+using System.Reflection;
+using System.Windows.Input;
 using ResumeApp.Controls;
 using ResumeApp.Models;
+using ResumeApp.Services;
+using ResumeApp.Tests.Services;
 using Xunit;
 
 namespace ResumeApp.Tests.Controls;
 
+[Collection( MotionPolicyCollection.Name )]
 public sealed class TimelineControlTests
 {
+    private static FieldInfo GetField( string pName ) =>
+        typeof( TimelineControl ).GetField( pName, BindingFlags.Instance | BindingFlags.NonPublic )!;
+
+    private static void SetField( TimelineControl pControl, string pName, object pValue ) =>
+        GetField( pName ).SetValue( pControl, pValue );
+
+    private static bool GetBoolField( TimelineControl pControl, string pName ) =>
+        ( bool )GetField( pName ).GetValue( pControl )!;
+
     [StaFact]
     public void Constructor_DoesNotThrow()
     {
@@ -157,5 +171,92 @@ public sealed class TimelineControlTests
         lControl.TodayMarkerText = null!;
 
         Assert.Equal( "Today", lControl.TodayMarkerText );
+    }
+
+    [StaFact]
+    public void FocusVisualStyle_IsNull()
+    {
+        var lControl = new TimelineControl();
+
+        Assert.Null( lControl.FocusVisualStyle );
+        Assert.True( lControl.Focusable );
+    }
+
+    [StaFact]
+    public void LostMouseCapture_DuringDrag_ResetsPointerAndInertiaState()
+    {
+        var lControl = new TimelineControl();
+        SetField( lControl, "mIsPointerDown", true );
+        SetField( lControl, "mHasDragged", true );
+        SetField( lControl, "mHasPendingPan", true );
+        SetField( lControl, "mIsInertiaActive", true );
+
+        lControl.RaiseEvent( new MouseEventArgs( Mouse.PrimaryDevice, Environment.TickCount )
+        {
+            RoutedEvent = Mouse.LostMouseCaptureEvent
+        } );
+
+        Assert.False( GetBoolField( lControl, "mIsPointerDown" ) );
+        Assert.False( GetBoolField( lControl, "mHasDragged" ) );
+        Assert.False( GetBoolField( lControl, "mHasPendingPan" ) );
+        Assert.False( GetBoolField( lControl, "mIsInertiaActive" ) );
+    }
+
+    [StaFact]
+    public void LostMouseCapture_WithoutDrag_KeepsInertiaState()
+    {
+        var lControl = new TimelineControl();
+        SetField( lControl, "mIsInertiaActive", true );
+
+        lControl.RaiseEvent( new MouseEventArgs( Mouse.PrimaryDevice, Environment.TickCount )
+        {
+            RoutedEvent = Mouse.LostMouseCaptureEvent
+        } );
+
+        Assert.True( GetBoolField( lControl, "mIsInertiaActive" ) );
+    }
+
+    [StaFact]
+    public void StartInertia_WhenMotionReduced_DoesNotActivateInertia()
+    {
+        try
+        {
+            var lControl = new TimelineControl();
+            MethodInfo lStartInertia = typeof( TimelineControl ).GetMethod( "StartInertiaIfPossible", BindingFlags.Instance | BindingFlags.NonPublic )!;
+
+            SetField( lControl, "mIsInertiaActive", true );
+            MotionPolicy.SetAnimationEnabledOverride( true );
+            lStartInertia.Invoke( lControl, null );
+
+            Assert.True( GetBoolField( lControl, "mIsInertiaActive" ) );
+
+            MotionPolicy.SetAnimationEnabledOverride( false );
+            lStartInertia.Invoke( lControl, null );
+
+            Assert.False( GetBoolField( lControl, "mIsInertiaActive" ) );
+        }
+        finally
+        {
+            MotionPolicy.SetAnimationEnabledOverride( null );
+        }
+    }
+
+    [StaFact]
+    public void ThemeServiceSubscription_FollowsLoadedAndUnloadedLifecycle()
+    {
+        _ = new ThemeService();
+
+        var lControl = new TimelineControl();
+        FieldInfo lSubscribedField = GetField( "mSubscribedThemeService" );
+        MethodInfo lSubscribe = typeof( TimelineControl ).GetMethod( "SubscribeToThemeService", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        MethodInfo lUnsubscribe = typeof( TimelineControl ).GetMethod( "UnsubscribeFromThemeService", BindingFlags.Instance | BindingFlags.NonPublic )!;
+
+        lSubscribe.Invoke( lControl, null );
+
+        Assert.Same( ThemeService.Instance, lSubscribedField.GetValue( lControl ) );
+
+        lUnsubscribe.Invoke( lControl, null );
+
+        Assert.Null( lSubscribedField.GetValue( lControl ) );
     }
 }

@@ -3,8 +3,10 @@
 
 using System.Diagnostics.CodeAnalysis;
 using ResumeApp.Models;
+using ResumeApp.Services;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -278,6 +280,8 @@ namespace ResumeApp.Controls
 
 		private bool mIsRenderingSubscribed;
 
+		private ThemeService? mSubscribedThemeService;
+
 		private bool mHasPendingPan;
 		private double mPendingPanPointerX;
 		private DateTime mPendingPanTimestampUtc;
@@ -364,6 +368,7 @@ namespace ResumeApp.Controls
 			mFormattedTextCache = new Dictionary<FormattedTextCacheKey, FormattedText>();
 
 			Focusable = true;
+			FocusVisualStyle = null;
 			ClipToBounds = true;
 
 			Loaded += OnLoaded;
@@ -1118,6 +1123,46 @@ namespace ResumeApp.Controls
 			}
 		}
 
+		protected override void OnLostMouseCapture( MouseEventArgs pEventArgs )
+		{
+			base.OnLostMouseCapture( pEventArgs );
+
+			if ( !mIsPointerDown )
+			{
+				return;
+			}
+
+			mIsPointerDown = false;
+			mHasDragged = false;
+			mHasPendingPan = false;
+			mIsInertiaActive = false;
+			mPointerDownTimeFrameItem = null;
+			mPanSamples.Clear();
+
+			if ( IsMouseOver )
+			{
+				UpdateCursorAtPosition( Mouse.GetPosition( this ) );
+			}
+			else
+			{
+				SetCursorIsHand( false );
+			}
+
+			UpdateRenderingSubscriptionIfNeeded();
+		}
+
+		protected override void OnGotKeyboardFocus( KeyboardFocusChangedEventArgs pEventArgs )
+		{
+			base.OnGotKeyboardFocus( pEventArgs );
+			InvalidateVisual();
+		}
+
+		protected override void OnLostKeyboardFocus( KeyboardFocusChangedEventArgs pEventArgs )
+		{
+			base.OnLostKeyboardFocus( pEventArgs );
+			InvalidateVisual();
+		}
+
 		protected override void OnKeyDown( KeyEventArgs pEventArgs )
 		{
 			base.OnKeyDown( pEventArgs );
@@ -1560,13 +1605,51 @@ namespace ResumeApp.Controls
 
 		private void OnLoaded( object pSender, RoutedEventArgs pEventArgs )
 		{
+			SubscribeToThemeService();
 			EnsureInitialFitIfNeeded();
 			UpdateRenderingSubscriptionIfNeeded();
 			InvalidateVisual();
 		}
 
+		private void SubscribeToThemeService()
+		{
+			ThemeService? lThemeService = ThemeService.Instance;
+			if ( lThemeService is null || ReferenceEquals( lThemeService, mSubscribedThemeService ) )
+			{
+				return;
+			}
+
+			UnsubscribeFromThemeService();
+
+			mSubscribedThemeService = lThemeService;
+			mSubscribedThemeService.PropertyChanged += OnThemeServicePropertyChanged;
+		}
+
+		private void UnsubscribeFromThemeService()
+		{
+			if ( mSubscribedThemeService is null )
+			{
+				return;
+			}
+
+			mSubscribedThemeService.PropertyChanged -= OnThemeServicePropertyChanged;
+			mSubscribedThemeService = null;
+		}
+
+		private void OnThemeServicePropertyChanged( object? pSender, PropertyChangedEventArgs pEventArgs )
+		{
+			if ( !string.IsNullOrEmpty( pEventArgs.PropertyName ) && pEventArgs.PropertyName != nameof( ThemeService.ActiveTheme ) )
+			{
+				return;
+			}
+
+			InvalidateVisual();
+		}
+
 		private void OnUnloaded( object pSender, RoutedEventArgs pEventArgs )
 		{
+			UnsubscribeFromThemeService();
+
 			if ( mIsRenderingSubscribed )
 			{
 				CompositionTarget.Rendering -= OnCompositionTargetRendering;
@@ -1597,6 +1680,11 @@ namespace ResumeApp.Controls
 
 			var lDeltaSeconds = Math.Max( 0.0, ( lNowUtc - mLastRenderTick ).TotalSeconds );
 			mLastRenderTick = lNowUtc;
+
+			if ( mIsInertiaActive && !MotionPolicy.IsAnimationEnabled )
+			{
+				mIsInertiaActive = false;
+			}
 
 			if ( mIsFitAnimationActive )
 			{
@@ -1660,6 +1748,12 @@ namespace ResumeApp.Controls
 
 		private void StartInertiaIfPossible()
 		{
+			if ( !MotionPolicy.IsAnimationEnabled )
+			{
+				mIsInertiaActive = false;
+				return;
+			}
+
 			var lNowUtc = DateTime.UtcNow;
 
 			var lSamples = mPanSamples

@@ -35,11 +35,7 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="999"
-                            RenderTransformOrigin="0.5,0.5"
                             SnapsToDevicePixels="True">
-                            <Border.RenderTransform>
-                                <ScaleTransform x:Name="mNavigationButtonScaleTransform" ScaleX="1" ScaleY="1" />
-                            </Border.RenderTransform>
 
                             <ContentPresenter
                                 Margin="{TemplateBinding Padding}"
@@ -49,56 +45,6 @@
 
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation
-                                                Storyboard.TargetName="mNavigationButtonScaleTransform"
-                                                Storyboard.TargetProperty="ScaleX"
-                                                To="1.06"
-                                                Duration="0:0:0.12">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <CubicEase EasingMode="EaseOut" />
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                            <DoubleAnimation
-                                                Storyboard.TargetName="mNavigationButtonScaleTransform"
-                                                Storyboard.TargetProperty="ScaleY"
-                                                To="1.06"
-                                                Duration="0:0:0.12">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <CubicEase EasingMode="EaseOut" />
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
-
-                                <Trigger.ExitActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation
-                                                Storyboard.TargetName="mNavigationButtonScaleTransform"
-                                                Storyboard.TargetProperty="ScaleX"
-                                                To="1"
-                                                Duration="0:0:0.16">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <CubicEase EasingMode="EaseOut" />
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                            <DoubleAnimation
-                                                Storyboard.TargetName="mNavigationButtonScaleTransform"
-                                                Storyboard.TargetProperty="ScaleY"
-                                                To="1"
-                                                Duration="0:0:0.16">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <CubicEase EasingMode="EaseOut" />
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.ExitActions>
-
                                 <Setter TargetName="mNavigationButtonBorder" Property="BorderBrush" Value="{DynamicResource CommonBrush}" />
                                 <Setter Property="Opacity" Value="1" />
                             </Trigger>
@@ -136,62 +82,9 @@
                             Background="{DynamicResource CommonWhiteBrush}"
                             CornerRadius="999"
                             Opacity="0.88"
-                            RenderTransformOrigin="0.5,0.5"
-                            SnapsToDevicePixels="True">
-                            <Border.RenderTransform>
-                                <ScaleTransform x:Name="mDotScaleTransform" ScaleX="1" ScaleY="1" />
-                            </Border.RenderTransform>
-                        </Border>
+                            SnapsToDevicePixels="True" />
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation
-                                                Storyboard.TargetName="mDotScaleTransform"
-                                                Storyboard.TargetProperty="ScaleX"
-                                                To="1.35"
-                                                Duration="0:0:0.12">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <CubicEase EasingMode="EaseOut" />
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                            <DoubleAnimation
-                                                Storyboard.TargetName="mDotScaleTransform"
-                                                Storyboard.TargetProperty="ScaleY"
-                                                To="1.35"
-                                                Duration="0:0:0.12">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <CubicEase EasingMode="EaseOut" />
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
-                                <Trigger.ExitActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation
-                                                Storyboard.TargetName="mDotScaleTransform"
-                                                Storyboard.TargetProperty="ScaleX"
-                                                To="1"
-                                                Duration="0:0:0.16">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <CubicEase EasingMode="EaseOut" />
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                            <DoubleAnimation
-                                                Storyboard.TargetName="mDotScaleTransform"
-                                                Storyboard.TargetProperty="ScaleY"
-                                                To="1"
-                                                Duration="0:0:0.16">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <CubicEase EasingMode="EaseOut" />
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.ExitActions>
                                 <Setter TargetName="mDotBorder" Property="Opacity" Value="0.95" />
                             </Trigger>
 
@@ -447,6 +340,7 @@
                             x:Name="mPreviousButton"
                             Margin="12,0,0,0"
                             HorizontalAlignment="Left"
+                            AutomationProperties.Name="{Binding ResourcesService[AutomationCarouselPrevious], ElementName=mProjectImageCarouselControlRoot}"
                             Click="OnPreviousButtonClick"
                             Style="{StaticResource ButtonStyle}">
                             <Path
@@ -466,6 +360,7 @@
                             Grid.Column="2"
                             Margin="0,0,12,0"
                             HorizontalAlignment="Right"
+                            AutomationProperties.Name="{Binding ResourcesService[AutomationCarouselNext], ElementName=mProjectImageCarouselControlRoot}"
                             Click="OnNextButtonClick"
                             Style="{StaticResource ButtonStyle}">
                             <Path

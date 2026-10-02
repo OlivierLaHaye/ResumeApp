@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using ResumeApp.Services;
 
 namespace ResumeApp.Behaviors;
 
@@ -26,6 +27,8 @@ public static class ExperienceTimelineScrollSyncBehavior
 	{
 		public PropertyInfo? PropertyInfo { get; } = pPropertyInfo;
 	}
+
+	private const int ScrollAnimationMilliseconds = 220;
 
 	public static readonly DependencyProperty sIsEnabledProperty =
 		DependencyProperty.RegisterAttached(
@@ -435,7 +438,9 @@ public static class ExperienceTimelineScrollSyncBehavior
 			return;
 		}
 
-		ScrollViewerAnimatedOffsetBehavior.AnimateVerticalOffset( pScrollViewer, lTargetOffset, 220 );
+		int lDurationMilliseconds = ( int )MotionPolicy.GetDuration( TimeSpan.FromMilliseconds( ScrollAnimationMilliseconds ) ).TimeSpan.TotalMilliseconds;
+
+		ScrollViewerAnimatedOffsetBehavior.AnimateVerticalOffset( pScrollViewer, lTargetOffset, lDurationMilliseconds );
 	}
 
 	private static bool TryGetContainer( ItemsControl pItemsControl, object pItem, out FrameworkElement pContainer )

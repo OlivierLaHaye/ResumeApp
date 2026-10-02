@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
+using ResumeApp.Services;
 
 namespace ResumeApp.Behaviors
 {
@@ -27,9 +28,11 @@ namespace ResumeApp.Behaviors
 
 			double lClampedTargetOffset = Math.Max( 0d, Math.Min( pTargetVerticalOffset, pScrollViewer.ScrollableHeight ) );
 
-			if ( pDurationMilliseconds <= 0 )
+			Duration lDuration = MotionPolicy.GetDuration( TimeSpan.FromMilliseconds( Math.Max( 0, pDurationMilliseconds ) ) );
+
+			if ( lDuration.TimeSpan <= TimeSpan.Zero )
 			{
-				SetAnimatedVerticalOffset( pScrollViewer, lClampedTargetOffset );
+				SnapToOffset( pScrollViewer, lClampedTargetOffset );
 				return;
 			}
 
@@ -37,7 +40,7 @@ namespace ResumeApp.Behaviors
 
 			if ( Math.Abs( lCurrentOffset - lClampedTargetOffset ) < 0.5d )
 			{
-				SetAnimatedVerticalOffset( pScrollViewer, lClampedTargetOffset );
+				SnapToOffset( pScrollViewer, lClampedTargetOffset );
 				return;
 			}
 
@@ -47,7 +50,7 @@ namespace ResumeApp.Behaviors
 			{
 				From = lCurrentOffset,
 				To = lClampedTargetOffset,
-				Duration = TimeSpan.FromMilliseconds( pDurationMilliseconds ),
+				Duration = lDuration,
 				EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
 				FillBehavior = FillBehavior.Stop
 			};
@@ -58,6 +61,12 @@ namespace ResumeApp.Behaviors
 			};
 
 			pScrollViewer.BeginAnimation( sAnimatedVerticalOffsetProperty, lAnimation, HandoffBehavior.SnapshotAndReplace );
+		}
+
+		private static void SnapToOffset( ScrollViewer pScrollViewer, double pOffset )
+		{
+			pScrollViewer.BeginAnimation( sAnimatedVerticalOffsetProperty, null );
+			SetAnimatedVerticalOffset( pScrollViewer, pOffset );
 		}
 
 		private static void SetAnimatedVerticalOffset( DependencyObject pElement, double pValue ) => pElement.SetValue( sAnimatedVerticalOffsetProperty, pValue );

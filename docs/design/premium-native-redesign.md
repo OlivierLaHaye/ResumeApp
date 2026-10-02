@@ -77,7 +77,7 @@ No ambient loops, autoplay, cursor followers, parallax or glow.
 
 - Tab order: identity row controls → caption buttons → section tabs → page content.
 - Section tabs: arrow keys / Ctrl+Tab switch sections; focus ring is visible immediately.
-- Carousel: focusable; Left/Right/Home/End change image, Enter opens the viewer; previous, next and enlarge buttons are focusable with localized automation names; the position is announced as "Image n of m".
+- Carousel: focusable; Left/Right/Home/End change image; previous and next buttons are focusable with localized automation names; Enter or a double-click opens the viewer (no separate enlarge button); the position is announced as "Image n of m".
 - Viewer: opens focused; Left/Right navigate; Escape closes; focus returns to the opening carousel with the same image selected.
 - Timeline: existing Home/End/arrow/Ctrl contract is preserved; a single focus outline is drawn and refreshed on focus change.
 - Contact and project link buttons are focusable.

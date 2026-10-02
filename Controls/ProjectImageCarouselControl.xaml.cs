@@ -14,12 +14,12 @@ using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace ResumeApp.Controls
@@ -38,6 +38,10 @@ namespace ResumeApp.Controls
 
 		private const string HintProjectImageCarouselExpandAndDragResourceKey = "HintProjectImageCarouselExpandAndDrag";
 		private const string HintProjectImageCarouselDragOnlyResourceKey = "HintProjectImageCarouselDragOnly";
+		private const string AutomationCarouselImagePositionResourceKey = "AutomationCarouselImagePosition";
+
+		private const int MaximumCachedImageSources = 64;
+		private const int TransitionDurationMilliseconds = 220;
 
 		public static readonly DependencyProperty sImagesProperty =
 			DependencyProperty.Register(
@@ -74,8 +78,16 @@ namespace ResumeApp.Controls
 				typeof( ProjectImageCarouselControl ),
 				new FrameworkPropertyMetadata( false, OnIsOpenOnClickEnabledChanged ) );
 
+		public static readonly DependencyProperty sResourcesServiceProperty =
+			DependencyProperty.Register(
+				nameof( ResourcesService ),
+				typeof( ResourcesService ),
+				typeof( ProjectImageCarouselControl ),
+				new FrameworkPropertyMetadata( null, OnResourcesServiceChanged ) );
+
 		private static readonly Dictionary<string, ImageSource> sCachedImageSourcesByUri = new( StringComparer.OrdinalIgnoreCase );
-		private static readonly TimeSpan sTransitionDuration = TimeSpan.FromMilliseconds( 240 );
+		private static readonly Queue<string> sCachedImageSourceUriOrder = new();
+		private static readonly TimeSpan sTransitionDuration = TimeSpan.FromMilliseconds( TransitionDurationMilliseconds );
 		private static readonly ResourceManager sFallbackResourceManager = CreateFallbackResourceManager();
 		private static readonly ConditionalWeakTable<Type, ResourcesServicePropertyCacheEntry> sResourcesServicePropertyByType = new();
 
@@ -98,6 +110,7 @@ namespace ResumeApp.Controls
 		private bool mHasPendingImagesCollectionRefresh;
 
 		private ResourcesService? mResourcesServiceForHint;
+		private ProjectImageViewerWindow? mOpenViewerWindow;
 
 		public IList? Images
 		{
@@ -127,6 +140,18 @@ namespace ResumeApp.Controls
 		{
 			get => ( bool )GetValue( sIsOpenOnClickEnabledProperty );
 			set => SetValue( sIsOpenOnClickEnabledProperty, value );
+		}
+
+		public ResourcesService? ResourcesService
+		{
+			get => GetValue( sResourcesServiceProperty ) as ResourcesService;
+			set => SetValue( sResourcesServiceProperty, value );
+		}
+
+		public Func<int, ImageSource?>? DisplayImageProvider
+		{
+			get;
+			set;
 		}
 
 		public ProjectImageCarouselControl()
@@ -203,6 +228,18 @@ namespace ResumeApp.Controls
 			lControl.RefreshVisualsAndCursor( false );
 		}
 
+		private static void OnResourcesServiceChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
+		{
+			if ( pDependencyObject is not ProjectImageCarouselControl lControl )
+			{
+				return;
+			}
+
+			lControl.AttachToResourcesService();
+			lControl.UpdateHintText();
+			lControl.UpdateAutomationName();
+		}
+
 		private static void OnSelectedIndexChanged( DependencyObject pDependencyObject, DependencyPropertyChangedEventArgs pEventArgs )
 		{
 			if ( pDependencyObject is not ProjectImageCarouselControl lControl || lControl.mIsUpdatingSelectedIndexInternally )
@@ -275,33 +312,38 @@ namespace ResumeApp.Controls
 				return lCachedImageSource;
 			}
 
-			ImageSource? lCreatedImageSource = null;
-
-			try
+			if ( !Uri.TryCreate( lUriText, UriKind.RelativeOrAbsolute, out Uri? lUri ) )
 			{
-				var lBitmapImage = new BitmapImage();
-				lBitmapImage.BeginInit();
-				lBitmapImage.UriSource = new Uri( lUriText, UriKind.RelativeOrAbsolute );
-				lBitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-				lBitmapImage.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-				lBitmapImage.EndInit();
-				lBitmapImage.Freeze();
-
-				lCreatedImageSource = lBitmapImage;
-			}
-			catch ( Exception )
-			{
-				// ignored
+				return null;
 			}
 
+			ImageSource? lCreatedImageSource = ImageDecodeService.TryCreatePreviewImage( lUri );
 			if ( lCreatedImageSource is null )
 			{
 				return null;
 			}
 
-			sCachedImageSourcesByUri[ lUriText ] = lCreatedImageSource;
+			AddToImageSourceCache( lUriText, lCreatedImageSource );
 			return lCreatedImageSource;
 		}
+
+		private static void AddToImageSourceCache( string pUriText, ImageSource pImageSource )
+		{
+			if ( !sCachedImageSourcesByUri.ContainsKey( pUriText ) )
+			{
+				while ( sCachedImageSourcesByUri.Count >= MaximumCachedImageSources && sCachedImageSourceUriOrder.Count > 0 )
+				{
+					sCachedImageSourcesByUri.Remove( sCachedImageSourceUriOrder.Dequeue() );
+				}
+
+				sCachedImageSourceUriOrder.Enqueue( pUriText );
+			}
+
+			sCachedImageSourcesByUri[ pUriText ] = pImageSource;
+		}
+
+		private static bool IsModifierKeyActive( ModifierKeys pModifiers ) =>
+			( pModifiers & ( ModifierKeys.Control | ModifierKeys.Alt | ModifierKeys.Windows ) ) != ModifierKeys.None;
 
 		private static bool IsDescendantOf( DependencyObject? pElement, DependencyObject? pPotentialAncestor )
 		{
@@ -543,6 +585,7 @@ namespace ResumeApp.Controls
 		{
 			AttachToResourcesService();
 			UpdateHintText();
+			UpdateAutomationName();
 		}
 
 		private void RefreshVisualsAndCursor( bool pIsAnimated )
@@ -585,10 +628,17 @@ namespace ResumeApp.Controls
 			}
 
 			UpdateHintText();
+			UpdateAutomationName();
 		}
 
 		private ResourcesService? TryResolveResourcesService()
 		{
+			ResourcesService? lFromProperty = ResourcesService;
+			if ( lFromProperty != null )
+			{
+				return lFromProperty;
+			}
+
 			ResourcesService? lFromSelf = ExtractResourcesServiceFromDataContext( DataContext );
 			if ( lFromSelf != null )
 			{
@@ -727,7 +777,41 @@ namespace ResumeApp.Controls
 			mNextButton.IsEnabled = lHasMultipleImages;
 
 			UpdateHintText();
+			UpdateAutomationName();
 			UpdateCarouselVisualState( pIsAnimated );
+		}
+
+		private void UpdateAutomationName()
+		{
+			int lImageCount = GetImageCount();
+			if ( lImageCount <= 0 )
+			{
+				AutomationProperties.SetName( this, PlaceholderText ?? string.Empty );
+				return;
+			}
+
+			string lTemplate = GetTextFromResources( AutomationCarouselImagePositionResourceKey );
+			if ( string.IsNullOrWhiteSpace( lTemplate ) )
+			{
+				AutomationProperties.SetName( this, string.Empty );
+				return;
+			}
+
+			int lPosition = Math.Clamp( SelectedIndex, 0, lImageCount - 1 ) + 1;
+			CultureInfo lCulture = mResourcesServiceForHint?.ActiveCulture ?? CultureInfo.CurrentUICulture;
+
+			string lName;
+
+			try
+			{
+				lName = string.Format( lCulture, lTemplate, lPosition, lImageCount );
+			}
+			catch ( FormatException )
+			{
+				lName = string.Empty;
+			}
+
+			AutomationProperties.SetName( this, lName );
 		}
 
 		private void UpdateHintText()
@@ -741,6 +825,7 @@ namespace ResumeApp.Controls
 			{
 				mHintTextBlock.Text = string.Empty;
 				mHintStackPanel.Visibility = Visibility.Collapsed;
+				AutomationProperties.SetHelpText( this, string.Empty );
 				return;
 			}
 
@@ -753,11 +838,13 @@ namespace ResumeApp.Controls
 			{
 				mHintTextBlock.Text = string.Empty;
 				mHintStackPanel.Visibility = Visibility.Collapsed;
+				AutomationProperties.SetHelpText( this, string.Empty );
 				return;
 			}
 
 			mHintTextBlock.Text = lHintText;
 			mHintStackPanel.Visibility = Visibility.Visible;
+			AutomationProperties.SetHelpText( this, lHintText );
 		}
 
 		private string GetTextFromResources( string pResourceKey )
@@ -847,8 +934,11 @@ namespace ResumeApp.Controls
 				return null;
 			}
 
-			return ConvertToImageSource( lImages[ lWrappedIndex ] );
+			ImageSource? lOverrideImageSource = DisplayImageProvider?.Invoke( lWrappedIndex );
+			return lOverrideImageSource ?? ConvertToImageSource( lImages[ lWrappedIndex ] );
 		}
+
+		public void RefreshDisplayedImages() => UpdateCarouselVisualState( false );
 
 		private void SetSlotState( Image? pImage, ImageSource? pImageSource, int pStep, int pDirection, double pContainerWidth, bool pIsAnimated, int pZIndex )
 		{
@@ -883,7 +973,8 @@ namespace ResumeApp.Controls
 
 		private void ApplyDouble( DependencyObject pTarget, DependencyProperty pProperty, double pToValue, bool pIsAnimated )
 		{
-			if ( !pIsAnimated )
+			Duration lDuration = MotionPolicy.GetDuration( sTransitionDuration );
+			if ( !pIsAnimated || lDuration.TimeSpan <= TimeSpan.Zero )
 			{
 				StopAndSet( pTarget, pProperty, pToValue );
 				return;
@@ -897,7 +988,7 @@ namespace ResumeApp.Controls
 			var lDoubleAnimation = new DoubleAnimation
 			{
 				To = pToValue,
-				Duration = new Duration( sTransitionDuration ),
+				Duration = lDuration,
 				EasingFunction = mCarouselEasingFunction
 			};
 
@@ -956,8 +1047,16 @@ namespace ResumeApp.Controls
 			return new ObservableCollection<ImageSource>( lImageSources );
 		}
 
+		private bool CanOpenViewer() => !IsFullscreen && GetImageCount() > 0;
+
 		private void OpenViewerWindow()
 		{
+			if ( mOpenViewerWindow != null )
+			{
+				mOpenViewerWindow.Activate();
+				return;
+			}
+
 			Window? lOwnerWindow = Window.GetWindow( this );
 			ObservableCollection<ImageSource> lImages = BuildViewerImages();
 
@@ -965,16 +1064,137 @@ namespace ResumeApp.Controls
 			{
 				Owner = lOwnerWindow,
 				Images = lImages,
-				SelectedIndex = SelectedIndex
+				SelectedIndex = SelectedIndex,
+				ResourcesService = mResourcesServiceForHint
 			};
 
+			lViewerWindow.Closed += OnViewerWindowClosed;
+			mOpenViewerWindow = lViewerWindow;
+
 			lViewerWindow.Show();
+		}
+
+		private void OnViewerWindowClosed( object? pSender, EventArgs pEventArgs )
+		{
+			if ( pSender is not ProjectImageViewerWindow lViewerWindow )
+			{
+				return;
+			}
+
+			lViewerWindow.Closed -= OnViewerWindowClosed;
+			mOpenViewerWindow = null;
+
+			int lLastIndex = lViewerWindow.SelectedIndex;
+			if ( lLastIndex >= 0 && lLastIndex < GetImageCount() && lLastIndex != SelectedIndex )
+			{
+				SelectedIndex = lLastIndex;
+			}
+
+			Dispatcher.BeginInvoke(
+				DispatcherPriority.ApplicationIdle,
+				new Action( RestoreFocusAfterViewerClosed ) );
+		}
+
+		private void RestoreFocusAfterViewerClosed()
+		{
+			if ( !IsLoaded || mOpenViewerWindow != null )
+			{
+				return;
+			}
+
+			if ( Window.GetWindow( this ) is { IsActive: true } )
+			{
+				Focus();
+			}
 		}
 
 		private void OnMediaRootGridSizeChanged( object? pSender, SizeChangedEventArgs pEventArgs )
 		{
 			UpdateCarouselVisualState( false );
 			UpdateHoverCursorFromMouse();
+		}
+
+		protected override void OnKeyDown( KeyEventArgs pEventArgs )
+		{
+			base.OnKeyDown( pEventArgs );
+
+			if ( pEventArgs.Handled )
+			{
+				return;
+			}
+
+			if ( TryHandleKey( pEventArgs.Key, Keyboard.Modifiers, pEventArgs.OriginalSource as DependencyObject ) )
+			{
+				pEventArgs.Handled = true;
+			}
+		}
+
+		internal bool TryHandleKey( Key pKey, ModifierKeys pModifiers, DependencyObject? pOriginalSource )
+		{
+			if ( IsModifierKeyActive( pModifiers ) )
+			{
+				return false;
+			}
+
+			int lImageCount = GetImageCount();
+
+			switch ( pKey )
+			{
+				case Key.Left:
+					{
+						if ( lImageCount <= 1 )
+						{
+							return false;
+						}
+
+						NavigatePrevious();
+						return true;
+					}
+				case Key.Right:
+					{
+						if ( lImageCount <= 1 )
+						{
+							return false;
+						}
+
+						NavigateNext();
+						return true;
+					}
+				case Key.Home:
+					{
+						if ( lImageCount <= 1 )
+						{
+							return false;
+						}
+
+						SelectedIndex = 0;
+						return true;
+					}
+				case Key.End:
+					{
+						if ( lImageCount <= 1 )
+						{
+							return false;
+						}
+
+						SelectedIndex = lImageCount - 1;
+						return true;
+					}
+				case Key.Enter:
+					{
+						if ( !CanOpenViewer() || FindAncestor<ButtonBase>( pOriginalSource ) != null )
+						{
+							return false;
+						}
+
+						OpenViewerWindow();
+						return true;
+					}
+				default:
+					{
+						return false;
+					}
+			}
 		}
 
 		private void OnRootPreviewMouseWheel( object? pSender, MouseWheelEventArgs pMouseWheelEventArgs )
@@ -988,8 +1208,7 @@ namespace ResumeApp.Controls
 		{
 			if ( pMouseButtonEventArgs is null
 				|| pMouseButtonEventArgs.ChangedButton != MouseButton.Left
-				|| IsFullscreen
-				|| GetImageCount() <= 0
+				|| !CanOpenViewer()
 				|| mIsDragInProgress
 				|| mHasViewerOpenSuppressedDueToDragNavigation
 				|| mHasNavigatedDuringDrag
