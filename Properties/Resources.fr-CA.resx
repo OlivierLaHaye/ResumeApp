@@ -82,6 +82,36 @@
   <data name="AppTitle" xml:space="preserve">
     <value>Curriculum vitae</value>
   </data>
+  <data name="AutomationCarouselImagePosition" xml:space="preserve">
+    <value>Image {0} sur {1}</value>
+  </data>
+  <data name="AutomationCarouselNext" xml:space="preserve">
+    <value>Image suivante</value>
+  </data>
+  <data name="AutomationCarouselOpen" xml:space="preserve">
+    <value>Agrandir l’image</value>
+  </data>
+  <data name="AutomationCarouselPrevious" xml:space="preserve">
+    <value>Image précédente</value>
+  </data>
+  <data name="AutomationMainNavigation" xml:space="preserve">
+    <value>Sections du CV</value>
+  </data>
+  <data name="AutomationViewerClose" xml:space="preserve">
+    <value>Fermer la visionneuse</value>
+  </data>
+  <data name="AutomationWindowClose" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="AutomationWindowMaximize" xml:space="preserve">
+    <value>Agrandir</value>
+  </data>
+  <data name="AutomationWindowMinimize" xml:space="preserve">
+    <value>Réduire</value>
+  </data>
+  <data name="AutomationWindowRestore" xml:space="preserve">
+    <value>Restaurer</value>
+  </data>
   <data name="ButtonCopyEmail" xml:space="preserve">
     <value>Copier le courriel</value>
   </data>
@@ -532,6 +562,15 @@
   <data name="LabelGitHub" xml:space="preserve">
     <value>GitHub</value>
   </data>
+  <data name="LabelImagesLoadFailed" xml:space="preserve">
+    <value>Impossible de charger les images.</value>
+  </data>
+  <data name="LabelImagesLoading" xml:space="preserve">
+    <value>Chargement des images…</value>
+  </data>
+  <data name="LabelLanguage" xml:space="preserve">
+    <value>Langue</value>
+  </data>
   <data name="LabelLinkedIn" xml:space="preserve">
     <value>LinkedIn</value>
   </data>
@@ -565,6 +604,9 @@
   <data name="LabelProjectLinks" xml:space="preserve">
     <value>Liens</value>
   </data>
+  <data name="LabelProjectNoImagesYet" xml:space="preserve">
+    <value>Aucune image pour l’instant.</value>
+  </data>
   <data name="LabelProjectWhatIBuilt" xml:space="preserve">
     <value>Ce que j’ai fait</value>
   </data>
@@ -582,6 +624,9 @@
   </data>
   <data name="LabelTech" xml:space="preserve">
     <value>Tech</value>
+  </data>
+  <data name="LabelTheme" xml:space="preserve">
+    <value>Thème</value>
   </data>
   <data name="LabelWorkPreference" xml:space="preserve">
     <value>Préférence de travail</value>
@@ -733,6 +778,18 @@
   <data name="SectionHeaderWorkPreferences" xml:space="preserve">
     <value>Préférences de travail</value>
   </data>
+  <data name="SegmentLanguageEnglishShort" xml:space="preserve">
+    <value>EN</value>
+  </data>
+  <data name="SegmentLanguageFrenchShort" xml:space="preserve">
+    <value>FR</value>
+  </data>
+  <data name="SegmentThemeDark" xml:space="preserve">
+    <value>Sombre</value>
+  </data>
+  <data name="SegmentThemeLight" xml:space="preserve">
+    <value>Clair</value>
+  </data>
   <data name="SkillsPageSubtitle" xml:space="preserve">
     <value>Groupes de compétences axés sur l’UI desktop, le design system et la livraison WPF.</value>
   </data>
@@ -820,6 +877,12 @@
   <data name="SkillsSectionWpfTitle" xml:space="preserve">
     <value>WPF et MVVM</value>
   </data>
+  <data name="StartupFailureText" xml:space="preserve">
+    <value>Le contenu n’a pas pu être chargé. Fermez puis rouvrez l’application.</value>
+  </data>
+  <data name="StartupLoadingText" xml:space="preserve">
+    <value>Chargement…</value>
+  </data>
   <data name="SummaryExperienceLine" xml:space="preserve">
     <value>Développement logiciel professionnel depuis 2018; interfaces WPF chez Creaform depuis 2020.</value>
   </data>
@@ -864,68 +927,5 @@
   </data>
   <data name="VisualCraftText" xml:space="preserve">
     <value>Photographe professionnel depuis 2010, avec plus de 20 ans d’expérience en retouche photo (depuis 2001). Travailler quotidiennement avec la composition, la lumière, la couleur et le cadrage affûte les mêmes instincts qui comptent en UI : hiérarchie visuelle plus nette, espacement plus délibéré, et un œil formé à reconnaître ce qui paraît intentionnel plutôt qu’accidentel.</value>
-  </data>
-  <data name="LabelLanguage" xml:space="preserve">
-    <value>Langue</value>
-  </data>
-  <data name="LabelTheme" xml:space="preserve">
-    <value>Thème</value>
-  </data>
-  <data name="SegmentThemeLight" xml:space="preserve">
-    <value>Clair</value>
-  </data>
-  <data name="SegmentThemeDark" xml:space="preserve">
-    <value>Sombre</value>
-  </data>
-  <data name="SegmentLanguageEnglishShort" xml:space="preserve">
-    <value>EN</value>
-  </data>
-  <data name="SegmentLanguageFrenchShort" xml:space="preserve">
-    <value>FR</value>
-  </data>
-  <data name="AutomationMainNavigation" xml:space="preserve">
-    <value>Sections du CV</value>
-  </data>
-  <data name="AutomationWindowMinimize" xml:space="preserve">
-    <value>Réduire</value>
-  </data>
-  <data name="AutomationWindowMaximize" xml:space="preserve">
-    <value>Agrandir</value>
-  </data>
-  <data name="AutomationWindowRestore" xml:space="preserve">
-    <value>Restaurer</value>
-  </data>
-  <data name="AutomationWindowClose" xml:space="preserve">
-    <value>Fermer</value>
-  </data>
-  <data name="AutomationCarouselPrevious" xml:space="preserve">
-    <value>Image précédente</value>
-  </data>
-  <data name="AutomationCarouselNext" xml:space="preserve">
-    <value>Image suivante</value>
-  </data>
-  <data name="AutomationCarouselOpen" xml:space="preserve">
-    <value>Agrandir l’image</value>
-  </data>
-  <data name="AutomationCarouselImagePosition" xml:space="preserve">
-    <value>Image {0} sur {1}</value>
-  </data>
-  <data name="AutomationViewerClose" xml:space="preserve">
-    <value>Fermer la visionneuse</value>
-  </data>
-  <data name="LabelProjectNoImagesYet" xml:space="preserve">
-    <value>Aucune image pour l’instant.</value>
-  </data>
-  <data name="LabelImagesLoading" xml:space="preserve">
-    <value>Chargement des images…</value>
-  </data>
-  <data name="LabelImagesLoadFailed" xml:space="preserve">
-    <value>Impossible de charger les images.</value>
-  </data>
-  <data name="StartupLoadingText" xml:space="preserve">
-    <value>Chargement…</value>
-  </data>
-  <data name="StartupFailureText" xml:space="preserve">
-    <value>Le contenu n’a pas pu être chargé. Fermez puis rouvrez l’application.</value>
   </data>
 </root>
