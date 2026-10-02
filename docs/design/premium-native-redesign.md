@@ -15,9 +15,14 @@ Direction C keeps the six-section navigation, Inter / Inconsolata, the blue acce
 
 ## 2. Shell
 
-- The 160-DIP icon header and its collapse toggle are replaced by a single 56-DIP identity row inside the window chrome: R2 icon (28 DIP), `AppTitle` / `AppSubtitle`, then the EN | FR and Light | Dark segmented controls, then the caption buttons at the native right-hand position. The collapse toggle is removed because the space it saved no longer exists.
-- Navigation is a left-aligned text tab strip: selected tab uses accent text and a 2-DIP accent underline; hover changes colour only; keyboard focus shows an immediate 2-DIP focus ring.
-- Content sits on one quiet surface with hairline separators; redundant card-inside-card borders are removed. Meaningful groups (a project, an album, a selected role) keep a boundary.
+- The 160-DIP icon header and its collapse toggle are replaced by a single identity row inside the window chrome. The collapse toggle is removed because the space it saved no longer exists.
+- Hybrid with the original identity (decided after the first review, at Olivier's request): the window keeps its 40-DIP rounded corners (custom `WindowChrome`, square when maximized), and the signature centred elements return.
+  - Left: R2 icon (32 DIP), `AppTitle` / `AppSubtitle`, trimmed with an ellipsis when space is short.
+  - Centre: the minimize / maximize / close buttons sit in a small capsule attached to the top edge.
+  - Right: the EN | FR and Light | Dark segmented pills.
+  - The image viewer uses the same frame and centred caption capsule.
+- Navigation is a centred strip of six equal-width tabs inside a rounded 14-DIP band. The selected tab is a neutral pill with accent text; hover changes the pill surface only; keyboard focus shows an immediate 2-DIP focus ring. The earlier left-aligned underline strip was replaced because it lost the original identity.
+- Content sits on one quiet surface with 16-DIP rounded groups; redundant card-inside-card borders are removed. Meaningful groups (a project, an album, a selected role) keep a boundary.
 - Segmented controls are command toggle buttons: `IsChecked` is bound one-way to the view model and activation executes the command, so mouse, keyboard (Space) and UI Automation (Toggle) produce exactly one state transition and the visual, logical and UIA states cannot diverge.
 
 ## 3. Adaptive layout (effective DIP)
@@ -50,15 +55,17 @@ Essential text no longer uses opacity. Nominal solid-surface contrast (computed,
 |---|---|---|
 | TextSecondary on raised surface | `#A6A6A6` on `#1C1C1C` ≈ 7.0:1 | `#4D4D4D` on `#E6E6E6` ≈ 6.8:1 |
 | AccentText on page surface | `#4DA3FF` on `#141414` ≈ 7.0:1 | `#0057D6` on `#F2F2F2` ≈ 5.6:1 |
-| Accent graphics (underline, focus ring) | `#047AF7` on `#141414` ≈ 4.5:1 | `#047AF7` on `#F2F2F2` ≈ 3.7:1 |
+| Accent graphics (focus ring, selected role border) | `#047AF7` on `#141414` ≈ 4.5:1 | `#047AF7` on `#F2F2F2` ≈ 3.7:1 |
 
 Targets: ≥ 4.5:1 for normal text, ≥ 3:1 for meaningful control and focus graphics. This is a readability target, not a WCAG certification.
 
-High contrast: when Windows high contrast is on, the theme service applies a dictionary built from `SystemColors` (window, window text, highlight, hot-track, gray text) instead of the app palette and re-applies it when the setting changes.
+High contrast: when Windows high contrast is on, the theme service applies a dictionary built from `SystemColors` (window, window text, highlight, highlight text, hot-track) instead of the app palette and re-applies it when the setting changes. Selected pills use the window surface with a highlight outline and hot-track text; the frame border uses window text; timeline lanes use highlight and are drawn opaque.
 
 ## 5. Motion
 
-Motion only explains a state change. All remaining motion is code-driven through one `MotionPolicy` that reads `SystemParameters.ClientAreaAnimation` and listens for changes.
+Motion only explains a state change. The code-driven motion below goes through one `MotionPolicy` that reads `SystemParameters.ClientAreaAnimation` and listens for changes; a running section fade stops when animation is turned off.
+
+Limit: a few implicit storyboards that remain in `Resources/Controls.xaml` templates (some button, tooltip and scroll-viewer states) are not gated by `MotionPolicy` yet.
 
 | Interaction | Before | After | Reduced motion |
 |---|---|---|---|
@@ -75,7 +82,7 @@ No ambient loops, autoplay, cursor followers, parallax or glow.
 
 ## 6. Keyboard and accessibility
 
-- Tab order: identity row controls → caption buttons → section tabs → page content.
+- Tab order follows the visual order left to right: caption buttons (centre) → EN | FR → Light | Dark → section tabs → page content.
 - Section tabs: arrow keys / Ctrl+Tab switch sections; focus ring is visible immediately.
 - Carousel: focusable; Left/Right/Home/End change image; previous and next buttons are focusable with localized automation names; Enter or a double-click opens the viewer (no separate enlarge button); the position is announced as "Image n of m".
 - Viewer: opens focused; Left/Right navigate; Escape closes; focus returns to the opening carousel with the same image selected.
@@ -97,3 +104,26 @@ No ambient loops, autoplay, cursor followers, parallax or glow.
 ## 9. Out of scope
 
 - Font-file trimming, `Controls.xaml` cleanup beyond touched styles, timeline roadmap features, installer/release work.
+
+## 10. Results (branch `resumeApp/premium-native-redesign`)
+
+Validation recorded on 2026-10-02. Final release-build evidence is kept with the hand-off report, not in this note.
+
+- Tests: the xUnit suite grew from 576 (baseline `8c07625`) to 701 passing tests (Debug, `dotnet test`, 0 failed). New coverage includes the command toggle, motion policy, high-contrast role mapping, adaptive size classes, window bounds clamping, carousel/viewer keyboard handling, preview-size decoding, the shared decode limiter, timeline label collision and culture formatting.
+- UI Automation (real app, commit `601a607`): segmented toggles expose the Toggle pattern with localized names; re-selecting the active language keeps it on; tabs and carousel controls have localized names ("Image 1 of 10" / "Image 1 sur 6").
+- Performance: Release builds of `8c07625` (baseline) and `601a607` (changed) were measured interleaved, three runs each, on the same machine. Before the hybrid shell commits.
+
+| Metric | Baseline runs | Changed runs |
+|---|---|---|
+| Main window visible (ms) | 1598 / 1337 / 1433 | 1363 / 1269 / 1294 |
+| Named tabs ready (ms) | 2569 / 2244 / 2429 | 2560 / 2391 / 2643 |
+| Private memory after 15 s idle (MB) | 945.8 / 931.9 / 941.1 | 654.1 / 659.6 / 666.7 |
+| Private memory on Photography (MB) | 1095.5 / 1085.6 / 1039.1 | 709.5 / 707.3 / 714.4 |
+
+The memory drop comes from preview-size decoding. Start-up time to named tabs did not change measurably.
+
+Known remaining items:
+- Some French résumé strings still contain English text (for example "Lead UI/UX…", "(Hybrid)", "Tech"). They need an author-written translation and were not machine translated.
+- The minimum window size is clamped to the work area at start-up but is not re-evaluated when the window moves to another monitor.
+- Caption button automation names are empty for a moment during start-up, before resources load.
+- Implicit template storyboards in `Controls.xaml` are not gated by `MotionPolicy` (see section 5).

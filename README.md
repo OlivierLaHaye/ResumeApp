@@ -72,6 +72,7 @@ French · Dark mode · Vertical 4K capture
 - `.resx` localization for `en-CA` and `fr-CA`
 - Custom controls for the experience timeline and image carousels
 - xUnit tests for view models, services, controls, converters, and helpers
+- Adaptive layout, keyboard, high-contrast and reduced-motion support; design decisions are recorded in [docs/design/premium-native-redesign.md](docs/design/premium-native-redesign.md)
 
 ### How to run it locally
 
@@ -124,6 +125,7 @@ Je voulais quelque chose de plus parlant que « voici mon CV en PDF ». Ce proje
 - Localisation `en-CA` et `fr-CA` avec des fichiers `.resx`
 - Contrôles sur mesure pour la ligne du temps d’expérience et les carrousels d’images
 - Projet de tests xUnit pour les view models, services, contrôles, convertisseurs et helpers
+- Mise en page adaptative, navigation au clavier, prise en charge du contraste élevé et du mouvement réduit; les décisions de design sont consignées dans [docs/design/premium-native-redesign.md](docs/design/premium-native-redesign.md)
 
 ### Lancer le projet localement
 
