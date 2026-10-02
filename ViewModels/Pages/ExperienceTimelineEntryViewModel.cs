@@ -12,6 +12,7 @@ namespace ResumeApp.ViewModels.Pages
 	public sealed class ExperienceTimelineEntryViewModel : PropertyChangedNotifier
 	{
 		private readonly ResourcesService mResourcesService;
+		private readonly Func<DateTime> mTodayProvider;
 
 		public string CompanyText { get; }
 		public string RoleText { get; }
@@ -27,6 +28,12 @@ namespace ResumeApp.ViewModels.Pages
 		public ObservableCollection<string> Accomplishments { get; }
 
 		public string DateRangeText
+		{
+			get;
+			private set => SetProperty( ref field, value );
+		}
+
+		public string DurationText
 		{
 			get;
 			private set => SetProperty( ref field, value );
@@ -71,9 +78,11 @@ namespace ResumeApp.ViewModels.Pages
 			DateTime pStartDate,
 			DateTime? pEndDate,
 			ObservableCollection<string>? pAccomplishments,
-			ResourcesService pResourcesService )
+			ResourcesService pResourcesService,
+			Func<DateTime>? pTodayProvider = null )
 		{
 			mResourcesService = pResourcesService ?? throw new ArgumentNullException( nameof( pResourcesService ) );
+			mTodayProvider = pTodayProvider ?? ( () => DateTime.Today );
 
 			CompanyText = pCompanyText ?? string.Empty;
 			RoleText = pRoleText ?? string.Empty;
@@ -89,10 +98,12 @@ namespace ResumeApp.ViewModels.Pages
 			Accomplishments = pAccomplishments ?? [];
 
 			DateRangeText = string.Empty;
+			DurationText = string.Empty;
 			MarkerGlyph = string.Empty;
 			LaneLeftMargin = new Thickness( 0 );
 
 			UpdateDateRangeText();
+			UpdateDurationText();
 			SetLaneIndex( 0 );
 			SetPaletteIndex( 0 );
 		}
@@ -104,19 +115,9 @@ namespace ResumeApp.ViewModels.Pages
 				return [];
 			}
 
-			string lNormalizedText = pTechText
-				.Replace( " / ", "," )
-				.Replace( "•", "," )
-				.Replace( "·", "," )
-				.Replace( "|", "," )
-				.Replace( ";", "," );
-
-			string[] lParts = lNormalizedText.Split(
-				[ ',', '\r', '\n', '\t' ],
-				StringSplitOptions.RemoveEmptyEntries );
-
-			return lParts
-				.Select( pPart => ( pPart ?? string.Empty ).Trim() )
+			return pTechText
+				.Split( ", ", StringSplitOptions.RemoveEmptyEntries )
+				.Select( pPart => pPart.Trim().TrimEnd( '.' ).Trim() )
 				.Where( pItem => !string.IsNullOrWhiteSpace( pItem ) )
 				.Distinct( StringComparer.OrdinalIgnoreCase )
 				.ToList();
@@ -154,9 +155,36 @@ namespace ResumeApp.ViewModels.Pages
 
 			string lEndText = EndDate.HasValue
 				? EndDate.Value.ToString( "yyyy-MM", mResourcesService.ActiveCulture )
-				: mResourcesService[ "LabelPresent" ];
+				: mResourcesService[ "ExperienceDateRangeOpenEnd" ];
 
 			DateRangeText = string.Concat( lStartText, lSeparator, lEndText );
+		}
+
+		private void UpdateDurationText()
+		{
+			DateTime lEndDate = EndDate ?? mTodayProvider();
+			int lTotalMonths = Math.Max( 0, ( ( lEndDate.Year - StartDate.Year ) * 12 ) + lEndDate.Month - StartDate.Month );
+			int lYears = lTotalMonths / 12;
+			int lMonths = lTotalMonths % 12;
+
+			List<string> lParts = [ ];
+
+			if ( lYears > 0 )
+			{
+				lParts.Add( FormatDurationPart( lYears == 1 ? "ExperienceDurationYearOne" : "ExperienceDurationYearMany", lYears ) );
+			}
+
+			if ( lMonths > 0 )
+			{
+				lParts.Add( FormatDurationPart( lMonths == 1 ? "ExperienceDurationMonthOne" : "ExperienceDurationMonthMany", lMonths ) );
+			}
+
+			DurationText = string.Join( " ", lParts );
+		}
+
+		private string FormatDurationPart( string pResourceKey, int pValue )
+		{
+			return string.Format( mResourcesService.ActiveCulture, mResourcesService[ pResourceKey ], pValue );
 		}
 
 		private void UpdateLaneMargin()

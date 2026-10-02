@@ -18,12 +18,14 @@
 
         <Style x:Key="ExperienceHeaderBandStyle" TargetType="{x:Type FrameworkElement}">
             <Setter Property="Margin" Value="32,28,32,16" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
                     <Setter Property="Margin" Value="20,12,20,8" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Wide">
                     <Setter Property="Margin" Value="40,32,40,16" />
+                    <Setter Property="MaxWidth" Value="1320" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -35,7 +37,7 @@
             <Setter Property="Margin" Value="0,0,0,16" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
-                    <Setter Property="Margin" Value="0,0,0,8" />
+                    <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -45,34 +47,59 @@
             BasedOn="{StaticResource ContentGroupBorderStyle}"
             TargetType="{x:Type Border}">
             <Setter Property="Margin" Value="0" />
-            <Setter Property="Padding" Value="16,12" />
+            <Setter Property="Padding" Value="16,12,16,8" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
-                    <Setter Property="Padding" Value="12,8" />
+                    <Setter Property="Padding" Value="12,8,12,6" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ExperienceTimelineFootGridStyle" TargetType="{x:Type Grid}">
+            <Setter Property="Height" Value="32" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Height" Value="28" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ExperienceTimelineHintTextBlockStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="TextWrapping" Value="NoWrap" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            <Setter Property="Margin" Value="12,0,0,0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
 
         <Style
-            x:Key="ExperienceTimelineControlStyle"
-            BasedOn="{StaticResource {x:Type controls:TimelineControl}}"
-            TargetType="{x:Type controls:TimelineControl}">
+            x:Key="ExperienceShowAllButtonStyle"
+            BasedOn="{StaticResource TimelinePillButtonStyle}"
+            TargetType="{x:Type Button}">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
-                    <Setter Property="Height" Value="140" />
-                    <Setter Property="Padding" Value="12,6,12,6" />
+                <DataTrigger Binding="{Binding IsShowingAll, ElementName=mExperienceTimelineControl}" Value="True">
+                    <Setter Property="IsEnabled" Value="False" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
 
         <Style x:Key="ExperienceListBandStyle" TargetType="{x:Type FrameworkElement}">
-            <Setter Property="Margin" Value="32,0,32,40" />
+            <Setter Property="Margin" Value="32,4,32,40" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
-                    <Setter Property="Margin" Value="20,0,20,32" />
+                    <Setter Property="Margin" Value="20,4,20,32" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Wide">
-                    <Setter Property="Margin" Value="40,0,40,48" />
+                    <Setter Property="Margin" Value="40,4,40,48" />
+                    <Setter Property="MaxWidth" Value="1320" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -91,10 +118,10 @@
                 <Setter.Value>
                     <ControlTemplate>
                         <Border
-                            Margin="-3,-3,-3,13"
+                            Margin="29,-3,-3,13"
                             BorderBrush="{DynamicResource FocusRingBrush}"
                             BorderThickness="2"
-                            CornerRadius="10"
+                            CornerRadius="19"
                             SnapsToDevicePixels="True" />
                     </ControlTemplate>
                 </Setter.Value>
@@ -128,15 +155,194 @@
             x:Key="ExperienceCardBorderStyle"
             BasedOn="{StaticResource ContentGroupBorderStyle}"
             TargetType="{x:Type Border}">
-            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Padding" Value="28,24,28,26" />
             <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Padding" Value="20,18,20,20" />
+                </DataTrigger>
                 <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" Value="True">
                     <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
                 </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ExperienceCardSelectionOutlineBorderStyle" TargetType="{x:Type Border}">
+            <Setter Property="BorderBrush" Value="{DynamicResource FocusRingBrush}" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="CornerRadius" Value="16" />
+            <Setter Property="IsHitTestVisible" Value="False" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                    <Setter Property="BorderBrush" Value="{DynamicResource FocusRingBrush}" />
+                    <Setter Property="Visibility" Value="Visible" />
                 </DataTrigger>
             </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ExperienceMarkerSelectionRingBorderStyle" TargetType="{x:Type Border}">
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="Margin" Value="0,26,0,0" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Background" Value="{DynamicResource CommonBlackBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource FocusRingBrush}" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="IsHitTestVisible" Value="False" />
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="ExperienceRoleTextBlockStyle"
+            BasedOn="{StaticResource PageSectionTitleTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="Margin" Value="0" />
+        </Style>
+
+        <Style
+            x:Key="ExperienceCompanyTextBlockStyle"
+            BasedOn="{StaticResource PageBodyTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="LineHeight" Value="20" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+            <Setter Property="Margin" Value="0,3,0,0" />
+        </Style>
+
+        <Style x:Key="ExperienceCardBodyGridStyle" TargetType="{x:Type Grid}">
+            <Setter Property="Margin" Value="0,16,0,0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Margin" Value="0,8,0,0" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ExperienceMetaDividerBorderStyle" TargetType="{x:Type Border}">
+            <Setter Property="Grid.Row" Value="0" />
+            <Setter Property="Grid.Column" Value="2" />
+            <Setter Property="Grid.RowSpan" Value="3" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
+            <Setter Property="BorderThickness" Value="1,0,0,0" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ExperienceMetaFactsPanelStyle" TargetType="{x:Type WrapPanel}">
+            <Setter Property="Grid.Row" Value="0" />
+            <Setter Property="Grid.Column" Value="2" />
+            <Setter Property="Orientation" Value="Vertical" />
+            <Setter Property="Margin" Value="25,0,0,0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Grid.Column" Value="0" />
+                    <Setter Property="Grid.ColumnSpan" Value="3" />
+                    <Setter Property="Orientation" Value="Horizontal" />
+                    <Setter Property="Margin" Value="0" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ExperienceScopeBulletsPanelStyle" TargetType="{x:Type StackPanel}">
+            <Setter Property="Grid.Row" Value="0" />
+            <Setter Property="Grid.Column" Value="0" />
+            <Setter Property="Grid.RowSpan" Value="3" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Grid.Row" Value="1" />
+                    <Setter Property="Grid.RowSpan" Value="1" />
+                    <Setter Property="Grid.ColumnSpan" Value="3" />
+                    <Setter Property="Margin" Value="0,12,0,0" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ExperienceTechPanelStyle" TargetType="{x:Type StackPanel}">
+            <Setter Property="Grid.Row" Value="1" />
+            <Setter Property="Grid.Column" Value="2" />
+            <Setter Property="Margin" Value="25,14,0,0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Grid.Row" Value="2" />
+                    <Setter Property="Grid.Column" Value="0" />
+                    <Setter Property="Grid.ColumnSpan" Value="3" />
+                    <Setter Property="Margin" Value="0,14,0,0" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="ExperienceDatesTextBlockStyle"
+            BasedOn="{StaticResource PageMonoTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+            <Setter Property="TextWrapping" Value="NoWrap" />
+            <Setter Property="Margin" Value="0,0,0,5" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="FontSize" Value="14" />
+                    <Setter Property="Margin" Value="0,0,14,2" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="ExperienceMetaTextBlockStyle"
+            BasedOn="{StaticResource PageSecondaryTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="13.5" />
+            <Setter Property="LineHeight" Value="20" />
+            <Setter Property="Margin" Value="0,0,0,5" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Margin" Value="0,0,14,2" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="ExperienceScopeTextBlockStyle"
+            BasedOn="{StaticResource PageBodyTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="LineHeight" Value="24" />
+            <Setter Property="MaxWidth" Value="720" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="FontSize" Value="15" />
+                    <Setter Property="LineHeight" Value="22" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="ExperienceBulletTextBlockStyle"
+            BasedOn="{StaticResource PageBodyTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="MaxWidth" Value="720" />
+        </Style>
+
+        <Style
+            x:Key="ExperienceTechLabelTextBlockStyle"
+            BasedOn="{StaticResource PageLabelTextBlockStyle}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="12.5" />
         </Style>
     </UserControl.Resources>
 
@@ -146,39 +352,112 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid x:Name="mExperienceHeaderHostGrid" Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MaxWidth="1400" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <StackPanel
-                x:Name="mHeaderStackPanel"
-                Orientation="Vertical"
-                Style="{StaticResource ExperienceHeaderBandStyle}">
-                <TextBlock
-                    x:Name="mSectionTitleTextBlock"
-                    Style="{StaticResource PageTitleTextBlockStyle}"
-                    Text="{Binding ResourcesService[SectionHeaderExperience]}" />
-                <TextBlock
-                    x:Name="mSectionSubtitleTextBlock"
-                    Style="{StaticResource ExperienceSubtitleTextBlockStyle}"
-                    Text="{Binding ResourcesService[ExperiencePageSubtitle]}" />
+        <StackPanel
+            x:Name="mHeaderStackPanel"
+            Grid.Row="0"
+            Orientation="Vertical"
+            Style="{StaticResource ExperienceHeaderBandStyle}">
+            <TextBlock
+                x:Name="mSectionTitleTextBlock"
+                Style="{StaticResource PageTitleTextBlockStyle}"
+                Text="{Binding ResourcesService[SectionHeaderExperience]}" />
+            <TextBlock
+                x:Name="mSectionSubtitleTextBlock"
+                Style="{StaticResource ExperienceSubtitleTextBlockStyle}"
+                Text="{Binding ResourcesService[ExperiencePageSubtitle]}" />
 
-                <Border x:Name="mTimelineBorder" Style="{StaticResource ExperienceTimelineBorderStyle}">
-                    <Grid x:Name="mTimelineLayoutGrid">
-                        <controls:TimelineControl
-                            x:Name="mExperienceTimelineControl"
-                            Focusable="True"
-                            MinDate="{Binding TimelineMinDate}"
-                            Style="{StaticResource ExperienceTimelineControlStyle}"
-                            SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            SelectedTimeFrame="{Binding SelectedTimeFrame, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            TimeFrames="{Binding ExperienceTimeFrames}"
-                            TodayMarkerText="{Binding ResourcesService[TimelineLabelTodayMarker]}" />
+            <Border x:Name="mTimelineBorder" Style="{StaticResource ExperienceTimelineBorderStyle}">
+                <Grid x:Name="mTimelineLayoutGrid">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <controls:TimelineControl
+                        x:Name="mExperienceTimelineControl"
+                        Grid.Row="0"
+                        Focusable="True"
+                        MinDate="{Binding TimelineMinDate}"
+                        SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        SelectedTimeFrame="{Binding SelectedTimeFrame, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        SelectionActivated="OnTimelineSelectionActivated"
+                        TimeFrames="{Binding ExperienceTimeFrames}"
+                        TodayMarkerText="{Binding ResourcesService[TimelineLabelTodayMarker]}" />
+
+                    <Grid
+                        x:Name="mTimelineFootGrid"
+                        Grid.Row="1"
+                        Style="{StaticResource ExperienceTimelineFootGridStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel
+                            x:Name="mTimelineZoomStackPanel"
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal">
+                            <Border
+                                x:Name="mTimelineZoomGroupBorder"
+                                Height="26"
+                                Margin="0,0,8,0"
+                                BorderBrush="{DynamicResource BorderSubtleBrush}"
+                                BorderThickness="1"
+                                CornerRadius="12"
+                                SnapsToDevicePixels="True">
+                                <StackPanel x:Name="mTimelineZoomButtonsStackPanel" Orientation="Horizontal">
+                                    <Button
+                                        x:Name="mTimelineZoomOutButton"
+                                        attachedProperties:CornerRadiusAssist.sCornerRadius="11,0,0,11"
+                                        AutomationProperties.Name="{Binding ResourcesService[TimelineZoomOutButtonAutomationName]}"
+                                        Click="OnTimelineZoomOutClick"
+                                        Style="{StaticResource TimelineZoomButtonStyle}">
+                                        <Path
+                                            x:Name="mTimelineZoomOutGlyphPath"
+                                            Width="10"
+                                            Height="10"
+                                            Data="M0,5 H10"
+                                            Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
+                                            StrokeThickness="1.5" />
+                                    </Button>
+                                    <Border
+                                        x:Name="mTimelineZoomDividerBorder"
+                                        Width="1"
+                                        Background="{DynamicResource BorderSubtleBrush}" />
+                                    <Button
+                                        x:Name="mTimelineZoomInButton"
+                                        attachedProperties:CornerRadiusAssist.sCornerRadius="0,11,11,0"
+                                        AutomationProperties.Name="{Binding ResourcesService[TimelineZoomInButtonAutomationName]}"
+                                        Click="OnTimelineZoomInClick"
+                                        Style="{StaticResource TimelineZoomButtonStyle}">
+                                        <Path
+                                            x:Name="mTimelineZoomInGlyphPath"
+                                            Width="10"
+                                            Height="10"
+                                            Data="M0,5 H10 M5,0 V10"
+                                            Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
+                                            StrokeThickness="1.5" />
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+
+                            <Button
+                                x:Name="mTimelineShowAllButton"
+                                Click="OnTimelineShowAllClick"
+                                Content="{Binding ResourcesService[TimelineShowAllButtonText]}"
+                                Style="{StaticResource ExperienceShowAllButtonStyle}" />
+                        </StackPanel>
+
+                        <TextBlock
+                            x:Name="mTimelineHintTextBlock"
+                            Grid.Column="1"
+                            Style="{StaticResource ExperienceTimelineHintTextBlockStyle}"
+                            Text="{Binding ResourcesService[TimelineHintText]}" />
                     </Grid>
-                </Border>
-            </StackPanel>
-        </Grid>
+                </Grid>
+            </Border>
+        </StackPanel>
 
         <ScrollViewer
             x:Name="mExperienceScrollViewer"
@@ -189,138 +468,150 @@
             behaviors:ExperienceTimelineScrollSyncBehavior.SelectedItem="{Binding SelectedTimelineEntry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             CanContentScroll="False"
             Style="{StaticResource PageScrollViewerStyle}">
-            <Grid x:Name="mExperienceListHostGrid">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" MaxWidth="1400" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <ItemsControl
-                    x:Name="mExperienceItemsControl"
-                    ItemsSource="{Binding TimelineEntries}"
-                    Style="{StaticResource ExperienceListBandStyle}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel x:Name="mExperienceItemsStackPanel" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
+            <ItemsControl
+                x:Name="mExperienceItemsControl"
+                ItemsSource="{Binding TimelineEntries}"
+                Style="{StaticResource ExperienceListBandStyle}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel x:Name="mExperienceItemsStackPanel" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
 
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Button
-                                x:Name="mExperienceCardButton"
-                                AutomationProperties.Name="{Binding RoleText}"
-                                Command="{Binding DataContext.SelectExperienceCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
-                                CommandParameter="{Binding}"
-                                Style="{StaticResource ExperienceCardButtonStyle}">
-                                <Grid x:Name="mTimelineItemGrid">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button
+                            x:Name="mExperienceCardButton"
+                            AutomationProperties.Name="{Binding RoleText}"
+                            Command="{Binding DataContext.SelectExperienceCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            CommandParameter="{Binding}"
+                            Style="{StaticResource ExperienceCardButtonStyle}">
+                            <Grid x:Name="mTimelineItemGrid">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                                    <Grid x:Name="mRailGrid" Grid.Column="0" Width="32">
-                                        <Border
-                                            x:Name="mRailLineBorder"
-                                            Width="{StaticResource ExtraExtraSmallThicknessValue}"
-                                            HorizontalAlignment="Center"
-                                            Background="{DynamicResource OnSurfaceDividerOnDarkBrush}" />
+                                <Grid x:Name="mRailGrid" Grid.Column="0" Width="32">
+                                    <Border
+                                        x:Name="mRailLineBorder"
+                                        Width="2"
+                                        HorizontalAlignment="Center"
+                                        Background="{DynamicResource BorderSubtleBrush}" />
 
-                                        <Border
-                                            x:Name="mMarkerBorder"
-                                            Width="12"
-                                            Height="12"
-                                            Margin="0,24,0,0"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Top"
-                                            CornerRadius="6">
-                                            <Border.Background>
-                                                <MultiBinding Converter="{StaticResource PaletteIndexToBrushMultiConverter}">
-                                                    <Binding Path="PaletteIndex" />
-                                                    <Binding Path="DataContext.ThemeService.ActiveTheme" RelativeSource="{RelativeSource AncestorType={x:Type UserControl}}" />
-                                                    <Binding Path="DataContext.ThemeService.IsHighContrastActive" RelativeSource="{RelativeSource AncestorType={x:Type UserControl}}" />
-                                                </MultiBinding>
-                                            </Border.Background>
-                                            <Border.Style>
-                                                <Style TargetType="{x:Type Border}">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                            <Setter Property="Width" Value="14" />
-                                                            <Setter Property="Height" Value="14" />
-                                                            <Setter Property="CornerRadius" Value="7" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-                                        </Border>
-                                    </Grid>
+                                    <Border x:Name="mMarkerSelectionRingBorder" Style="{StaticResource ExperienceMarkerSelectionRingBorderStyle}" />
 
-                                    <Grid x:Name="mContentGrid" Grid.Column="1">
-                                        <Border x:Name="mCardBorder" Style="{StaticResource ExperienceCardBorderStyle}">
-                                            <StackPanel x:Name="mCardContentStackPanel" Orientation="Vertical">
-                                                <TextBlock
-                                                    x:Name="mRoleTextBlock"
-                                                    Margin="0"
-                                                    Style="{StaticResource PageSectionTitleTextBlockStyle}"
-                                                    Text="{Binding RoleText}" />
-                                                <TextBlock
-                                                    x:Name="mCompanyTextBlock"
-                                                    Margin="0,2,0,0"
-                                                    Style="{StaticResource PageBodyTextBlockStyle}"
-                                                    Text="{Binding CompanyText}" />
+                                    <Border
+                                        x:Name="mMarkerBorder"
+                                        Width="12"
+                                        Height="12"
+                                        Margin="0,30,0,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Top"
+                                        BorderThickness="1"
+                                        CornerRadius="6">
+                                        <Border.Background>
+                                            <MultiBinding Converter="{StaticResource PaletteIndexToBrushMultiConverter}">
+                                                <Binding Path="PaletteIndex" />
+                                                <Binding Path="DataContext.ThemeService.ActiveTheme" RelativeSource="{RelativeSource AncestorType={x:Type UserControl}}" />
+                                                <Binding Path="DataContext.ThemeService.IsHighContrastActive" RelativeSource="{RelativeSource AncestorType={x:Type UserControl}}" />
+                                            </MultiBinding>
+                                        </Border.Background>
+                                        <Border.BorderBrush>
+                                            <MultiBinding Converter="{StaticResource PaletteIndexToBrushMultiConverter}" ConverterParameter="Edge">
+                                                <Binding Path="PaletteIndex" />
+                                                <Binding Path="DataContext.ThemeService.ActiveTheme" RelativeSource="{RelativeSource AncestorType={x:Type UserControl}}" />
+                                                <Binding Path="DataContext.ThemeService.IsHighContrastActive" RelativeSource="{RelativeSource AncestorType={x:Type UserControl}}" />
+                                            </MultiBinding>
+                                        </Border.BorderBrush>
+                                    </Border>
+                                </Grid>
 
-                                                <WrapPanel
-                                                    x:Name="mMetaWrapPanel"
-                                                    Margin="0,8,0,0"
-                                                    Orientation="Horizontal">
+                                <Grid
+                                    x:Name="mContentGrid"
+                                    Grid.Column="1"
+                                    Margin="0,0,0,16">
+                                    <Border x:Name="mCardBorder" Style="{StaticResource ExperienceCardBorderStyle}">
+                                        <StackPanel x:Name="mCardContentStackPanel" Orientation="Vertical">
+                                            <TextBlock
+                                                x:Name="mRoleTextBlock"
+                                                Style="{StaticResource ExperienceRoleTextBlockStyle}"
+                                                Text="{Binding RoleText}" />
+                                            <TextBlock
+                                                x:Name="mCompanyTextBlock"
+                                                Style="{StaticResource ExperienceCompanyTextBlockStyle}"
+                                                Text="{Binding CompanyText}" />
+
+                                            <Grid x:Name="mCardBodyGrid" Style="{StaticResource ExperienceCardBodyGridStyle}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="1000*" MaxWidth="720" />
+                                                    <ColumnDefinition Width="*" MinWidth="48" />
+                                                    <ColumnDefinition Width="280" />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="*" />
+                                                </Grid.RowDefinitions>
+
+                                                <Border x:Name="mMetaDividerBorder" Style="{StaticResource ExperienceMetaDividerBorderStyle}" />
+
+                                                <StackPanel
+                                                    x:Name="mScopeBulletsStackPanel"
+                                                    Orientation="Vertical"
+                                                    Style="{StaticResource ExperienceScopeBulletsPanelStyle}">
+                                                    <TextBlock
+                                                        x:Name="mScopeTextBlock"
+                                                        Style="{StaticResource ExperienceScopeTextBlockStyle}"
+                                                        Text="{Binding ScopeText}" />
+
+                                                    <ItemsControl
+                                                        x:Name="mAccomplishmentsItemsControl"
+                                                        Focusable="False"
+                                                        ItemsSource="{Binding Accomplishments}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <DockPanel
+                                                                    x:Name="mBulletDockPanel"
+                                                                    Margin="0,0,0,8"
+                                                                    LastChildFill="True">
+                                                                    <TextBlock
+                                                                        x:Name="mBulletGlyphTextBlock"
+                                                                        DockPanel.Dock="Left"
+                                                                        Style="{StaticResource BulletGlyphTextBlockStyle}"
+                                                                        Text="{Binding DataContext.ResourcesService[GlyphBullet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                                                                    <TextBlock
+                                                                        x:Name="mBulletTextBlock"
+                                                                        Style="{StaticResource ExperienceBulletTextBlockStyle}"
+                                                                        Text="{Binding}" />
+                                                                </DockPanel>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+
+                                                <WrapPanel x:Name="mMetaFactsWrapPanel" Style="{StaticResource ExperienceMetaFactsPanelStyle}">
                                                     <TextBlock
                                                         x:Name="mDatesTextBlock"
-                                                        Margin="0,0,16,0"
-                                                        Style="{StaticResource PageMonoTextBlockStyle}"
+                                                        Style="{StaticResource ExperienceDatesTextBlockStyle}"
                                                         Text="{Binding DateRangeText}" />
                                                     <TextBlock
+                                                        x:Name="mDurationTextBlock"
+                                                        Style="{StaticResource ExperienceMetaTextBlockStyle}"
+                                                        Text="{Binding DurationText}" />
+                                                    <TextBlock
                                                         x:Name="mLocationTextBlock"
-                                                        Style="{StaticResource PageSecondaryTextBlockStyle}"
+                                                        Style="{StaticResource ExperienceMetaTextBlockStyle}"
                                                         Text="{Binding LocationText}" />
                                                 </WrapPanel>
 
-                                                <TextBlock
-                                                    x:Name="mScopeTextBlock"
-                                                    Margin="0,12,0,0"
-                                                    Style="{StaticResource PageBodyTextBlockStyle}"
-                                                    Text="{Binding ScopeText}" />
-
-                                                <ItemsControl
-                                                    x:Name="mAccomplishmentsItemsControl"
-                                                    Margin="0,12,0,0"
-                                                    Focusable="False"
-                                                    ItemsSource="{Binding Accomplishments}">
-                                                    <ItemsControl.ItemTemplate>
-                                                        <DataTemplate>
-                                                            <DockPanel
-                                                                x:Name="mBulletDockPanel"
-                                                                Margin="0,0,0,6"
-                                                                LastChildFill="True">
-                                                                <TextBlock
-                                                                    x:Name="mBulletGlyphTextBlock"
-                                                                    DockPanel.Dock="Left"
-                                                                    Style="{StaticResource BulletGlyphTextBlockStyle}"
-                                                                    Text="{Binding DataContext.ResourcesService[GlyphBullet], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
-                                                                <TextBlock
-                                                                    x:Name="mBulletTextBlock"
-                                                                    Style="{StaticResource PageBodyTextBlockStyle}"
-                                                                    Text="{Binding}" />
-                                                            </DockPanel>
-                                                        </DataTemplate>
-                                                    </ItemsControl.ItemTemplate>
-                                                </ItemsControl>
-
                                                 <StackPanel
                                                     x:Name="mTechStackPanel"
-                                                    Margin="0,8,0,0"
-                                                    Orientation="Vertical">
+                                                    Orientation="Vertical"
+                                                    Style="{StaticResource ExperienceTechPanelStyle}">
                                                     <TextBlock
                                                         x:Name="mTechLabelTextBlock"
-                                                        Style="{StaticResource PageLabelTextBlockStyle}"
+                                                        Style="{StaticResource ExperienceTechLabelTextBlockStyle}"
                                                         Text="{Binding DataContext.ResourcesService[LabelTech], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
 
                                                     <ItemsControl
@@ -337,6 +628,7 @@
                                                                 <Border x:Name="mTechChipBorder" Style="{StaticResource ChipBorderStyle}">
                                                                     <TextBlock
                                                                         x:Name="mTechChipTextBlock"
+                                                                        FontSize="12.5"
                                                                         Style="{StaticResource ChipTextBlockStyle}"
                                                                         Text="{Binding}" />
                                                                 </Border>
@@ -344,15 +636,17 @@
                                                         </ItemsControl.ItemTemplate>
                                                     </ItemsControl>
                                                 </StackPanel>
-                                            </StackPanel>
-                                        </Border>
-                                    </Grid>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border x:Name="mCardSelectionOutlineBorder" Style="{StaticResource ExperienceCardSelectionOutlineBorderStyle}" />
                                 </Grid>
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Grid>
+                            </Grid>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </ScrollViewer>
     </Grid>
 </UserControl>

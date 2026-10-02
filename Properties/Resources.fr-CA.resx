@@ -377,13 +377,13 @@
     <value>FARO CREAFORM</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertLocation" xml:space="preserve">
-    <value>Lévis, QC, Canada (Hybrid)</value>
+    <value>Lévis, QC, Canada (Hybride)</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertRole" xml:space="preserve">
     <value>UI/UX Expert Software Developer</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertScope" xml:space="preserve">
-    <value>Lead UI/UX and front-end delivery across projects, ensuring consistent, high-quality desktop UI.</value>
+    <value>Leadership UI/UX et livraison front-end sur plusieurs projets, en assurant une UI desktop cohérente et de haute qualité.</value>
   </data>
   <data name="ExperienceCreaformUiUxExpertStartIso" xml:space="preserve">
     <value>2024-03-01</value>
@@ -391,8 +391,23 @@
   <data name="ExperienceCreaformUiUxExpertTech" xml:space="preserve">
     <value>WPF, XAML, C# 7.3, MVVM, Visual Studio, Adobe Photoshop</value>
   </data>
+  <data name="ExperienceDateRangeOpenEnd" xml:space="preserve">
+    <value>aujourd'hui</value>
+  </data>
   <data name="ExperienceDateRangeSeparator" xml:space="preserve">
-    <value> à </value>
+    <value> – </value>
+  </data>
+  <data name="ExperienceDurationMonthMany" xml:space="preserve">
+    <value>{0} mois</value>
+  </data>
+  <data name="ExperienceDurationMonthOne" xml:space="preserve">
+    <value>{0} mois</value>
+  </data>
+  <data name="ExperienceDurationYearMany" xml:space="preserve">
+    <value>{0} ans</value>
+  </data>
+  <data name="ExperienceDurationYearOne" xml:space="preserve">
+    <value>{0} an</value>
   </data>
   <data name="ExperienceIaAcc1" xml:space="preserve">
     <value>Développé des fonctionnalités en C# et VB.NET et contribué aux tests unitaires pour la stabilité à long terme.</value>
@@ -910,11 +925,29 @@
   <data name="TabVisualCraftTitle" xml:space="preserve">
     <value>Savoir-faire visuel</value>
   </data>
+  <data name="TimelineAutomationName" xml:space="preserve">
+    <value>Chronologie du parcours</value>
+  </data>
+  <data name="TimelineBarLabelSeparator" xml:space="preserve">
+    <value> · </value>
+  </data>
   <data name="TimelineControlInteractionsHelpText" xml:space="preserve">
-    <value>Cliquez sur la timeline, utilisez la molette pour zoomer, glissez pour déplacer avec inertie, cliquez sur une barre ou n’importe où sur la timeline pour sélectionner une date. Au clavier, utilisez les flèches, Début et Fin.</value>
+    <value>Cliquez sur la timeline, utilisez la molette pour zoomer, glissez pour déplacer avec inertie, cliquez sur une barre ou n’importe où sur la timeline pour sélectionner une date. Au clavier, utilisez les flèches, Début et Fin, les touches plus et moins pour zoomer, 0 pour tout afficher et Entrée pour ouvrir la carte du rôle sélectionné.</value>
+  </data>
+  <data name="TimelineHintText" xml:space="preserve">
+    <value>Glissez pour parcourir · Molette ou +/− pour zoomer · Flèches pour naviguer</value>
   </data>
   <data name="TimelineLabelTodayMarker" xml:space="preserve">
     <value>Aujourd'hui</value>
+  </data>
+  <data name="TimelineShowAllButtonText" xml:space="preserve">
+    <value>Tout afficher</value>
+  </data>
+  <data name="TimelineZoomInButtonAutomationName" xml:space="preserve">
+    <value>Zoom avant</value>
+  </data>
+  <data name="TimelineZoomOutButtonAutomationName" xml:space="preserve">
+    <value>Zoom arrière</value>
   </data>
   <data name="ValueFullRemoteOnly" xml:space="preserve">
     <value>100% à distance</value>

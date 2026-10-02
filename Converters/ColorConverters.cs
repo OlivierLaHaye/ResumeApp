@@ -1,6 +1,7 @@
 ﻿// Copyright (C) Olivier La Haye
 // All rights reserved.
 
+using ResumeApp.Controls;
 using ResumeApp.Helpers;
 using System.Globalization;
 using System.Windows;
@@ -55,6 +56,8 @@ namespace ResumeApp.Converters
 	[ValueConversion( typeof( int ), typeof( Brush ) )]
 	public sealed class PaletteIndexToBrushConverter : IValueConverter
 	{
+		public const string EdgeParameter = "Edge";
+
 		private static Brush? TryFindBrushOrNull( string pBrushKey )
 		{
 			if ( string.IsNullOrWhiteSpace( pBrushKey ) )
@@ -82,6 +85,13 @@ namespace ResumeApp.Converters
 
 			int lNormalizedIndex = lPaletteIndex < 0 ? 0 : lPaletteIndex;
 			string lBrushKey = lAccentBrushKeys[ lNormalizedIndex % lAccentBrushKeys.Length ];
+
+			if ( string.Equals( pParameter as string, EdgeParameter, StringComparison.Ordinal ) )
+			{
+				return TryFindBrushOrNull( TimelineLayoutHelper.GetEdgeBrushKey( lBrushKey ) ?? string.Empty )
+					?? TryFindBrushOrNull( lBrushKey )
+					?? Brushes.Transparent;
+			}
 
 			return TryFindBrushOrNull( lBrushKey )
 				?? TryFindBrushOrNull( "CommonBlueBrush" )

@@ -166,4 +166,35 @@ public sealed class TimelineTimeFrameItemTests
 
         Assert.Equal( string.Empty, lItem.SubtitleText );
     }
+
+    [Fact]
+    public void DescriptionText_DefaultsToEmpty()
+    {
+        var lItem = new TimelineTimeFrameItem( DateTime.Today, DateTime.Today, "Job", "Blue" );
+
+        Assert.Equal( string.Empty, lItem.DescriptionText );
+    }
+
+    [Fact]
+    public void SetDescriptionText_RaisesPropertyChanged()
+    {
+        var lItem = new TimelineTimeFrameItem( DateTime.Today, DateTime.Today, "Job", "Blue" );
+        string? lRaisedName = null;
+        lItem.PropertyChanged += ( _, pArgs ) => lRaisedName = pArgs.PropertyName;
+
+        lItem.DescriptionText = "Details";
+
+        Assert.Equal( "DescriptionText", lRaisedName );
+        Assert.Equal( "Details", lItem.DescriptionText );
+    }
+
+    [Fact]
+    public void SetDescriptionText_NullCoalescesToEmpty()
+    {
+        var lItem = new TimelineTimeFrameItem( DateTime.Today, DateTime.Today, "Job", "Blue" ) { DescriptionText = "Seed" };
+
+        lItem.DescriptionText = null!;
+
+        Assert.Equal( string.Empty, lItem.DescriptionText );
+    }
 }

@@ -95,7 +95,7 @@ namespace ResumeApp.ViewModels.Pages
 				out DateTime lParsedDate ) ? lParsedDate : null;
 		}
 
-		private static TimelineTimeFrameItem CreateTimeFrameForEntry( ExperienceTimelineEntryViewModel pEntry )
+		private TimelineTimeFrameItem CreateTimeFrameForEntry( ExperienceTimelineEntryViewModel pEntry )
 		{
 			DateTime lEndDate = ( pEntry.EndDate ?? DateTime.Today ).Date;
 			string lAccentKey = GetAccentKeyForPaletteIndex( pEntry.PaletteIndex );
@@ -105,7 +105,17 @@ namespace ResumeApp.ViewModels.Pages
 				pEndDate: lEndDate,
 				pTitle: pEntry.CompanyText,
 				pAccentColorKey: lAccentKey,
-				pSubtitleText: pEntry.RoleText );
+				pSubtitleText: pEntry.RoleText )
+			{
+				DescriptionText = BuildTimeFrameDescription( pEntry )
+			};
+		}
+
+		private string BuildTimeFrameDescription( ExperienceTimelineEntryViewModel pEntry )
+		{
+			return string.IsNullOrEmpty( pEntry.DurationText )
+				? pEntry.DateRangeText
+				: string.Concat( pEntry.DateRangeText, ResourcesService[ "TimelineBarLabelSeparator" ], pEntry.DurationText );
 		}
 
 		private static string GetAccentKeyForPaletteIndex( int pPaletteIndex )

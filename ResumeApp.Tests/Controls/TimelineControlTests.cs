@@ -244,14 +244,14 @@ public sealed class TimelineControlTests
     }
 
     [Theory]
-    [InlineData( "en-CA", "Mar 1, 2024" )]
-    [InlineData( "en-US", "Mar 1, 2024" )]
-    [InlineData( "fr-CA", "1 mars 2024" )]
-    public void FormatSelectedDateLabel_FollowsCultureConventions( string pCultureName, string pExpected )
+    [InlineData( "en-CA", "Mar 2024" )]
+    [InlineData( "en-US", "Mar 2024" )]
+    [InlineData( "fr-CA", "mars 2024" )]
+    public void FormatPillDateLabel_UsesMonthPrecisionAndCultureConventions( string pCultureName, string pExpected )
     {
         var lCulture = CultureInfo.GetCultureInfo( pCultureName );
 
-        var lLabel = TimelineControl.FormatSelectedDateLabel( new DateTime( 2024, 3, 1 ), lCulture );
+        var lLabel = TimelineControl.FormatPillDateLabel( new DateTime( 2024, 3, 17 ), lCulture );
 
         Assert.Equal( pExpected, lLabel );
     }

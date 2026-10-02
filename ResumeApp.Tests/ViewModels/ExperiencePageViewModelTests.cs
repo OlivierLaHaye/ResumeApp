@@ -478,6 +478,57 @@ public sealed class ExperiencePageViewModelTests
         Assert.Contains( nameof( ExperiencePageViewModel.SelectedTimeFrame ), lRaisedProperties );
     }
 
+    [Fact]
+    public void ExperienceTimeFrames_DescriptionIsDateRangeThenSeparatorThenDuration()
+    {
+        var lViewModel = Create();
+
+        for ( int lIndex = 0; lIndex < lViewModel.ExperienceTimeFrames.Count; lIndex++ )
+        {
+            var lFrame = lViewModel.ExperienceTimeFrames[ lIndex ];
+            var lEntry = lViewModel.TimelineEntries[ lIndex ];
+
+            Assert.NotEmpty( lEntry.DurationText );
+            Assert.Equal( $"{lEntry.DateRangeText} · {lEntry.DurationText}", lFrame.DescriptionText );
+        }
+    }
+
+    [Fact]
+    public void ExperienceTimeFrames_OpenEndedFrameDescribesPresentInEnglish()
+    {
+        var lViewModel = Create();
+
+        var lOpenEndedEntry = lViewModel.TimelineEntries.First( pEntry => pEntry.EndDate == null );
+        var lFrame = lViewModel.ExperienceTimeFrames[ lViewModel.TimelineEntries.IndexOf( lOpenEndedEntry ) ];
+
+        Assert.StartsWith( $"{lOpenEndedEntry.StartDate:yyyy-MM} – Present · ", lFrame.DescriptionText );
+    }
+
+    [Fact]
+    public void ExperienceTimeFrames_DescriptionIsRefreshedOnLanguageChange()
+    {
+        var lResourcesService = new ResourcesService();
+        var lViewModel = new ExperiencePageViewModel( lResourcesService, new ThemeService() );
+        string[] lEnglishDescriptions = lViewModel.ExperienceTimeFrames.Select( pFrame => pFrame.DescriptionText ).ToArray();
+
+        lResourcesService.SetLanguage( AppLanguage.FrenchCanada );
+
+        Assert.Equal( lEnglishDescriptions.Length, lViewModel.ExperienceTimeFrames.Count );
+
+        for ( int lIndex = 0; lIndex < lViewModel.ExperienceTimeFrames.Count; lIndex++ )
+        {
+            var lFrame = lViewModel.ExperienceTimeFrames[ lIndex ];
+            var lEntry = lViewModel.TimelineEntries[ lIndex ];
+
+            Assert.Equal( $"{lEntry.DateRangeText} · {lEntry.DurationText}", lFrame.DescriptionText );
+            Assert.NotEqual( lEnglishDescriptions[ lIndex ], lFrame.DescriptionText );
+        }
+
+        var lOpenEndedFrame = lViewModel.ExperienceTimeFrames[ lViewModel.TimelineEntries.ToList().FindIndex( pEntry => pEntry.EndDate == null ) ];
+        Assert.Contains( "– aujourd'hui · ", lOpenEndedFrame.DescriptionText );
+        Assert.DoesNotContain( "Present", lOpenEndedFrame.DescriptionText );
+    }
+
     private static void AssertSelectionIsCoherent(
         ExperiencePageViewModel pViewModel,
         int pExpectedIndex,

@@ -391,8 +391,23 @@
   <data name="ExperienceCreaformUiUxExpertTech" xml:space="preserve">
     <value>WPF, XAML, C# 7.3, MVVM, Visual Studio, Adobe Photoshop</value>
   </data>
+  <data name="ExperienceDateRangeOpenEnd" xml:space="preserve">
+    <value>Present</value>
+  </data>
   <data name="ExperienceDateRangeSeparator" xml:space="preserve">
-    <value> to </value>
+    <value> – </value>
+  </data>
+  <data name="ExperienceDurationMonthMany" xml:space="preserve">
+    <value>{0} mos</value>
+  </data>
+  <data name="ExperienceDurationMonthOne" xml:space="preserve">
+    <value>{0} mo</value>
+  </data>
+  <data name="ExperienceDurationYearMany" xml:space="preserve">
+    <value>{0} yrs</value>
+  </data>
+  <data name="ExperienceDurationYearOne" xml:space="preserve">
+    <value>{0} yr</value>
   </data>
   <data name="ExperienceIaAcc1" xml:space="preserve">
     <value>Delivered features in C# and VB.NET and contributed to unit testing for long-term stability.</value>
@@ -910,11 +925,29 @@
   <data name="TabVisualCraftTitle" xml:space="preserve">
     <value>Visual craft</value>
   </data>
+  <data name="TimelineAutomationName" xml:space="preserve">
+    <value>Career timeline</value>
+  </data>
+  <data name="TimelineBarLabelSeparator" xml:space="preserve">
+    <value> · </value>
+  </data>
   <data name="TimelineControlInteractionsHelpText" xml:space="preserve">
-    <value>Click the timeline, use the mouse wheel to zoom, drag to pan with inertia, click a bar or anywhere on the timeline to select a date. With the keyboard, use the arrow keys, Home and End.</value>
+    <value>Click the timeline, use the mouse wheel to zoom, drag to pan with inertia, click a bar or anywhere on the timeline to select a date. With the keyboard, use the arrow keys, Home and End, plus and minus to zoom, 0 to show everything, and Enter to open the selected role card.</value>
+  </data>
+  <data name="TimelineHintText" xml:space="preserve">
+    <value>Drag to pan · Wheel or +/− to zoom · Arrows to move</value>
   </data>
   <data name="TimelineLabelTodayMarker" xml:space="preserve">
     <value>Today</value>
+  </data>
+  <data name="TimelineShowAllButtonText" xml:space="preserve">
+    <value>Show all</value>
+  </data>
+  <data name="TimelineZoomInButtonAutomationName" xml:space="preserve">
+    <value>Zoom in</value>
+  </data>
+  <data name="TimelineZoomOutButtonAutomationName" xml:space="preserve">
+    <value>Zoom out</value>
   </data>
   <data name="ValueFullRemoteOnly" xml:space="preserve">
     <value>Full remote only</value>

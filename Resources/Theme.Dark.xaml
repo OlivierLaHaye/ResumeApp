@@ -1,7 +1,7 @@
 ﻿<!--  Copyright (C) Olivier La Haye  -->
 <!--  All rights reserved.  -->
 
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:sys="clr-namespace:System;assembly=mscorlib" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Color x:Key="CommonColor">#047af7</Color>
     <Color x:Key="CommonBlueColor">#047af7</Color>
@@ -21,6 +21,15 @@
     <Color x:Key="CommonCyanStrongColor">#0E7490</Color>
     <Color x:Key="CommonPinkStrongColor">#BE185D</Color>
     <Color x:Key="CommonRedStrongColor">#BE123C</Color>
+
+    <Color x:Key="CommonBlueEdgeColor">#047AF7</Color>
+    <Color x:Key="CommonGreenEdgeColor">#04D182</Color>
+    <Color x:Key="CommonYellowEdgeColor">#F7E004</Color>
+    <Color x:Key="CommonRedEdgeColor">#F70452</Color>
+    <Color x:Key="CommonPurpleEdgeColor">#8B5CF6</Color>
+    <Color x:Key="CommonOrangeEdgeColor">#F97316</Color>
+    <Color x:Key="CommonCyanEdgeColor">#06B6D4</Color>
+    <Color x:Key="CommonPinkEdgeColor">#EC4899</Color>
 
     <Color x:Key="CommonBlackColor">#0C0C0C</Color>
     <Color x:Key="CommonDarkerGrayColor">#141414</Color>
@@ -54,6 +63,15 @@
     <SolidColorBrush x:Key="CommonCyanStrongBrush" Color="{StaticResource CommonCyanStrongColor}" />
     <SolidColorBrush x:Key="CommonPinkStrongBrush" Color="{StaticResource CommonPinkStrongColor}" />
     <SolidColorBrush x:Key="CommonRedStrongBrush" Color="{StaticResource CommonRedStrongColor}" />
+
+    <SolidColorBrush x:Key="CommonBlueEdgeBrush" Color="{StaticResource CommonBlueEdgeColor}" />
+    <SolidColorBrush x:Key="CommonGreenEdgeBrush" Color="{StaticResource CommonGreenEdgeColor}" />
+    <SolidColorBrush x:Key="CommonYellowEdgeBrush" Color="{StaticResource CommonYellowEdgeColor}" />
+    <SolidColorBrush x:Key="CommonRedEdgeBrush" Color="{StaticResource CommonRedEdgeColor}" />
+    <SolidColorBrush x:Key="CommonPurpleEdgeBrush" Color="{StaticResource CommonPurpleEdgeColor}" />
+    <SolidColorBrush x:Key="CommonOrangeEdgeBrush" Color="{StaticResource CommonOrangeEdgeColor}" />
+    <SolidColorBrush x:Key="CommonCyanEdgeBrush" Color="{StaticResource CommonCyanEdgeColor}" />
+    <SolidColorBrush x:Key="CommonPinkEdgeBrush" Color="{StaticResource CommonPinkEdgeColor}" />
 
     <SolidColorBrush
         x:Key="OnSurfaceDividerOnDarkBrush"
@@ -106,4 +124,6 @@
     <SolidColorBrush x:Key="SurfacePillSelectedBrush" Color="{StaticResource SurfacePillSelectedColor}" />
     <SolidColorBrush x:Key="SurfacePillSelectedBorderBrush" Color="{StaticResource SurfacePillSelectedBorderColor}" />
     <SolidColorBrush x:Key="BorderStrongBrush" Color="{StaticResource BorderStrongColor}" />
+
+    <sys:Double x:Key="TimelineInactiveBarOpacity">0.72</sys:Double>
 </ResourceDictionary>

@@ -14,8 +14,7 @@
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource CommonWhiteBrush}" />
-        <Setter Property="Padding" Value="16,12,16,16" />
-        <Setter Property="Height" Value="220" />
+        <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
         <Setter Property="Focusable" Value="True" />
         <Setter Property="FocusVisualStyle">
             <Setter.Value>
@@ -5802,6 +5801,98 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="{StaticResource CommonDisableOpacity}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="TimelineZoomButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="30" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="IsTabStop" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource InsetFocusRingVisualStyle}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border
+                        x:Name="mTimelineZoomButtonBorder"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(attachedProperties:CornerRadiusAssist.sCornerRadius)}"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SurfacePillSelectedBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="{StaticResource CommonDisableOpacity}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="TimelinePillButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource CommonFontFamily}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="IsTabStop" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource OutsetFocusRingVisualStyle}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border
+                        x:Name="mTimelinePillBorder"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="13"
+                        SnapsToDevicePixels="True">
+                        <TextBlock
+                            x:Name="mTimelinePillTextBlock"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontFamily="{TemplateBinding FontFamily}"
+                            FontSize="{TemplateBinding FontSize}"
+                            FontWeight="{TemplateBinding FontWeight}"
+                            Foreground="{TemplateBinding Foreground}"
+                            Text="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SurfacePillSelectedBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
                 <Setter Property="Opacity" Value="{StaticResource CommonDisableOpacity}" />
             </Trigger>
         </Style.Triggers>

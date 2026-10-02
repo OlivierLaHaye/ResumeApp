@@ -51,7 +51,15 @@ namespace ResumeApp.Services
 			"TextSecondaryColor",
 			"BorderSubtleColor",
 			"BorderStrongColor",
-			"CaptionCloseHoverGlyphColor"
+			"CaptionCloseHoverGlyphColor",
+			"CommonBlueEdgeColor",
+			"CommonGreenEdgeColor",
+			"CommonYellowEdgeColor",
+			"CommonRedEdgeColor",
+			"CommonPurpleEdgeColor",
+			"CommonOrangeEdgeColor",
+			"CommonCyanEdgeColor",
+			"CommonPinkEdgeColor"
 		];
 
 		internal static IReadOnlyList<string> HighContrastHighlightColorKeys { get; } =

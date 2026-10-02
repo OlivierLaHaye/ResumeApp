@@ -42,6 +42,13 @@ namespace ResumeApp.Models
 			set => SetProperty( ref mSubtitleText, value ?? string.Empty );
 		}
 
+		private string mDescriptionText = string.Empty;
+		public string DescriptionText
+		{
+			get => mDescriptionText;
+			set => SetProperty( ref mDescriptionText, value ?? string.Empty );
+		}
+
 		public TimelineTimeFrameItem( DateTime pStartDate, DateTime pEndDate, string? pTitle, string? pAccentColorKey )
 			: this( pStartDate, pEndDate, pTitle, pAccentColorKey, null )
 		{
