@@ -7,9 +7,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:ResumeApp.Controls"
     xmlns:pages="clr-namespace:ResumeApp.Pages"
+    xmlns:services="clr-namespace:ResumeApp.Services"
     x:Name="mMainWindowRoot"
     Title="{Binding ResourcesService[AppTitle], Mode=OneWay}"
-    MinWidth="1400"
+    MinWidth="960"
+    MinHeight="640"
     AllowsTransparency="False"
     Background="{DynamicResource CommonBlackBrush}"
     BorderThickness="0"
@@ -19,53 +21,16 @@
     WindowStartupLocation="Manual"
     WindowStyle="None">
 
-    <Window.Resources>
-        <Style
-            x:Key="MainWindowTopBarBorderStyle"
-            BasedOn="{StaticResource SectionCardBorderStyle}"
-            TargetType="{x:Type Border}">
-            <Setter Property="Margin" Value="{StaticResource LargeThickness}" />
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
-                    <Setter Property="Margin" Value="0" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style
-            x:Key="MainWindowTabControlStyle"
-            BasedOn="{StaticResource MainTabControlStyle}"
-            TargetType="{x:Type TabControl}">
-            <Setter Property="Margin" Value="{StaticResource LargeLeftRightThickness}" />
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
-                    <Setter Property="Margin" Value="0" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
-
     <Border
         x:Name="mWindowFrameBorder"
-        BorderBrush="{DynamicResource CommonLightGrayBrush}"
-        CornerRadius="40"
+        BorderBrush="{DynamicResource BorderSubtleBrush}"
+        BorderThickness="0"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True">
-        <Border.Style>
-            <Style TargetType="{x:Type Border}">
-                <Setter Property="BorderThickness" Value="{StaticResource ExtraSmallThickness}" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
-                        <Setter Property="BorderThickness" Value="0" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Border.Style>
 
         <Grid x:Name="mMainWindowLayoutRoot">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="56" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
@@ -73,303 +38,171 @@
                 x:Name="mCustomTitleBarRootGrid"
                 Grid.Row="0"
                 Background="Transparent">
-                <Grid.Margin>
-                    <Thickness Bottom="{StaticResource CommonThicknessValue}" />
-                </Grid.Margin>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-                <Border x:Name="mCustomTitleBarDragSurfaceBorder" Background="Transparent" />
+                <Image
+                    x:Name="mAppIconImage"
+                    Grid.Column="0"
+                    Width="28"
+                    Height="28"
+                    Margin="20,0,12,0"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="{Binding ResourcesService[AppTitle], Mode=OneWay}"
+                    RenderOptions.BitmapScalingMode="HighQuality"
+                    Source="pack://application:,,,/ResumeApp;component/Resources/ResumeApp.png"
+                    Stretch="Uniform" />
+
+                <StackPanel
+                    x:Name="mTitleStackPanel"
+                    Grid.Column="1"
+                    Margin="0,0,16,0"
+                    VerticalAlignment="Center"
+                    Orientation="Vertical">
+                    <TextBlock
+                        x:Name="mAppTitleTextBlock"
+                        Margin="0"
+                        FontSize="15"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource TextPrimaryBrush}"
+                        Text="{Binding ResourcesService[AppTitle], Mode=OneWay}"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="NoWrap" />
+                    <TextBlock
+                        x:Name="mAppSubtitleTextBlock"
+                        Margin="0,1,0,0"
+                        FontSize="12"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Text="{Binding ResourcesService[AppSubtitle], Mode=OneWay}"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="NoWrap" />
+                </StackPanel>
 
                 <Border
-                    x:Name="mCaptionButtonsCapsuleBorder"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Top"
+                    x:Name="mLanguageSegmentBorder"
+                    Grid.Column="2"
+                    Margin="0,0,10,0"
+                    Style="{StaticResource SegmentedGroupBorderStyle}"
                     WindowChrome.IsHitTestVisibleInChrome="True">
-
-                    <Grid x:Name="mCaptionButtonsGrid">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="45" />
-                            <ColumnDefinition Width="45" />
-                            <ColumnDefinition Width="45" />
-                        </Grid.ColumnDefinitions>
-
-                        <Button
-                            x:Name="mMinimizeWindowButton"
-                            Grid.Column="0"
-                            Click="OnMinimizeWindowButtonClick"
-                            Style="{StaticResource MinimizeButtonStyle}"
-                            WindowChrome.IsHitTestVisibleInChrome="True" />
-
-                        <Grid x:Name="mMaximizeRestoreButtonsGrid" Grid.Column="1">
-                            <Button
-                                x:Name="mMaximizeWindowButton"
-                                Click="OnMaximizeRestoreWindowButtonClick"
-                                WindowChrome.IsHitTestVisibleInChrome="True">
-                                <Button.Style>
-                                    <Style BasedOn="{StaticResource MaximizeButtonStyle}" TargetType="{x:Type Button}">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
-
-                            <Button
-                                x:Name="mRestoreWindowButton"
-                                Click="OnMaximizeRestoreWindowButtonClick"
-                                WindowChrome.IsHitTestVisibleInChrome="True">
-                                <Button.Style>
-                                    <Style BasedOn="{StaticResource RestoreButtonStyle}" TargetType="{x:Type Button}">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="Maximized">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
-                        </Grid>
-
-                        <Button
-                            x:Name="mCloseWindowButton"
-                            Grid.Column="2"
-                            Click="OnCloseWindowButtonClick"
-                            Style="{StaticResource CloseButtonStyle}"
-                            WindowChrome.IsHitTestVisibleInChrome="True" />
-                    </Grid>
+                    <StackPanel x:Name="mLanguageSegmentStackPanel" Orientation="Horizontal">
+                        <controls:CommandToggleButton
+                            x:Name="mEnglishLanguageToggleButton"
+                            AutomationProperties.HelpText="{Binding ResourcesService[LabelLanguage], Mode=OneWay}"
+                            AutomationProperties.Name="{Binding ResourcesService[LanguageEnglishCanadaDisplayName], Mode=OneWay}"
+                            Content="{Binding ResourcesService[SegmentLanguageEnglishShort], Mode=OneWay}"
+                            IsChecked="{Binding IsEnglishLanguageActive, Mode=OneWay}"
+                            Style="{StaticResource SegmentedToggleButtonStyle}"
+                            ToggleCommand="{Binding SetLanguageCommand}"
+                            ToggleCommandParameter="{x:Static services:AppLanguage.EnglishCanada}" />
+                        <controls:CommandToggleButton
+                            x:Name="mFrenchLanguageToggleButton"
+                            AutomationProperties.HelpText="{Binding ResourcesService[LabelLanguage], Mode=OneWay}"
+                            AutomationProperties.Name="{Binding ResourcesService[LanguageFrenchCanadaDisplayName], Mode=OneWay}"
+                            Content="{Binding ResourcesService[SegmentLanguageFrenchShort], Mode=OneWay}"
+                            IsChecked="{Binding IsFrenchLanguageActive, Mode=OneWay}"
+                            Style="{StaticResource SegmentedToggleButtonStyle}"
+                            ToggleCommand="{Binding SetLanguageCommand}"
+                            ToggleCommandParameter="{x:Static services:AppLanguage.FrenchCanada}" />
+                    </StackPanel>
                 </Border>
+
+                <Border
+                    x:Name="mThemeSegmentBorder"
+                    Grid.Column="3"
+                    Margin="0,0,16,0"
+                    Style="{StaticResource SegmentedGroupBorderStyle}"
+                    WindowChrome.IsHitTestVisibleInChrome="True">
+                    <StackPanel x:Name="mThemeSegmentStackPanel" Orientation="Horizontal">
+                        <controls:CommandToggleButton
+                            x:Name="mLightThemeToggleButton"
+                            AutomationProperties.HelpText="{Binding ResourcesService[LabelTheme], Mode=OneWay}"
+                            AutomationProperties.Name="{Binding ResourcesService[SegmentThemeLight], Mode=OneWay}"
+                            Content="{Binding ResourcesService[SegmentThemeLight], Mode=OneWay}"
+                            IsChecked="{Binding IsLightThemeActive, Mode=OneWay}"
+                            Style="{StaticResource SegmentedToggleButtonStyle}"
+                            ToggleCommand="{Binding SetThemeCommand}"
+                            ToggleCommandParameter="{x:Static services:AppTheme.Light}" />
+                        <controls:CommandToggleButton
+                            x:Name="mDarkThemeToggleButton"
+                            AutomationProperties.HelpText="{Binding ResourcesService[LabelTheme], Mode=OneWay}"
+                            AutomationProperties.Name="{Binding ResourcesService[SegmentThemeDark], Mode=OneWay}"
+                            Content="{Binding ResourcesService[SegmentThemeDark], Mode=OneWay}"
+                            IsChecked="{Binding IsDarkThemeActive, Mode=OneWay}"
+                            Style="{StaticResource SegmentedToggleButtonStyle}"
+                            ToggleCommand="{Binding SetThemeCommand}"
+                            ToggleCommandParameter="{x:Static services:AppTheme.Dark}" />
+                    </StackPanel>
+                </Border>
+
+                <StackPanel
+                    x:Name="mCaptionButtonsStackPanel"
+                    Grid.Column="4"
+                    VerticalAlignment="Top"
+                    Orientation="Horizontal"
+                    WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Button
+                        x:Name="mMinimizeWindowButton"
+                        AutomationProperties.Name="{Binding ResourcesService[AutomationWindowMinimize], Mode=OneWay}"
+                        Click="OnMinimizeWindowButtonClick"
+                        Style="{StaticResource MinimizeButtonStyle}" />
+
+                    <Button
+                        x:Name="mMaximizeWindowButton"
+                        AutomationProperties.Name="{Binding ResourcesService[AutomationWindowMaximize], Mode=OneWay}"
+                        Click="OnMaximizeRestoreWindowButtonClick">
+                        <Button.Style>
+                            <Style BasedOn="{StaticResource MaximizeButtonStyle}" TargetType="{x:Type Button}">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding WindowState, ElementName=mMainWindowRoot}" Value="Maximized">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button
+                        x:Name="mRestoreWindowButton"
+                        AutomationProperties.Name="{Binding ResourcesService[AutomationWindowRestore], Mode=OneWay}"
+                        Click="OnMaximizeRestoreWindowButtonClick">
+                        <Button.Style>
+                            <Style BasedOn="{StaticResource RestoreButtonStyle}" TargetType="{x:Type Button}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding WindowState, ElementName=mMainWindowRoot}" Value="Maximized">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button
+                        x:Name="mCloseWindowButton"
+                        AutomationProperties.Name="{Binding ResourcesService[AutomationWindowClose], Mode=OneWay}"
+                        Click="OnCloseWindowButtonClick"
+                        Style="{StaticResource CloseButtonStyle}" />
+                </StackPanel>
             </Grid>
-
-            <Border
-                x:Name="mTopBarBorder"
-                Grid.Row="1"
-                Style="{StaticResource MainWindowTopBarBorderStyle}">
-                <Border.Margin>
-                    <Thickness
-                        Bottom="{StaticResource LargeThicknessValue}"
-                        Left="{StaticResource LargeThicknessValue}"
-                        Right="{StaticResource LargeThicknessValue}" />
-                </Border.Margin>
-
-                <Grid x:Name="mTopBarRootGrid" VerticalAlignment="Center">
-
-                    <Image
-                        Height="32"
-                        Margin="{StaticResource CommonThickness}"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        RenderOptions.BitmapScalingMode="HighQuality"
-                        Source="pack://application:,,,/ResumeApp;component/Resources/ResumeApp.png"
-                        Stretch="Uniform"
-                        Visibility="{Binding IsTopBarCollapsed, Mode=OneWay, Converter={StaticResource BoolToCollapseConverter}}">
-                        <Image.Style>
-                            <Style TargetType="{x:Type Image}">
-                                <Style.Triggers>
-                                    <!--  Fade in when collapsed (IsTopBarCollapsed becomes True)  -->
-                                    <DataTrigger Binding="{Binding IsTopBarCollapsed}" Value="True">
-                                        <DataTrigger.EnterActions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <DoubleAnimation
-                                                        EasingFunction="{StaticResource CubicEaseOut}"
-                                                        Storyboard.TargetProperty="Opacity"
-                                                        From="0"
-                                                        To="1"
-                                                        Duration="{StaticResource SubtleDuration}" />
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </DataTrigger.EnterActions>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Image.Style>
-                    </Image>
-
-                    <Grid
-                        x:Name="mTopBarLayoutGrid"
-                        Margin="{StaticResource SmallThickness}"
-                        VerticalAlignment="Center"
-                        Visibility="{Binding IsTopBarCollapsed, Mode=OneWay, Converter={StaticResource InverseBoolToCollapseConverter}}">
-                        <Grid.Style>
-                            <Style TargetType="{x:Type Grid}">
-                                <Style.Triggers>
-                                    <!--  Fade in when expanded (IsTopBarCollapsed becomes False)  -->
-                                    <DataTrigger Binding="{Binding IsTopBarCollapsed}" Value="False">
-                                        <DataTrigger.EnterActions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <DoubleAnimation
-                                                        EasingFunction="{StaticResource CubicEaseOut}"
-                                                        Storyboard.TargetProperty="Opacity"
-                                                        From="0"
-                                                        To="1"
-                                                        Duration="{StaticResource SubtleDuration}" />
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </DataTrigger.EnterActions>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <Grid x:Name="mTitleWithIconGrid" VerticalAlignment="Center">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <Image
-                                x:Name="mAppIconImage"
-                                Height="160"
-                                Margin="{StaticResource LargeThickness}"
-                                VerticalAlignment="Center"
-                                RenderOptions.BitmapScalingMode="HighQuality"
-                                Source="pack://application:,,,/ResumeApp;component/Resources/ResumeApp.png"
-                                Stretch="Uniform" />
-
-                            <StackPanel
-                                x:Name="mTitleStackPanel"
-                                Grid.Column="1"
-                                Margin="{StaticResource LargeTopBottomThickness}"
-                                Orientation="Vertical">
-                                <TextBlock
-                                    x:Name="mAppTitleTextBlock"
-                                    FontSize="{StaticResource LargeFontSize}"
-                                    FontWeight="SemiBold"
-                                    Text="{Binding ResourcesService[AppTitle], Mode=OneWay}" />
-                                <TextBlock
-                                    x:Name="mAppSubtitleTextBlock"
-                                    FontSize="{StaticResource SmallFontSize}"
-                                    Opacity="{StaticResource LowOpacity}"
-                                    Text="{Binding ResourcesService[AppSubtitle], Mode=OneWay}" />
-                            </StackPanel>
-                        </Grid>
-
-                        <StackPanel
-                            x:Name="mTopBarActionsStackPanel"
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            Orientation="Horizontal">
-
-                            <controls:ThemeCheckBox
-                                x:Name="mThemeToggleControl"
-                                CheckBoxThemeCommand="{Binding CheckBoxThemeCommand}"
-                                IsDarkThemeActive="{Binding IsDarkThemeActive}"
-                                LabelResourceKey="ButtonToggleTheme"
-                                ResourcesService="{Binding ResourcesService}" />
-
-                            <controls:LanguageCheckBoxControl
-                                x:Name="mLanguageToggleControl"
-                                CheckBoxLanguageCommand="{Binding CheckBoxLanguageCommand}"
-                                IsFrenchLanguageActive="{Binding IsFrenchLanguageActive}"
-                                LabelResourceKey="LabelActiveLanguage"
-                                ResourcesService="{Binding ResourcesService}" />
-                        </StackPanel>
-                    </Grid>
-
-                    <ToggleButton
-                        x:Name="mTopBarCollapseToggleButton"
-                        Grid.Row="0"
-                        HorizontalAlignment="Center"
-                        IsChecked="{Binding IsTopBarCollapsed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        <ToggleButton.Style>
-                            <Style TargetType="{x:Type ToggleButton}">
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="BorderBrush" Value="{x:Null}" />
-                                <Setter Property="BorderThickness" Value="0" />
-                                <Setter Property="Padding" Value="6,6" />
-                                <Setter Property="Cursor" Value="Hand" />
-                                <Setter Property="Focusable" Value="False" />
-                                <Setter Property="HorizontalAlignment" Value="Center" />
-                                <Setter Property="VerticalAlignment" Value="Bottom" />
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type ToggleButton}">
-                                            <Border
-                                                x:Name="mTopBarCollapseToggleBorder"
-                                                Padding="{TemplateBinding Padding}"
-                                                Background="{TemplateBinding Background}">
-                                                <Viewbox
-                                                    x:Name="mTopBarCollapseIconViewBox"
-                                                    Width="20"
-                                                    Height="20"
-                                                    Stretch="Uniform">
-                                                    <Grid x:Name="mTopBarCollapseIconGrid">
-                                                        <Path
-                                                            x:Name="mTopBarCollapseIconPath"
-                                                            Fill="{DynamicResource CommonWhiteBrush}"
-                                                            Data="M17.920015,8.074995 H11.690015 H6.079985 C5.119985,8.074995 4.639985,9.234995 5.319985,9.915005 L10.500015,15.095005 C11.330015,15.925005 12.680015,15.925005 13.510015,15.095005 L15.480015,13.125005 L18.690015,9.915005 C19.360015,9.234995 18.880015,8.074995 17.920015,8.074995 Z"
-                                                            RenderTransformOrigin="0.5,0.5">
-                                                            <Path.RenderTransform>
-                                                                <RotateTransform x:Name="mTopBarCollapseIconRotateTransform" Angle="180" />
-                                                            </Path.RenderTransform>
-                                                        </Path>
-                                                    </Grid>
-                                                </Viewbox>
-                                            </Border>
-
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="mTopBarCollapseToggleBorder" Property="Opacity" Value="0.85" />
-                                                </Trigger>
-
-                                                <Trigger Property="IsPressed" Value="True">
-                                                    <Setter TargetName="mTopBarCollapseToggleBorder" Property="Opacity" Value="0.65" />
-                                                </Trigger>
-
-                                                <Trigger Property="IsChecked" Value="True">
-                                                    <Setter Property="VerticalAlignment" Value="Center" />
-
-                                                    <Trigger.EnterActions>
-                                                        <BeginStoryboard>
-                                                            <Storyboard>
-                                                                <DoubleAnimation
-                                                                    Storyboard.TargetName="mTopBarCollapseIconRotateTransform"
-                                                                    Storyboard.TargetProperty="Angle"
-                                                                    To="0"
-                                                                    Duration="0:0:0.15" />
-                                                            </Storyboard>
-                                                        </BeginStoryboard>
-                                                    </Trigger.EnterActions>
-                                                    <Trigger.ExitActions>
-                                                        <BeginStoryboard>
-                                                            <Storyboard>
-                                                                <DoubleAnimation
-                                                                    Storyboard.TargetName="mTopBarCollapseIconRotateTransform"
-                                                                    Storyboard.TargetProperty="Angle"
-                                                                    To="180"
-                                                                    Duration="0:0:0.15" />
-                                                            </Storyboard>
-                                                        </BeginStoryboard>
-                                                    </Trigger.ExitActions>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </ToggleButton.Style>
-                    </ToggleButton>
-                </Grid>
-            </Border>
 
             <TabControl
                 x:Name="mMainTabControl"
-                Grid.Row="2"
-                Style="{StaticResource MainWindowTabControlStyle}">
+                Grid.Row="1"
+                Padding="12,0"
+                AutomationProperties.Name="{Binding ResourcesService[AutomationMainNavigation], Mode=OneWay}"
+                Style="{StaticResource MainTabControlStyle}">
                 <TabItem x:Name="mOverviewTabItem">
                     <TabItem.Header>
                         <TextBlock
                             x:Name="mOverviewTabHeaderTextBlock"
-                            Text="{Binding ResourcesService[TabResumeTitle], Mode=OneWay}"
-                            TextAlignment="Center" />
+                            Style="{StaticResource MainTabHeaderTextBlockStyle}"
+                            Text="{Binding ResourcesService[TabResumeTitle], Mode=OneWay}" />
                     </TabItem.Header>
                     <pages:OverviewPage x:Name="mOverviewPage" DataContext="{Binding OverviewPageViewModel}" />
                 </TabItem>
@@ -378,8 +211,8 @@
                     <TabItem.Header>
                         <TextBlock
                             x:Name="mExperienceTabHeaderTextBlock"
-                            Text="{Binding ResourcesService[TabExperienceTitle], Mode=OneWay}"
-                            TextAlignment="Center" />
+                            Style="{StaticResource MainTabHeaderTextBlockStyle}"
+                            Text="{Binding ResourcesService[TabExperienceTitle], Mode=OneWay}" />
                     </TabItem.Header>
                     <pages:ExperiencePage x:Name="mExperiencePage" DataContext="{Binding ExperiencePageViewModel}" />
                 </TabItem>
@@ -388,8 +221,8 @@
                     <TabItem.Header>
                         <TextBlock
                             x:Name="mSkillsTabHeaderTextBlock"
-                            Text="{Binding ResourcesService[TabSkillsTitle], Mode=OneWay}"
-                            TextAlignment="Center" />
+                            Style="{StaticResource MainTabHeaderTextBlockStyle}"
+                            Text="{Binding ResourcesService[TabSkillsTitle], Mode=OneWay}" />
                     </TabItem.Header>
                     <pages:SkillsPage x:Name="mSkillsPage" DataContext="{Binding SkillsPageViewModel}" />
                 </TabItem>
@@ -398,8 +231,8 @@
                     <TabItem.Header>
                         <TextBlock
                             x:Name="mProjectsTabHeaderTextBlock"
-                            Text="{Binding ResourcesService[TabProjectsTitle], Mode=OneWay}"
-                            TextAlignment="Center" />
+                            Style="{StaticResource MainTabHeaderTextBlockStyle}"
+                            Text="{Binding ResourcesService[TabProjectsTitle], Mode=OneWay}" />
                     </TabItem.Header>
                     <pages:ProjectsPage x:Name="mProjectsPage" DataContext="{Binding ProjectsPageViewModel}" />
                 </TabItem>
@@ -408,8 +241,8 @@
                     <TabItem.Header>
                         <TextBlock
                             x:Name="mPhotographyTabHeaderTextBlock"
-                            Text="{Binding ResourcesService[TabPhotographyTitle], Mode=OneWay}"
-                            TextAlignment="Center" />
+                            Style="{StaticResource MainTabHeaderTextBlockStyle}"
+                            Text="{Binding ResourcesService[TabPhotographyTitle], Mode=OneWay}" />
                     </TabItem.Header>
                     <pages:PhotographyPage x:Name="mPhotographyPage" DataContext="{Binding PhotographyPageViewModel}" />
                 </TabItem>
@@ -418,13 +251,29 @@
                     <TabItem.Header>
                         <TextBlock
                             x:Name="mEducationTabHeaderTextBlock"
-                            Text="{Binding ResourcesService[TabEducationTitle], Mode=OneWay}"
-                            TextAlignment="Center" />
+                            Style="{StaticResource MainTabHeaderTextBlockStyle}"
+                            Text="{Binding ResourcesService[TabEducationTitle], Mode=OneWay}" />
                     </TabItem.Header>
                     <pages:EducationPage x:Name="mEducationPage" DataContext="{Binding EducationPageViewModel}" />
                 </TabItem>
-
             </TabControl>
+
+            <Grid
+                x:Name="mStartupStatusGrid"
+                Grid.Row="1"
+                Background="{DynamicResource CommonBlackBrush}"
+                Visibility="Collapsed">
+                <TextBlock
+                    x:Name="mStartupStatusTextBlock"
+                    MaxWidth="560"
+                    Margin="24"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    AutomationProperties.LiveSetting="Polite"
+                    FontSize="15"
+                    Foreground="{DynamicResource TextSecondaryBrush}"
+                    TextAlignment="Center" />
+            </Grid>
         </Grid>
     </Border>
 </Window>

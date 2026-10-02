@@ -77,4 +77,27 @@
         <GradientStop Offset="0" Color="{DynamicResource CommonWhiteColor}" />
         <GradientStop Offset="1" Color="{DynamicResource CommonBlackColor}" />
     </LinearGradientBrush>
+    <Color x:Key="TextPrimaryColor">#F2F2F2</Color>
+    <Color x:Key="TextSecondaryColor">#A6A6A6</Color>
+    <Color x:Key="AccentColor">#047AF7</Color>
+    <Color x:Key="AccentTextColor">#4DA3FF</Color>
+    <Color x:Key="FocusRingColor">#4DA3FF</Color>
+    <Color x:Key="BorderSubtleColor">#2E2E2E</Color>
+    <Color x:Key="SurfaceHoverColor">#262626</Color>
+    <Color x:Key="SurfaceSelectedColor">#0057D6</Color>
+    <Color x:Key="TextOnSelectedColor">#FFFFFF</Color>
+    <Color x:Key="CaptionCloseHoverColor">#C42B1C</Color>
+    <Color x:Key="CaptionCloseHoverGlyphColor">#FFFFFF</Color>
+
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+    <SolidColorBrush x:Key="AccentTextBrush" Color="{StaticResource AccentTextColor}" />
+    <SolidColorBrush x:Key="FocusRingBrush" Color="{StaticResource FocusRingColor}" />
+    <SolidColorBrush x:Key="BorderSubtleBrush" Color="{StaticResource BorderSubtleColor}" />
+    <SolidColorBrush x:Key="SurfaceHoverBrush" Color="{StaticResource SurfaceHoverColor}" />
+    <SolidColorBrush x:Key="SurfaceSelectedBrush" Color="{StaticResource SurfaceSelectedColor}" />
+    <SolidColorBrush x:Key="TextOnSelectedBrush" Color="{StaticResource TextOnSelectedColor}" />
+    <SolidColorBrush x:Key="CaptionCloseHoverBrush" Color="{StaticResource CaptionCloseHoverColor}" />
+    <SolidColorBrush x:Key="CaptionCloseHoverGlyphBrush" Color="{StaticResource CaptionCloseHoverGlyphColor}" />
 </ResourceDictionary>

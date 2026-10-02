@@ -1,3 +1,4 @@
+using System.Windows.Media;
 using ResumeApp.Services;
 using Xunit;
 
@@ -78,5 +79,61 @@ public sealed class ThemeServiceTests
         var lService = new ThemeService();
 
         Assert.Throws<ArgumentNullException>( () => lService.ToggleTheme( null! ) );
+    }
+
+    [Theory]
+    [InlineData( "TextPrimaryColor", "TextPrimaryBrush" )]
+    [InlineData( "CommonWhiteColor", "CommonWhiteBrush" )]
+    [InlineData( "AccentText", "AccentTextBrush" )]
+    public void GetBrushKeyForColorKey_MapsColorKeyToBrushKey( string pColorKey, string pExpectedBrushKey )
+    {
+        Assert.Equal( pExpectedBrushKey, ThemeService.GetBrushKeyForColorKey( pColorKey ) );
+    }
+
+    [StaFact]
+    public void CreateHighContrastDictionary_MapsEverySemanticKeyToSystemColorRoles()
+    {
+        Color lWindow = Colors.Black;
+        Color lWindowText = Colors.White;
+        Color lHighlight = Colors.Cyan;
+        Color lHighlightText = Colors.Navy;
+        Color lHotTrack = Colors.Yellow;
+
+        var lDictionary = ThemeService.CreateHighContrastDictionary( lWindow, lWindowText, lHighlight, lHighlightText, lHotTrack );
+
+        AssertRole( lDictionary, ThemeService.HighContrastSurfaceColorKeys, lWindow );
+        AssertRole( lDictionary, ThemeService.HighContrastTextColorKeys, lWindowText );
+        AssertRole( lDictionary, ThemeService.HighContrastHighlightColorKeys, lHighlight );
+        AssertRole( lDictionary, ThemeService.HighContrastHighlightTextColorKeys, lHighlightText );
+        AssertRole( lDictionary, ThemeService.HighContrastHotTrackColorKeys, lHotTrack );
+    }
+
+    [Fact]
+    public void HighContrastKeys_CoverSemanticTokens()
+    {
+        string[] lAllKeys =
+        [
+            .. ThemeService.HighContrastSurfaceColorKeys,
+            .. ThemeService.HighContrastTextColorKeys,
+            .. ThemeService.HighContrastHighlightColorKeys,
+            .. ThemeService.HighContrastHighlightTextColorKeys,
+            .. ThemeService.HighContrastHotTrackColorKeys
+        ];
+
+        string[] lSemanticKeys = [ "TextPrimaryColor", "TextSecondaryColor", "AccentColor", "AccentTextColor", "FocusRingColor", "BorderSubtleColor", "SurfaceHoverColor", "SurfaceSelectedColor", "TextOnSelectedColor" ];
+
+        Assert.All( lSemanticKeys, pKey => Assert.Contains( pKey, lAllKeys ) );
+        Assert.Equal( lAllKeys.Length, lAllKeys.Distinct( StringComparer.Ordinal ).Count() );
+    }
+
+    private static void AssertRole( System.Windows.ResourceDictionary pDictionary, IEnumerable<string> pColorKeys, Color pExpected )
+    {
+        foreach ( string lColorKey in pColorKeys )
+        {
+            Assert.Equal( pExpected, Assert.IsType<Color>( pDictionary[ lColorKey ] ) );
+            var lBrush = Assert.IsType<SolidColorBrush>( pDictionary[ ThemeService.GetBrushKeyForColorKey( lColorKey ) ] );
+            Assert.Equal( pExpected, lBrush.Color );
+            Assert.True( lBrush.IsFrozen );
+        }
     }
 }

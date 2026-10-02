@@ -24,24 +24,19 @@ namespace ResumeApp.ViewModels
 
 		public EducationPageViewModel EducationPageViewModel { get; }
 
-		public RelayCommand CheckBoxThemeCommand { get; }
-
-		public RelayCommand CheckBoxLanguageCommand { get; }
-
 		public RelayCommand<AppLanguage> SetLanguageCommand { get; }
+
+		public RelayCommand<AppTheme> SetThemeCommand { get; }
 
 		public bool IsDarkThemeActive => ThemeService.IsDarkThemeActive;
 
+		public bool IsLightThemeActive => !ThemeService.IsDarkThemeActive;
+
 		public bool IsFrenchLanguageActive => SelectedLanguage == AppLanguage.FrenchCanada;
 
-		public string ActiveLanguageDisplayName => ResourcesService.ActiveLanguageDisplayName;
+		public bool IsEnglishLanguageActive => SelectedLanguage == AppLanguage.EnglishCanada;
 
-		private bool mIsTopBarCollapsed;
-		public bool IsTopBarCollapsed
-		{
-			get => mIsTopBarCollapsed;
-			set => SetProperty( ref mIsTopBarCollapsed, value );
-		}
+		public string ActiveLanguageDisplayName => ResourcesService.ActiveLanguageDisplayName;
 
 		private AppLanguage mSelectedLanguage;
 		public AppLanguage SelectedLanguage
@@ -49,13 +44,12 @@ namespace ResumeApp.ViewModels
 			get => mSelectedLanguage;
 			set
 			{
-				if ( !SetProperty( ref mSelectedLanguage, value ) )
+				if ( !SetSelectedLanguageState( value ) )
 				{
 					return;
 				}
 
-				RaisePropertyChanged( nameof( IsFrenchLanguageActive ) );
-				SetLanguage( value );
+				ResourcesService.SetLanguage( value );
 			}
 		}
 
@@ -77,47 +71,60 @@ namespace ResumeApp.ViewModels
 			PhotographyPageViewModel = pPhotographyPageViewModel ?? throw new ArgumentNullException( nameof( pPhotographyPageViewModel ) );
 			EducationPageViewModel = pEducationPageViewModel ?? throw new ArgumentNullException( nameof( pEducationPageViewModel ) );
 
-			CheckBoxThemeCommand = new RelayCommand( ToggleTheme );
-			CheckBoxLanguageCommand = new RelayCommand( ToggleLanguage );
-			SetLanguageCommand = new RelayCommand<AppLanguage>( SetLanguage );
+			SetLanguageCommand = new RelayCommand<AppLanguage>( pLanguage => SelectedLanguage = pLanguage );
+			SetThemeCommand = new RelayCommand<AppTheme>( SetTheme );
 
-			mSelectedLanguage = pResourcesService.ActiveCulture.Name.StartsWith( "fr", StringComparison.OrdinalIgnoreCase )
-				? AppLanguage.FrenchCanada
-				: AppLanguage.EnglishCanada;
-
-			mIsTopBarCollapsed = false;
+			mSelectedLanguage = GetLanguageForCulture( pResourcesService.ActiveCulture.Name );
 
 			pResourcesService.PropertyChanged += OnResourcesServicePropertyChanged;
-			pThemeService.PropertyChanged += ( _, _ ) => RaisePropertyChanged( nameof( IsDarkThemeActive ) );
+			pThemeService.PropertyChanged += OnThemeServicePropertyChanged;
+		}
+
+		private static AppLanguage GetLanguageForCulture( string? pCultureName )
+		{
+			return pCultureName?.StartsWith( "fr", StringComparison.OrdinalIgnoreCase ) == true
+				? AppLanguage.FrenchCanada
+				: AppLanguage.EnglishCanada;
+		}
+
+		private bool SetSelectedLanguageState( AppLanguage pLanguage )
+		{
+			if ( !SetProperty( ref mSelectedLanguage, pLanguage, nameof( SelectedLanguage ) ) )
+			{
+				return false;
+			}
+
+			RaisePropertyChanged( nameof( IsFrenchLanguageActive ) );
+			RaisePropertyChanged( nameof( IsEnglishLanguageActive ) );
+			return true;
 		}
 
 		private void OnResourcesServicePropertyChanged( object? pSender, PropertyChangedEventArgs pEventArgs )
 		{
-			if ( !string.Equals( pEventArgs.PropertyName, "Item[]", StringComparison.Ordinal ) )
+			if ( !string.Equals( pEventArgs.PropertyName, ResourcesService.IndexerPropertyName, StringComparison.Ordinal ) )
 			{
 				return;
 			}
 
 			RaisePropertyChanged( nameof( ActiveLanguageDisplayName ) );
-			RaisePropertyChanged( nameof( IsFrenchLanguageActive ) );
+			SetSelectedLanguageState( GetLanguageForCulture( ResourcesService.ActiveCulture.Name ) );
 		}
 
-		[ExcludeFromCodeCoverage( Justification = "Delegates to ThemeService.ToggleTheme(Application.Current) which requires a running WPF Application." )]
-		private void ToggleTheme()
+		private void OnThemeServicePropertyChanged( object? pSender, PropertyChangedEventArgs pEventArgs )
 		{
-			ThemeService.ToggleTheme( Application.Current );
+			RaisePropertyChanged( nameof( IsDarkThemeActive ) );
+			RaisePropertyChanged( nameof( IsLightThemeActive ) );
 		}
 
-		private void ToggleLanguage()
+		[ExcludeFromCodeCoverage( Justification = "Delegates to ThemeService.SetTheme(Application.Current) which requires a running WPF Application." )]
+		private void SetTheme( AppTheme pTheme )
 		{
-			SelectedLanguage = SelectedLanguage == AppLanguage.FrenchCanada
-				? AppLanguage.EnglishCanada
-				: AppLanguage.FrenchCanada;
-		}
+			if ( Application.Current is not Application lApplication )
+			{
+				return;
+			}
 
-		private void SetLanguage( AppLanguage pLanguage )
-		{
-			ResourcesService.SetLanguage( pLanguage );
+			ThemeService.SetTheme( lApplication, pTheme );
 		}
 	}
 }

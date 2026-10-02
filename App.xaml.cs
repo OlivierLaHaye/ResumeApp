@@ -13,7 +13,12 @@ namespace ResumeApp;
 [ExcludeFromCodeCoverage( Justification = "WPF Application entry point: OnStartup, Dispatcher, and async initialization require a running WPF Application instance with message loop." )]
 public partial class App
 {
+	private const string StartupLoadingTextResourceKey = "StartupLoadingText";
+	private const string StartupFailureTextResourceKey = "StartupFailureText";
+
 	private ThemeService? mThemeService;
+
+	private ResourcesService? mResourcesService;
 
 	private bool mHasQueuedMainWindowInitialization;
 
@@ -31,17 +36,28 @@ public partial class App
 		} ), DispatcherPriority.ContextIdle );
 	}
 
-	private static async Task<ResourcesService> CreateInitializedResourcesServiceAsync()
+	private static ResourcesService CreateInitializedResourcesService()
 	{
 		var lResourcesService = new ResourcesService();
+		TryRun( lResourcesService.Initialize );
+		return lResourcesService;
+	}
 
-		if ( await TryRunAsync( () => Task.Run( () => lResourcesService.Initialize() ) ) )
+	private static string GetResourceTextOrEmpty( ResourcesService? pResourcesService, string pResourceKey )
+	{
+		if ( pResourcesService is null )
 		{
-			return lResourcesService;
+			return string.Empty;
 		}
 
-		TryRun( () => lResourcesService.Initialize() );
-		return lResourcesService;
+		try
+		{
+			return pResourcesService[ pResourceKey ];
+		}
+		catch ( Exception )
+		{
+			return string.Empty;
+		}
 	}
 
 	private static bool TryCreatePageViewModels(
@@ -94,21 +110,6 @@ public partial class App
 		return false;
 	}
 
-	private static async Task<bool> TryRunAsync( Func<Task> pActionAsync )
-	{
-		try
-		{
-			await pActionAsync();
-			return true;
-		}
-		catch ( Exception )
-		{
-			// ignored
-		}
-
-		return false;
-	}
-
 	private static bool TryCreateValue<T>( Func<T> pFactory, out T pValue )
 	{
 		try
@@ -146,10 +147,12 @@ public partial class App
 		base.OnStartup( pStartupEventArgs );
 
 		InitializeThemeService();
+		mResourcesService = CreateInitializedResourcesService();
 
 		var lMainWindow = new MainWindow();
 		MainWindow = lMainWindow;
 
+		lMainWindow.ShowStartupStatus( GetResourceTextOrEmpty( mResourcesService, StartupLoadingTextResourceKey ) );
 		lMainWindow.ContentRendered += OnMainWindowContentRenderedAsync;
 		lMainWindow.Show();
 	}
@@ -167,12 +170,25 @@ public partial class App
 
 			lMainWindow.ContentRendered -= OnMainWindowContentRenderedAsync;
 
-			await InitializeMainWindowAsync( lMainWindow );
+			if ( !await InitializeMainWindowAsync( lMainWindow ) )
+			{
+				ShowStartupFailure( lMainWindow );
+			}
 		}
 		catch ( Exception )
 		{
-			// ignored
+			ShowStartupFailure( pSender as MainWindow );
 		}
+	}
+
+	private void ShowStartupFailure( MainWindow? pMainWindow )
+	{
+		if ( pMainWindow is null || pMainWindow.DataContext != null )
+		{
+			return;
+		}
+
+		pMainWindow.ShowStartupStatus( GetResourceTextOrEmpty( mResourcesService, StartupFailureTextResourceKey ) );
 	}
 
 	private void InitializeThemeService()
@@ -189,24 +205,25 @@ public partial class App
 		}
 	}
 
-	private async Task InitializeMainWindowAsync( FrameworkElement pMainWindow )
+	private async Task<bool> InitializeMainWindowAsync( FrameworkElement pMainWindow )
 	{
-		if ( mThemeService is not ThemeService lThemeService )
+		if ( mThemeService is not ThemeService lThemeService || mResourcesService is not ResourcesService lResourcesService )
 		{
-			return;
+			return false;
 		}
 
-		ResourcesService lResourcesService = await CreateInitializedResourcesServiceAsync();
+		await Dispatcher.Yield( DispatcherPriority.Background );
 
 		if ( !TryCreatePageViewModels( lResourcesService, lThemeService, out PageViewModels lPageViewModels )
 		     || !TryCreateMainViewModel( lResourcesService, lThemeService, lPageViewModels, out MainViewModel lMainViewModel ) )
 		{
-			return;
+			return false;
 		}
 
 		pMainWindow.DataContext = lMainViewModel;
 
 		QueueBackgroundImagePreload( lPageViewModels.ProjectsPageViewModel, lPageViewModels.PhotographyPageViewModel );
+		return true;
 	}
 
 	private readonly record struct PageViewModels(

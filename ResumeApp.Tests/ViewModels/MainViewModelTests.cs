@@ -81,27 +81,6 @@ public sealed class MainViewModelTests
     }
 
     [Fact]
-    public void IsTopBarCollapsed_DefaultIsFalse()
-    {
-        var lViewModel = Create();
-
-        Assert.False( lViewModel.IsTopBarCollapsed );
-    }
-
-    [Fact]
-    public void IsTopBarCollapsed_SetTrue_RaisesPropertyChanged()
-    {
-        var lViewModel = Create();
-        string? lRaisedPropertyName = null;
-        lViewModel.PropertyChanged += ( _, pArgs ) => lRaisedPropertyName = pArgs.PropertyName;
-
-        lViewModel.IsTopBarCollapsed = true;
-
-        Assert.True( lViewModel.IsTopBarCollapsed );
-        Assert.Equal( "IsTopBarCollapsed", lRaisedPropertyName );
-    }
-
-    [Fact]
     public void SelectedLanguage_Default_IsEnglish()
     {
         var lViewModel = Create();
@@ -136,50 +115,11 @@ public sealed class MainViewModelTests
     }
 
     [StaFact]
-    public void CheckBoxThemeCommand_NotNull()
-    {
-        var lViewModel = Create();
-
-        Assert.NotNull( lViewModel.CheckBoxThemeCommand );
-    }
-
-    [StaFact]
-    public void CheckBoxLanguageCommand_NotNull()
-    {
-        var lViewModel = Create();
-
-        Assert.NotNull( lViewModel.CheckBoxLanguageCommand );
-    }
-
-    [StaFact]
     public void SetLanguageCommand_NotNull()
     {
         var lViewModel = Create();
 
         Assert.NotNull( lViewModel.SetLanguageCommand );
-    }
-
-    [StaFact]
-    public void CheckBoxLanguageCommand_TogglesLanguage()
-    {
-        var lViewModel = Create();
-        Assert.Equal( AppLanguage.EnglishCanada, lViewModel.SelectedLanguage );
-
-        lViewModel.CheckBoxLanguageCommand.Execute( null );
-
-        Assert.Equal( AppLanguage.FrenchCanada, lViewModel.SelectedLanguage );
-    }
-
-    [StaFact]
-    public void CheckBoxLanguageCommand_TogglesBack()
-    {
-        var lViewModel = Create();
-        lViewModel.CheckBoxLanguageCommand.Execute( null );
-        Assert.Equal( AppLanguage.FrenchCanada, lViewModel.SelectedLanguage );
-
-        lViewModel.CheckBoxLanguageCommand.Execute( null );
-
-        Assert.Equal( AppLanguage.EnglishCanada, lViewModel.SelectedLanguage );
     }
 
     [StaFact]
@@ -246,11 +186,8 @@ public sealed class MainViewModelTests
         var lRaisedProperties = new List<string?>();
         lViewModel.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
 
-        // Setting language raises multiple PropertyChanged events including "ActiveCulture"
-        // which should be filtered out by the OnResourcesServicePropertyChanged guard
         lResourcesService.SetLanguage( AppLanguage.FrenchCanada );
 
-        // "ActiveLanguageDisplayName" should appear (from Item[] event) but not duplicated for non-Item[] events
         int lActiveLanguageCount = lRaisedProperties.Count( pName => pName == "ActiveLanguageDisplayName" );
         Assert.Equal( 1, lActiveLanguageCount );
     }
@@ -274,5 +211,91 @@ public sealed class MainViewModelTests
 
         Assert.Equal( AppLanguage.FrenchCanada, lViewModel.SelectedLanguage );
         Assert.True( lViewModel.IsFrenchLanguageActive );
+    }
+
+    [StaFact]
+    public void SetLanguageCommand_SwitchesLanguageStateOnce()
+    {
+        var lViewModel = Create();
+        var lRaisedProperties = new List<string?>();
+        lViewModel.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
+
+        lViewModel.SetLanguageCommand.Execute( AppLanguage.FrenchCanada );
+
+        Assert.Equal( AppLanguage.FrenchCanada, lViewModel.SelectedLanguage );
+        Assert.True( lViewModel.IsFrenchLanguageActive );
+        Assert.False( lViewModel.IsEnglishLanguageActive );
+        Assert.Equal( 1, lRaisedProperties.Count( pName => pName == nameof( MainViewModel.IsFrenchLanguageActive ) ) );
+        Assert.Equal( 1, lRaisedProperties.Count( pName => pName == nameof( MainViewModel.IsEnglishLanguageActive ) ) );
+    }
+
+    [StaFact]
+    public void SetLanguageCommand_SameLanguage_RaisesNothing()
+    {
+        var lViewModel = Create();
+        var lRaisedProperties = new List<string?>();
+        lViewModel.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
+
+        lViewModel.SetLanguageCommand.Execute( AppLanguage.EnglishCanada );
+
+        Assert.Empty( lRaisedProperties );
+        Assert.True( lViewModel.IsEnglishLanguageActive );
+    }
+
+    [StaFact]
+    public void SetLanguageCommand_RoundTrip_RestoresEnglish()
+    {
+        var lViewModel = Create();
+
+        lViewModel.SetLanguageCommand.Execute( AppLanguage.FrenchCanada );
+        lViewModel.SetLanguageCommand.Execute( AppLanguage.EnglishCanada );
+
+        Assert.Equal( "en-CA", lViewModel.ResourcesService.ActiveCulture.Name );
+        Assert.True( lViewModel.IsEnglishLanguageActive );
+        Assert.False( lViewModel.IsFrenchLanguageActive );
+    }
+
+    [Fact]
+    public void ExternalLanguageChange_SynchronizesSelectedLanguage()
+    {
+        var lResourcesService = new ResourcesService();
+        var lViewModel = Create( pResourcesService: lResourcesService );
+
+        lResourcesService.SetLanguage( AppLanguage.FrenchCanada );
+
+        Assert.Equal( AppLanguage.FrenchCanada, lViewModel.SelectedLanguage );
+        Assert.True( lViewModel.IsFrenchLanguageActive );
+        Assert.False( lViewModel.IsEnglishLanguageActive );
+    }
+
+    [StaFact]
+    public void SetThemeCommand_NotNull()
+    {
+        var lViewModel = Create();
+
+        Assert.NotNull( lViewModel.SetThemeCommand );
+    }
+
+    [Fact]
+    public void IsLightThemeActive_DefaultIsTrue()
+    {
+        var lViewModel = Create();
+
+        Assert.True( lViewModel.IsLightThemeActive );
+    }
+
+    [Fact]
+    public void ThemeServicePropertyChanged_RaisesBothThemeStates()
+    {
+        var lThemeService = new ThemeService();
+        var lViewModel = Create( pThemeService: lThemeService );
+        var lRaisedProperties = new List<string?>();
+        lViewModel.PropertyChanged += ( _, pArgs ) => lRaisedProperties.Add( pArgs.PropertyName );
+
+        lThemeService.ActiveTheme = AppTheme.Dark;
+
+        Assert.Contains( nameof( MainViewModel.IsDarkThemeActive ), lRaisedProperties );
+        Assert.Contains( nameof( MainViewModel.IsLightThemeActive ), lRaisedProperties );
+        Assert.False( lViewModel.IsLightThemeActive );
     }
 }
