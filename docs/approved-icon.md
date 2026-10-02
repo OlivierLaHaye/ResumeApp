@@ -16,3 +16,9 @@ The existing application portrait/header resource uses the approved R2 portrait-
 `dotnet build ResumeApp.csproj -c Release -nodeReuse:false` passed. The compiled executable icon payloads match the approved ICO exactly. 0 build warnings/errors.
 
 Desktop/window-launch, hardware, shell-cache and installed-shortcut checks are skipped by explicit desktop constraints. The full UI/production validation ladder is not claimed. The branch has not been pushed, merged or installed. Outputs were inspected in place and removed from this isolated worktree to stay within disk limits; evidence is retained in the task handoff.
+
+## Validation of the branch
+
+`dotnet build ResumeApp.csproj -c Release -nodeReuse:false` passed. The compiled executable icon payloads match the approved ICO exactly. 0 build warnings/errors.
+
+Desktop/window-launch, hardware, shell-cache and installed-shortcut checks are skipped by explicit desktop constraints. The full UI/production validation ladder is not claimed. The branch has not been pushed, merged or installed. Outputs were inspected in place and removed from this isolated worktree to stay within disk limits; evidence is retained in the task handoff.
