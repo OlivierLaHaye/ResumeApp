@@ -503,10 +503,10 @@
     <value>Développé un outil personnel WPF pour accélérer le workflow de retouche photo, utilisé comme terrain de jeu UI (theming, localisation, contrôles interactifs), incluant l’import en batch, le renommage guidé, et des actions rapides orientées productivité.</value>
   </data>
   <data name="HintProjectImageCarouselDragOnly" xml:space="preserve">
-    <value>Glissez vers la gauche ou vers la droite pour changer d’image.</value>
+    <value>Utilisez les flèches ou glissez vers la gauche ou la droite pour changer d’image.</value>
 </data>
   <data name="HintProjectImageCarouselExpandAndDrag" xml:space="preserve">
-    <value>Double-cliquez pour agrandir, ou glissez vers la gauche ou la droite pour changer d’image.</value>
+    <value>Appuyez sur Entrée ou double-cliquez pour agrandir. Utilisez les flèches ou glissez pour changer d’image.</value>
 </data>
   <data name="LabelAccomplishments" xml:space="preserve">
     <value>Réalisations</value>
@@ -851,7 +851,7 @@
     <value>Savoir-faire visuel</value>
   </data>
   <data name="TimelineControlInteractionsHelpText" xml:space="preserve">
-    <value>Cliquez sur la timeline, utilisez la molette pour zoomer, glissez pour déplacer avec inertie, cliquez sur une barre ou n'importe où sur la timeline pour sélectionner une date.</value>
+    <value>Cliquez sur la timeline, utilisez la molette pour zoomer, glissez pour déplacer avec inertie, cliquez sur une barre ou n’importe où sur la timeline pour sélectionner une date. Au clavier, utilisez les flèches, Début et Fin.</value>
   </data>
   <data name="TimelineLabelTodayMarker" xml:space="preserve">
     <value>Aujourd'hui</value>
@@ -864,5 +864,68 @@
   </data>
   <data name="VisualCraftText" xml:space="preserve">
     <value>Photographe professionnel depuis 2010, avec plus de 20 ans d’expérience en retouche photo (depuis 2001). Travailler quotidiennement avec la composition, la lumière, la couleur et le cadrage affûte les mêmes instincts qui comptent en UI : hiérarchie visuelle plus nette, espacement plus délibéré, et un œil formé à reconnaître ce qui paraît intentionnel plutôt qu’accidentel.</value>
+  </data>
+  <data name="LabelLanguage" xml:space="preserve">
+    <value>Langue</value>
+  </data>
+  <data name="LabelTheme" xml:space="preserve">
+    <value>Thème</value>
+  </data>
+  <data name="SegmentThemeLight" xml:space="preserve">
+    <value>Clair</value>
+  </data>
+  <data name="SegmentThemeDark" xml:space="preserve">
+    <value>Sombre</value>
+  </data>
+  <data name="SegmentLanguageEnglishShort" xml:space="preserve">
+    <value>EN</value>
+  </data>
+  <data name="SegmentLanguageFrenchShort" xml:space="preserve">
+    <value>FR</value>
+  </data>
+  <data name="AutomationMainNavigation" xml:space="preserve">
+    <value>Sections du CV</value>
+  </data>
+  <data name="AutomationWindowMinimize" xml:space="preserve">
+    <value>Réduire</value>
+  </data>
+  <data name="AutomationWindowMaximize" xml:space="preserve">
+    <value>Agrandir</value>
+  </data>
+  <data name="AutomationWindowRestore" xml:space="preserve">
+    <value>Restaurer</value>
+  </data>
+  <data name="AutomationWindowClose" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="AutomationCarouselPrevious" xml:space="preserve">
+    <value>Image précédente</value>
+  </data>
+  <data name="AutomationCarouselNext" xml:space="preserve">
+    <value>Image suivante</value>
+  </data>
+  <data name="AutomationCarouselOpen" xml:space="preserve">
+    <value>Agrandir l’image</value>
+  </data>
+  <data name="AutomationCarouselImagePosition" xml:space="preserve">
+    <value>Image {0} sur {1}</value>
+  </data>
+  <data name="AutomationViewerClose" xml:space="preserve">
+    <value>Fermer la visionneuse</value>
+  </data>
+  <data name="LabelProjectNoImagesYet" xml:space="preserve">
+    <value>Aucune image pour l’instant.</value>
+  </data>
+  <data name="LabelImagesLoading" xml:space="preserve">
+    <value>Chargement des images…</value>
+  </data>
+  <data name="LabelImagesLoadFailed" xml:space="preserve">
+    <value>Impossible de charger les images.</value>
+  </data>
+  <data name="StartupLoadingText" xml:space="preserve">
+    <value>Chargement…</value>
+  </data>
+  <data name="StartupFailureText" xml:space="preserve">
+    <value>Le contenu n’a pas pu être chargé. Fermez puis rouvrez l’application.</value>
   </data>
 </root>

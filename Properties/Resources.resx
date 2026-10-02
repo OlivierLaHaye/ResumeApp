@@ -503,10 +503,10 @@
     <value>Built a personal WPF productivity app to accelerate professional photo editing workflows, using it as a UI playground for theming, localization, and interactive controls, including batch import, guided renaming, and productivity-focused quick actions.</value>
   </data>
   <data name="HintProjectImageCarouselDragOnly" xml:space="preserve">
-    <value>Drag left or right to switch images.</value>
+    <value>Use the arrow keys or drag left or right to switch images.</value>
 </data>
   <data name="HintProjectImageCarouselExpandAndDrag" xml:space="preserve">
-    <value>Double-click to expand, or drag left or right to switch images.</value>
+    <value>Press Enter or double-click to enlarge. Use the arrow keys or drag to switch images.</value>
 </data>
   <data name="LabelAccomplishments" xml:space="preserve">
     <value>Accomplishments</value>
@@ -851,7 +851,7 @@
     <value>Visual craft</value>
   </data>
   <data name="TimelineControlInteractionsHelpText" xml:space="preserve">
-    <value>Click the timeline, use the mouse wheel to zoom, drag to pan with inertia, click a bar or anywhere on the timeline to select a date.</value>
+    <value>Click the timeline, use the mouse wheel to zoom, drag to pan with inertia, click a bar or anywhere on the timeline to select a date. With the keyboard, use the arrow keys, Home and End.</value>
   </data>
   <data name="TimelineLabelTodayMarker" xml:space="preserve">
     <value>Today</value>
@@ -864,5 +864,68 @@
   </data>
   <data name="VisualCraftText" xml:space="preserve">
     <value>Professional photographer since 2010, with 20+ years of photo editing experience (since 2001). Working daily with composition, light, colour, and framing sharpens the same instincts that matter in UI: cleaner visual hierarchy, more deliberate spacing, and a trained eye for what feels intentional versus accidental.</value>
+  </data>
+  <data name="LabelLanguage" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="LabelTheme" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="SegmentThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="SegmentThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="SegmentLanguageEnglishShort" xml:space="preserve">
+    <value>EN</value>
+  </data>
+  <data name="SegmentLanguageFrenchShort" xml:space="preserve">
+    <value>FR</value>
+  </data>
+  <data name="AutomationMainNavigation" xml:space="preserve">
+    <value>Resume sections</value>
+  </data>
+  <data name="AutomationWindowMinimize" xml:space="preserve">
+    <value>Minimize</value>
+  </data>
+  <data name="AutomationWindowMaximize" xml:space="preserve">
+    <value>Maximize</value>
+  </data>
+  <data name="AutomationWindowRestore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="AutomationWindowClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="AutomationCarouselPrevious" xml:space="preserve">
+    <value>Previous image</value>
+  </data>
+  <data name="AutomationCarouselNext" xml:space="preserve">
+    <value>Next image</value>
+  </data>
+  <data name="AutomationCarouselOpen" xml:space="preserve">
+    <value>Enlarge image</value>
+  </data>
+  <data name="AutomationCarouselImagePosition" xml:space="preserve">
+    <value>Image {0} of {1}</value>
+  </data>
+  <data name="AutomationViewerClose" xml:space="preserve">
+    <value>Close viewer</value>
+  </data>
+  <data name="LabelProjectNoImagesYet" xml:space="preserve">
+    <value>No images yet.</value>
+  </data>
+  <data name="LabelImagesLoading" xml:space="preserve">
+    <value>Loading images…</value>
+  </data>
+  <data name="LabelImagesLoadFailed" xml:space="preserve">
+    <value>Images could not be loaded.</value>
+  </data>
+  <data name="StartupLoadingText" xml:space="preserve">
+    <value>Loading…</value>
+  </data>
+  <data name="StartupFailureText" xml:space="preserve">
+    <value>The content could not be loaded. Close and reopen the application.</value>
   </data>
 </root>
