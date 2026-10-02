@@ -20,10 +20,6 @@
 
     <ScrollViewer x:Name="mEducationScrollViewer" Style="{StaticResource PageScrollViewerStyle}">
         <Grid x:Name="mEducationContentHostGrid">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MaxWidth="1400" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
             <StackPanel x:Name="mEducationLayoutRoot" HorizontalAlignment="Stretch" Style="{StaticResource PageContentPanelStyle}">
                 <StackPanel x:Name="mEducationHeaderStackPanel" Orientation="Vertical">
                     <TextBlock

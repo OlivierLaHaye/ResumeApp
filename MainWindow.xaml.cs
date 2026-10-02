@@ -56,19 +56,19 @@ public partial class MainWindow
 	private const double InitialNormalSizeRatio = 0.95;
 	private const double MinimumWindowWidth = 960.0;
 	private const double MinimumWindowHeight = 640.0;
-	private const double FallbackFrameThickness = 1.0;
+	private const double FrameThickness = 1.0;
+	private const double NormalFrameCornerRadius = 40.0;
+	private const double NormalChromeCornerRadius = 80.0;
 	private const string SelectedContentHostPartName = "PART_SelectedContentHost";
 
 	private const int WmGetMinMaxInfo = 0x0024;
 	private const int MonitorDefaultToNearest = 2;
-	private const int DwmWindowCornerPreferenceAttribute = 33;
-	private const int DwmWindowCornerPreferenceRound = 2;
 
 	private static readonly TimeSpan sSectionFadeDuration = TimeSpan.FromMilliseconds( 160 );
 
 	private HwndSource? mHwndSource;
+	private WindowChrome? mWindowChrome;
 	private bool mHasAppliedInitialNormalBounds;
-	private bool mHasSystemRoundedCorners;
 
 	public MainWindow()
 	{
@@ -84,8 +84,17 @@ public partial class MainWindow
 		SizeChanged += OnMainWindowSizeChanged;
 		DataContextChanged += OnMainWindowDataContextChanged;
 		mMainTabControl.SelectionChanged += OnMainTabControlSelectionChanged;
+		MotionPolicy.Changed += OnMotionPolicyChanged;
 
 		UpdateShellReadyState();
+	}
+
+	internal static System.Windows.Size ClampMinimumSizeToWorkArea( double pMinimumWidth, double pMinimumHeight, double pWorkAreaWidth, double pWorkAreaHeight )
+	{
+		double lWidth = pWorkAreaWidth > 0.0 ? Math.Min( pMinimumWidth, pWorkAreaWidth ) : pMinimumWidth;
+		double lHeight = pWorkAreaHeight > 0.0 ? Math.Min( pMinimumHeight, pWorkAreaHeight ) : pMinimumHeight;
+
+		return new System.Windows.Size( lWidth, lHeight );
 	}
 
 	internal static ( int Width, int Height ) ClampMinimumTrackSize( int pRequestedWidthPixels, int pRequestedHeightPixels, int pWorkAreaWidthPixels, int pWorkAreaHeightPixels )
@@ -296,27 +305,6 @@ public partial class MainWindow
 	[DllImport( "user32.dll", CharSet = CharSet.Auto )]
 	private static extern bool GetMonitorInfo( IntPtr pMonitorHandle, ref MonitorInfo pMonitorInfo );
 
-	[DllImport( "dwmapi.dll" )]
-	private static extern int DwmSetWindowAttribute( IntPtr pHwnd, int pAttribute, ref int pValue, int pValueSize );
-
-	private static bool TryApplySystemRoundedCorners( IntPtr pHwnd )
-	{
-		if ( pHwnd == IntPtr.Zero )
-		{
-			return false;
-		}
-
-		try
-		{
-			int lPreference = DwmWindowCornerPreferenceRound;
-			return DwmSetWindowAttribute( pHwnd, DwmWindowCornerPreferenceAttribute, ref lPreference, sizeof( int ) ) == 0;
-		}
-		catch ( Exception )
-		{
-			return false;
-		}
-	}
-
 	private static IntPtr WindowProc( IntPtr pHwnd, int pMessage, IntPtr pWParam, IntPtr pLParam, ref bool pIsHandled )
 	{
 		if ( pMessage != WmGetMinMaxInfo )
@@ -338,22 +326,21 @@ public partial class MainWindow
 
 		InitializeWindowChrome();
 		InitializeWindowHooks();
-		mHasSystemRoundedCorners = TryApplySystemRoundedCorners( new WindowInteropHelper( this ).Handle );
 		UpdateWindowChromeForCurrentState();
 	}
 
 	private void InitializeWindowChrome()
 	{
-		var lWindowChrome = new WindowChrome
+		mWindowChrome = new WindowChrome
 		{
 			CaptionHeight = TitleBarHeight,
-			CornerRadius = new CornerRadius( 0 ),
+			CornerRadius = new CornerRadius( NormalChromeCornerRadius ),
 			GlassFrameThickness = new Thickness( 0 ),
 			ResizeBorderThickness = new Thickness( 6 ),
 			UseAeroCaptionButtons = false
 		};
 
-		WindowChrome.SetWindowChrome( this, lWindowChrome );
+		WindowChrome.SetWindowChrome( this, mWindowChrome );
 	}
 
 	private void InitializeWindowHooks()
@@ -420,7 +407,7 @@ public partial class MainWindow
 
 		if ( !MotionPolicy.IsAnimationEnabled )
 		{
-			lContentHost.BeginAnimation( OpacityProperty, null );
+			StopSectionFade();
 			return;
 		}
 
@@ -459,6 +446,10 @@ public partial class MainWindow
 			return;
 		}
 
+		System.Windows.Size lMinimumSize = ClampMinimumSizeToWorkArea( MinimumWindowWidth, MinimumWindowHeight, lWorkAreaRectDip.Width, lWorkAreaRectDip.Height );
+		MinWidth = lMinimumSize.Width;
+		MinHeight = lMinimumSize.Height;
+
 		double lTargetWidth = Math.Floor( lWorkAreaRectDip.Width * InitialNormalSizeRatio );
 		double lTargetHeight = Math.Floor( lWorkAreaRectDip.Height * InitialNormalSizeRatio );
 
@@ -482,8 +473,28 @@ public partial class MainWindow
 		mHasAppliedInitialNormalBounds = true;
 	}
 
+	private void OnMotionPolicyChanged( object? pSender, EventArgs pEventArgs )
+	{
+		if ( MotionPolicy.IsAnimationEnabled )
+		{
+			return;
+		}
+
+		Dispatcher.BeginInvoke( new Action( StopSectionFade ) );
+	}
+
+	private void StopSectionFade()
+	{
+		if ( mMainTabControl.Template?.FindName( SelectedContentHostPartName, mMainTabControl ) is UIElement lContentHost )
+		{
+			lContentHost.BeginAnimation( OpacityProperty, null );
+		}
+	}
+
 	private void OnWindowClosed( object? pSender, EventArgs pEventArgs )
 	{
+		MotionPolicy.Changed -= OnMotionPolicyChanged;
+
 		if ( mHwndSource is not HwndSource lHwndSource )
 		{
 			return;
@@ -500,8 +511,10 @@ public partial class MainWindow
 
 	private void UpdateWindowChromeForCurrentState()
 	{
-		bool lIsFrameVisible = WindowState != WindowState.Maximized && !mHasSystemRoundedCorners;
-		mWindowFrameBorder.BorderThickness = new Thickness( lIsFrameVisible ? FallbackFrameThickness : 0.0 );
+		bool lIsNormal = WindowState != WindowState.Maximized;
+		mWindowChrome?.CornerRadius = new CornerRadius( lIsNormal ? NormalChromeCornerRadius : 0.0 );
+		mWindowFrameBorder.CornerRadius = new CornerRadius( lIsNormal ? NormalFrameCornerRadius : 0.0 );
+		mWindowFrameBorder.BorderThickness = new Thickness( lIsNormal ? FrameThickness : 0.0 );
 	}
 
 	private void OnMinimizeWindowButtonClick( object pSender, RoutedEventArgs pEventArgs )

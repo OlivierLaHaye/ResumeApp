@@ -40,7 +40,7 @@
         <Setter Property="Background" Value="{DynamicResource CommonDarkerGrayBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="CornerRadius" Value="16" />
         <Setter Property="Margin" Value="0,0,0,16" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
@@ -49,7 +49,7 @@
         <Setter Property="Background" Value="{DynamicResource CommonDarkerGrayBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="CornerRadius" Value="16" />
         <Setter Property="Margin" Value="0,0,0,16" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
@@ -63,7 +63,6 @@
 
     <Style x:Key="PageContentPanelStyle" TargetType="{x:Type FrameworkElement}">
         <Setter Property="Margin" Value="32,28,32,40" />
-        <Setter Property="MaxWidth" Value="1320" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
@@ -71,7 +70,7 @@
             </DataTrigger>
             <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Wide">
                 <Setter Property="Margin" Value="40,32,40,48" />
-                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="MaxWidth" Value="1320" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -80,7 +79,7 @@
         <Setter Property="Background" Value="{DynamicResource CommonDarkerGrayBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="CornerRadius" Value="16" />
         <Setter Property="Padding" Value="24,20" />
         <Setter Property="Margin" Value="0,0,0,16" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -106,7 +105,7 @@
                         Margin="-3"
                         BorderBrush="{DynamicResource FocusRingBrush}"
                         BorderThickness="2"
-                        CornerRadius="8"
+                        CornerRadius="17"
                         SnapsToDevicePixels="True" />
                 </ControlTemplate>
             </Setter.Value>
@@ -121,7 +120,7 @@
                         Margin="2"
                         BorderBrush="{DynamicResource FocusRingBrush}"
                         BorderThickness="2"
-                        CornerRadius="4"
+                        CornerRadius="8"
                         SnapsToDevicePixels="True" />
                 </ControlTemplate>
             </Setter.Value>
@@ -132,8 +131,8 @@
         <Setter Property="Padding" Value="2" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
-        <Setter Property="CornerRadius" Value="8" />
-        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="CornerRadius" Value="17" />
+        <Setter Property="Background" Value="{DynamicResource CommonDarkerGrayBrush}" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
@@ -155,7 +154,7 @@
                         x:Name="mSegmentBorder"
                         Padding="{TemplateBinding Padding}"
                         Background="{TemplateBinding Background}"
-                        CornerRadius="6"
+                        CornerRadius="14"
                         SnapsToDevicePixels="True">
                         <TextBlock
                             x:Name="mSegmentTextBlock"
@@ -177,8 +176,8 @@
                 <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
             </Trigger>
             <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource TextOnSelectedBrush}" />
-                <Setter Property="Background" Value="{DynamicResource SurfaceSelectedBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+                <Setter Property="Background" Value="{DynamicResource SurfacePillSelectedBrush}" />
                 <Setter Property="FontWeight" Value="SemiBold" />
             </Trigger>
         </Style.Triggers>
@@ -195,13 +194,25 @@
         <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type TabItem}}}" />
     </Style>
 
+    <Style x:Key="CaptionCapsuleBorderStyle" TargetType="{x:Type Border}">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Padding" Value="4,2,4,4" />
+        <Setter Property="Background" Value="{DynamicResource CommonDarkerGrayBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderStrongBrush}" />
+        <Setter Property="BorderThickness" Value="1,0,1,1" />
+        <Setter Property="CornerRadius" Value="0,0,12,12" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+    </Style>
+
     <Style x:Key="ChromeCaptionButtonStyle" TargetType="{x:Type Button}">
-        <Setter Property="Width" Value="46" />
-        <Setter Property="Height" Value="40" />
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="28" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource InsetFocusRingVisualStyle}" />
@@ -209,7 +220,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Border x:Name="LayoutRoot" Background="{TemplateBinding Background}">
+                    <Border
+                        x:Name="LayoutRoot"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="6">
                         <TextBlock
                             x:Name="mCaptionGlyphTextBlock"
                             Margin="0"
@@ -5384,38 +5398,35 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="12,0" />
-        <Setter Property="MinHeight" Value="44" />
+        <Setter Property="Padding" Value="16,0" />
+        <Setter Property="MinHeight" Value="40" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
-                    <Grid x:Name="mTabItemRootGrid" Background="{TemplateBinding Background}">
+                    <Border
+                        x:Name="mTabItemPillBorder"
+                        MinHeight="{TemplateBinding MinHeight}"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="10"
+                        SnapsToDevicePixels="True">
                         <ContentPresenter
                             x:Name="mTabItemContentPresenter"
-                            Margin="{TemplateBinding Padding}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             ContentSource="Header"
                             RecognizesAccessKey="True" />
-
-                        <Border
-                            x:Name="mTabItemSelectionIndicatorBorder"
-                            Height="2"
-                            Margin="{TemplateBinding Padding}"
-                            VerticalAlignment="Bottom"
-                            Background="{DynamicResource AccentBrush}"
-                            SnapsToDevicePixels="True"
-                            Visibility="Hidden" />
-                    </Grid>
+                    </Border>
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+                            <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
                         </Trigger>
 
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
-                            <Setter TargetName="mTabItemSelectionIndicatorBorder" Property="Visibility" Value="Visible" />
+                            <Setter Property="Background" Value="{DynamicResource SurfacePillSelectedBrush}" />
                         </Trigger>
 
                         <Trigger Property="IsEnabled" Value="False">
@@ -5447,22 +5458,26 @@
                         <Border
                             x:Name="mTabStripBorder"
                             Grid.Row="0"
-                            Padding="{TemplateBinding Padding}"
+                            Margin="20,0,20,8"
+                            Padding="4"
+                            Background="{DynamicResource CommonDarkerGrayBrush}"
                             BorderBrush="{DynamicResource BorderSubtleBrush}"
-                            BorderThickness="0,0,0,1"
+                            BorderThickness="1"
+                            CornerRadius="14"
                             SnapsToDevicePixels="True">
-                            <StackPanel
-                                x:Name="mTabHeaderStackPanel"
+                            <UniformGrid
+                                x:Name="mTabHeaderUniformGrid"
                                 IsItemsHost="True"
                                 KeyboardNavigation.DirectionalNavigation="Cycle"
                                 KeyboardNavigation.TabIndex="1"
                                 KeyboardNavigation.TabNavigation="Once"
-                                Orientation="Horizontal" />
+                                Rows="1" />
                         </Border>
 
                         <ContentPresenter
                             x:Name="PART_SelectedContentHost"
                             Grid.Row="1"
+                            Margin="0,0,6,22"
                             ContentSource="SelectedContent"
                             KeyboardNavigation.TabIndex="2"
                             KeyboardNavigation.TabNavigation="Local" />
@@ -5735,7 +5750,7 @@
     </Style>
 
     <Style x:Key="ContactActionPillButtonStyle" TargetType="{x:Type Button}">
-        <Setter Property="Background" Value="{DynamicResource CommonGrayBrush}" />
+        <Setter Property="Background" Value="{DynamicResource CommonDarkGrayBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderSubtleBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Cursor" Value="{StaticResource HandCursor}" />
@@ -5758,7 +5773,7 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="8"
+                        CornerRadius="18"
                         SnapsToDevicePixels="True">
                         <ContentPresenter
                             HorizontalAlignment="Center"
@@ -5770,7 +5785,7 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+                <Setter Property="Background" Value="{DynamicResource SurfacePillSelectedBrush}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">

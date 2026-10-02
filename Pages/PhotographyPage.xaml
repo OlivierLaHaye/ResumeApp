@@ -12,10 +12,6 @@
 
     <ScrollViewer x:Name="mPhotographyScrollViewer" Style="{StaticResource PageScrollViewerStyle}">
         <Grid x:Name="mPhotographyContentHostGrid">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MaxWidth="1400" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
             <Grid x:Name="mPhotographyLayoutRoot" HorizontalAlignment="Stretch" Style="{StaticResource PageContentPanelStyle}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

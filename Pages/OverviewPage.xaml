@@ -69,10 +69,6 @@
 
     <ScrollViewer x:Name="mOverviewScrollViewer" Style="{StaticResource PageScrollViewerStyle}">
         <Grid x:Name="mOverviewContentHostGrid">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MaxWidth="1400" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
             <StackPanel x:Name="mOverviewLayoutRoot" HorizontalAlignment="Stretch" Style="{StaticResource PageContentPanelStyle}">
 
                 <Border

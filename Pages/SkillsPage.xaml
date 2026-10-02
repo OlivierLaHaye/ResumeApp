@@ -35,7 +35,7 @@
                     <Setter Property="ItemsPanel">
                         <Setter.Value>
                             <ItemsPanelTemplate>
-                                <UniformGrid x:Name="mSkillSectionsWideUniformGrid" Columns="3" />
+                                <UniformGrid x:Name="mSkillSectionsWideUniformGrid" Columns="2" />
                             </ItemsPanelTemplate>
                         </Setter.Value>
                     </Setter>
@@ -46,10 +46,6 @@
 
     <ScrollViewer x:Name="mSkillsScrollViewer" Style="{StaticResource PageScrollViewerStyle}">
         <Grid x:Name="mSkillsContentHostGrid">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MaxWidth="1400" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
             <StackPanel x:Name="mSkillsLayoutRoot" HorizontalAlignment="Stretch" Style="{StaticResource PageContentPanelStyle}">
                 <StackPanel x:Name="mSkillsHeaderStackPanel" Orientation="Vertical">
                     <TextBlock

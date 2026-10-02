@@ -21,6 +21,15 @@
             <Setter Property="VerticalAlignment" Value="Top" />
         </Style>
 
+        <Style x:Key="ProjectFactsPanelStyle" TargetType="{x:Type StackPanel}">
+            <Setter Property="Grid.ColumnSpan" Value="1" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding (attachedProperties:AdaptiveLayout.SizeClass), RelativeSource={RelativeSource Self}}" Value="Compact">
+                    <Setter Property="Grid.ColumnSpan" Value="3" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <Style x:Key="ProjectImagesHostStyle" TargetType="{x:Type Border}">
             <Setter Property="Grid.Row" Value="0" />
             <Setter Property="Grid.Column" Value="2" />
@@ -40,10 +49,6 @@
 
     <ScrollViewer x:Name="mProjectsScrollViewer" Style="{StaticResource PageScrollViewerStyle}">
         <Grid x:Name="mProjectsContentHostGrid">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MaxWidth="1400" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
             <Grid x:Name="mProjectsLayoutRoot" HorizontalAlignment="Stretch" Style="{StaticResource PageContentPanelStyle}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -116,7 +121,8 @@
                                             x:Name="mProjectFactsStackPanel"
                                             Grid.Row="0"
                                             Grid.Column="0"
-                                            Orientation="Vertical">
+                                            Orientation="Vertical"
+                                            Style="{StaticResource ProjectFactsPanelStyle}">
                                             <StackPanel
                                                 x:Name="mProjectContextStackPanel"
                                                 Margin="0,0,0,16"
