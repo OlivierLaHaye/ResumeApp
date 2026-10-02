@@ -57,15 +57,15 @@ namespace ResumeApp.Windows
 
 		private const int NeighbourDecodeDelayMilliseconds = 150;
 		private const double TitleBarHeight = 48.0;
-		private const double FallbackFrameThickness = 1.0;
+		private const double FrameThickness = 1.0;
+		private const double NormalFrameCornerRadius = 40.0;
+		private const double NormalChromeCornerRadius = 80.0;
 		private const double InitialNormalSizeRatio = 0.95;
 		private const double MinimumWindowWidth = 960.0;
 		private const double MinimumWindowHeight = 640.0;
 
 		private const int WmGetMinMaxInfo = 0x0024;
 		private const int MonitorDefaultToNearest = 2;
-		private const int DwmWindowCornerPreferenceAttribute = 33;
-		private const int DwmWindowCornerPreferenceRound = 2;
 
 		public static readonly DependencyProperty sImagesProperty =
 			DependencyProperty.Register(
@@ -92,8 +92,8 @@ namespace ResumeApp.Windows
 		private readonly Dictionary<int, CancellationTokenSource> mPendingDecodesByIndex = [];
 
 		private HwndSource? mHwndSource;
+		private WindowChrome? mWindowChrome;
 		private bool mHasAppliedInitialNormalBounds;
-		private bool mHasSystemRoundedCorners;
 		private bool mIsClosed;
 
 		public ObservableCollection<ImageSource> Images
@@ -431,26 +431,6 @@ namespace ResumeApp.Windows
 		[DllImport( "user32.dll", CharSet = CharSet.Auto )]
 		private static extern bool GetMonitorInfo( IntPtr pMonitorHandle, ref MonitorInfo pMonitorInfo );
 
-		[DllImport( "dwmapi.dll" )]
-		private static extern int DwmSetWindowAttribute( IntPtr pHwnd, int pAttribute, ref int pValue, int pValueSize );
-
-		private static bool TryApplySystemRoundedCorners( IntPtr pHwnd )
-		{
-			if ( pHwnd == IntPtr.Zero )
-			{
-				return false;
-			}
-
-			try
-			{
-				int lPreference = DwmWindowCornerPreferenceRound;
-				return DwmSetWindowAttribute( pHwnd, DwmWindowCornerPreferenceAttribute, ref lPreference, sizeof( int ) ) == 0;
-			}
-			catch ( Exception )
-			{
-				return false;
-			}
-		}
 
 		private static IntPtr WindowProc( IntPtr pHwnd, int pMessage, IntPtr pWParam, IntPtr pLParam, ref bool pIsHandled )
 		{
@@ -483,22 +463,21 @@ namespace ResumeApp.Windows
 
 			InitializeWindowChrome();
 			InitializeWindowHooks();
-			mHasSystemRoundedCorners = TryApplySystemRoundedCorners( new WindowInteropHelper( this ).Handle );
 			UpdateWindowChromeForCurrentState();
 		}
 
 		private void InitializeWindowChrome()
 		{
-			var lWindowChrome = new WindowChrome
+			mWindowChrome = new WindowChrome
 			{
 				CaptionHeight = TitleBarHeight,
-				CornerRadius = new CornerRadius( 0 ),
+				CornerRadius = new CornerRadius( NormalChromeCornerRadius ),
 				GlassFrameThickness = new Thickness( 0 ),
 				ResizeBorderThickness = new Thickness( 6 ),
 				UseAeroCaptionButtons = false
 			};
 
-			WindowChrome.SetWindowChrome( this, lWindowChrome );
+			WindowChrome.SetWindowChrome( this, mWindowChrome );
 		}
 
 		private void InitializeWindowHooks()
@@ -784,8 +763,10 @@ namespace ResumeApp.Windows
 
 		private void UpdateWindowChromeForCurrentState()
 		{
-			bool lIsFrameVisible = WindowState != WindowState.Maximized && !mHasSystemRoundedCorners;
-			mWindowFrameBorder.BorderThickness = new Thickness( lIsFrameVisible ? FallbackFrameThickness : 0.0 );
+			bool lIsNormal = WindowState != WindowState.Maximized;
+			mWindowChrome?.CornerRadius = new CornerRadius( lIsNormal ? NormalChromeCornerRadius : 0.0 );
+			mWindowFrameBorder.CornerRadius = new CornerRadius( lIsNormal ? NormalFrameCornerRadius : 0.0 );
+			mWindowFrameBorder.BorderThickness = new Thickness( lIsNormal ? FrameThickness : 0.0 );
 		}
 
 		private void OnMinimizeWindowButtonClick( object pSender, RoutedEventArgs pEventArgs )

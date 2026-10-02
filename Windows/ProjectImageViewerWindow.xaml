@@ -21,7 +21,7 @@
 
     <Border
         x:Name="mWindowFrameBorder"
-        BorderBrush="{DynamicResource BorderSubtleBrush}"
+        BorderBrush="{DynamicResource BorderStrongBrush}"
         BorderThickness="0"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True">
@@ -48,17 +48,13 @@
                     MouseLeftButtonDown="OnCustomTitleBarDragSurfaceBorderMouseLeftButtonDown"
                     WindowChrome.IsHitTestVisibleInChrome="True" />
 
-                <Border
-                    x:Name="mCaptionButtonsBorder"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    WindowChrome.IsHitTestVisibleInChrome="True">
+                <Border x:Name="mCaptionButtonsCapsuleBorder" Style="{StaticResource CaptionCapsuleBorderStyle}">
 
                     <Grid x:Name="mCaptionButtonsGrid">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="46" />
-                            <ColumnDefinition Width="46" />
-                            <ColumnDefinition Width="46" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <Button
